@@ -3,16 +3,17 @@
 //   sqlc v1.24.0
 // source: query.sql
 
-package database
+package sqlc
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 const createProfile = `-- name: CreateProfile :exec
-INSERT INTO profile (name, last_name, cpf, phone, created_at, updated_at)
+INSERT INTO cardapio.profile (name, last_name, cpf, phone, created_at, updated_at)
 VALUES ($1, $2, $3, $4, NOW(), NOW())
 `
 
@@ -23,9 +24,8 @@ type CreateProfileParams struct {
 	Phone    string `db:"phone" json:"phone"`
 }
 
-// --------------------Profile----------------------------
 func (q *Queries) CreateProfile(ctx context.Context, arg CreateProfileParams) error {
-	_, err := q.db.Exec(ctx, createProfile,
+	_, err := q.exec(ctx, q.createProfileStmt, createProfile,
 		arg.Name,
 		arg.LastName,
 		arg.Cpf,
@@ -35,20 +35,19 @@ func (q *Queries) CreateProfile(ctx context.Context, arg CreateProfileParams) er
 }
 
 const createUser = `-- name: CreateUser :exec
-INSERT INTO users (email, password, role, account_provider, created_at, updated_at)
+INSERT INTO cardapio.users (email, password, role, account_provider, created_at, updated_at)
 VALUES ($1, $2, $3, $4, NOW(), NOW())
 `
 
 type CreateUserParams struct {
-	Email           string          `db:"email" json:"email"`
-	Password        pgtype.Text     `db:"password" json:"password"`
-	Role            NullUserRole    `db:"role" json:"role"`
-	AccountProvider AccountProvider `db:"account_provider" json:"account_provider"`
+	Email           string                  `db:"email" json:"email"`
+	Password        sql.NullString          `db:"password" json:"password"`
+	Role            NullCardapioUserRole    `db:"role" json:"role"`
+	AccountProvider CardapioAccountProvider `db:"account_provider" json:"account_provider"`
 }
 
-// --------------------Users----------------------------
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
-	_, err := q.db.Exec(ctx, createUser,
+	_, err := q.exec(ctx, q.createUserStmt, createUser,
 		arg.Email,
 		arg.Password,
 		arg.Role,
@@ -58,14 +57,14 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 }
 
 const getProfile = `-- name: GetProfile :one
-SELECT id, name, last_name, cpf, phone, created_at, updated_at FROM profile
+SELECT id, name, last_name, cpf, phone, created_at, updated_at FROM cardapio.profile
 WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetProfile(ctx context.Context, id int32) (Profile, error) {
-	row := q.db.QueryRow(ctx, getProfile, id)
-	var i Profile
+func (q *Queries) GetProfile(ctx context.Context, id int32) (CardapioProfile, error) {
+	row := q.queryRow(ctx, q.getProfileStmt, getProfile, id)
+	var i CardapioProfile
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -79,14 +78,14 @@ func (q *Queries) GetProfile(ctx context.Context, id int32) (Profile, error) {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, profile_id, email, password, role, account_provider, created_at, updated_at FROM users
+SELECT id, profile_id, email, password, role, account_provider, created_at, updated_at FROM cardapio.users
 WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
-	row := q.db.QueryRow(ctx, getUser, id)
-	var i User
+func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (CardapioUser, error) {
+	row := q.queryRow(ctx, q.getUserStmt, getUser, id)
+	var i CardapioUser
 	err := row.Scan(
 		&i.ID,
 		&i.ProfileID,
@@ -101,7 +100,7 @@ func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
 }
 
 const updateProfile = `-- name: UpdateProfile :exec
-UPDATE profile
+UPDATE cardapio.profile
 SET 
     name = $2,
     last_name = $3,
@@ -118,7 +117,7 @@ type UpdateProfileParams struct {
 }
 
 func (q *Queries) UpdateProfile(ctx context.Context, arg UpdateProfileParams) error {
-	_, err := q.db.Exec(ctx, updateProfile,
+	_, err := q.exec(ctx, q.updateProfileStmt, updateProfile,
 		arg.ID,
 		arg.Name,
 		arg.LastName,
@@ -128,7 +127,7 @@ func (q *Queries) UpdateProfile(ctx context.Context, arg UpdateProfileParams) er
 }
 
 const updateProfileCpf = `-- name: UpdateProfileCpf :exec
-UPDATE profile
+UPDATE cardapio.profile
 SET 
     cpf = $2,
     updated_at = NOW()
@@ -141,12 +140,12 @@ type UpdateProfileCpfParams struct {
 }
 
 func (q *Queries) UpdateProfileCpf(ctx context.Context, arg UpdateProfileCpfParams) error {
-	_, err := q.db.Exec(ctx, updateProfileCpf, arg.ID, arg.Cpf)
+	_, err := q.exec(ctx, q.updateProfileCpfStmt, updateProfileCpf, arg.ID, arg.Cpf)
 	return err
 }
 
 const updateUser = `-- name: UpdateUser :exec
-UPDATE users
+UPDATE cardapio.users
 SET 
     email = $2,
     role = $3,
@@ -155,18 +154,18 @@ WHERE id = $1
 `
 
 type UpdateUserParams struct {
-	ID    int32        `db:"id" json:"id"`
-	Email string       `db:"email" json:"email"`
-	Role  NullUserRole `db:"role" json:"role"`
+	ID    uuid.UUID            `db:"id" json:"id"`
+	Email string               `db:"email" json:"email"`
+	Role  NullCardapioUserRole `db:"role" json:"role"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.db.Exec(ctx, updateUser, arg.ID, arg.Email, arg.Role)
+	_, err := q.exec(ctx, q.updateUserStmt, updateUser, arg.ID, arg.Email, arg.Role)
 	return err
 }
 
 const updateUserPassword = `-- name: UpdateUserPassword :exec
-UPDATE users
+UPDATE cardapio.users
 SET 
     password = $2,
     updated_at = NOW()
@@ -174,17 +173,17 @@ WHERE id = $1
 `
 
 type UpdateUserPasswordParams struct {
-	ID       int32       `db:"id" json:"id"`
-	Password pgtype.Text `db:"password" json:"password"`
+	ID       uuid.UUID      `db:"id" json:"id"`
+	Password sql.NullString `db:"password" json:"password"`
 }
 
 func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
-	_, err := q.db.Exec(ctx, updateUserPassword, arg.ID, arg.Password)
+	_, err := q.exec(ctx, q.updateUserPasswordStmt, updateUserPassword, arg.ID, arg.Password)
 	return err
 }
 
 const updateUserProfile = `-- name: UpdateUserProfile :exec
-UPDATE users
+UPDATE cardapio.users
 SET 
     profile_id = $2,
     updated_at = NOW()
@@ -192,11 +191,11 @@ WHERE id = $1
 `
 
 type UpdateUserProfileParams struct {
-	ID        int32       `db:"id" json:"id"`
-	ProfileID pgtype.Int4 `db:"profile_id" json:"profile_id"`
+	ID        uuid.UUID     `db:"id" json:"id"`
+	ProfileID sql.NullInt32 `db:"profile_id" json:"profile_id"`
 }
 
 func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) error {
-	_, err := q.db.Exec(ctx, updateUserProfile, arg.ID, arg.ProfileID)
+	_, err := q.exec(ctx, q.updateUserProfileStmt, updateUserProfile, arg.ID, arg.ProfileID)
 	return err
 }

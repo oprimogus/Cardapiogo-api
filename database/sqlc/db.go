@@ -2,31 +2,167 @@
 // versions:
 //   sqlc v1.24.0
 
-package database
+package sqlc
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
+	"database/sql"
+	"fmt"
 )
 
 type DBTX interface {
-	Exec(context.Context, string, ...interface{}) (pgconn.CommandTag, error)
-	Query(context.Context, string, ...interface{}) (pgx.Rows, error)
-	QueryRow(context.Context, string, ...interface{}) pgx.Row
+	ExecContext(context.Context, string, ...interface{}) (sql.Result, error)
+	PrepareContext(context.Context, string) (*sql.Stmt, error)
+	QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
+	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
 }
 
 func New(db DBTX) *Queries {
 	return &Queries{db: db}
 }
 
-type Queries struct {
-	db DBTX
+func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
+	q := Queries{db: db}
+	var err error
+	if q.createProfileStmt, err = db.PrepareContext(ctx, createProfile); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateProfile: %w", err)
+	}
+	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
+	}
+	if q.getProfileStmt, err = db.PrepareContext(ctx, getProfile); err != nil {
+		return nil, fmt.Errorf("error preparing query GetProfile: %w", err)
+	}
+	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
+	}
+	if q.updateProfileStmt, err = db.PrepareContext(ctx, updateProfile); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateProfile: %w", err)
+	}
+	if q.updateProfileCpfStmt, err = db.PrepareContext(ctx, updateProfileCpf); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateProfileCpf: %w", err)
+	}
+	if q.updateUserStmt, err = db.PrepareContext(ctx, updateUser); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUser: %w", err)
+	}
+	if q.updateUserPasswordStmt, err = db.PrepareContext(ctx, updateUserPassword); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserPassword: %w", err)
+	}
+	if q.updateUserProfileStmt, err = db.PrepareContext(ctx, updateUserProfile); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserProfile: %w", err)
+	}
+	return &q, nil
 }
 
-func (q *Queries) WithTx(tx pgx.Tx) *Queries {
+func (q *Queries) Close() error {
+	var err error
+	if q.createProfileStmt != nil {
+		if cerr := q.createProfileStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createProfileStmt: %w", cerr)
+		}
+	}
+	if q.createUserStmt != nil {
+		if cerr := q.createUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
+		}
+	}
+	if q.getProfileStmt != nil {
+		if cerr := q.getProfileStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getProfileStmt: %w", cerr)
+		}
+	}
+	if q.getUserStmt != nil {
+		if cerr := q.getUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserStmt: %w", cerr)
+		}
+	}
+	if q.updateProfileStmt != nil {
+		if cerr := q.updateProfileStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateProfileStmt: %w", cerr)
+		}
+	}
+	if q.updateProfileCpfStmt != nil {
+		if cerr := q.updateProfileCpfStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateProfileCpfStmt: %w", cerr)
+		}
+	}
+	if q.updateUserStmt != nil {
+		if cerr := q.updateUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserStmt: %w", cerr)
+		}
+	}
+	if q.updateUserPasswordStmt != nil {
+		if cerr := q.updateUserPasswordStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserPasswordStmt: %w", cerr)
+		}
+	}
+	if q.updateUserProfileStmt != nil {
+		if cerr := q.updateUserProfileStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserProfileStmt: %w", cerr)
+		}
+	}
+	return err
+}
+
+func (q *Queries) exec(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (sql.Result, error) {
+	switch {
+	case stmt != nil && q.tx != nil:
+		return q.tx.StmtContext(ctx, stmt).ExecContext(ctx, args...)
+	case stmt != nil:
+		return stmt.ExecContext(ctx, args...)
+	default:
+		return q.db.ExecContext(ctx, query, args...)
+	}
+}
+
+func (q *Queries) query(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (*sql.Rows, error) {
+	switch {
+	case stmt != nil && q.tx != nil:
+		return q.tx.StmtContext(ctx, stmt).QueryContext(ctx, args...)
+	case stmt != nil:
+		return stmt.QueryContext(ctx, args...)
+	default:
+		return q.db.QueryContext(ctx, query, args...)
+	}
+}
+
+func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) *sql.Row {
+	switch {
+	case stmt != nil && q.tx != nil:
+		return q.tx.StmtContext(ctx, stmt).QueryRowContext(ctx, args...)
+	case stmt != nil:
+		return stmt.QueryRowContext(ctx, args...)
+	default:
+		return q.db.QueryRowContext(ctx, query, args...)
+	}
+}
+
+type Queries struct {
+	db                     DBTX
+	tx                     *sql.Tx
+	createProfileStmt      *sql.Stmt
+	createUserStmt         *sql.Stmt
+	getProfileStmt         *sql.Stmt
+	getUserStmt            *sql.Stmt
+	updateProfileStmt      *sql.Stmt
+	updateProfileCpfStmt   *sql.Stmt
+	updateUserStmt         *sql.Stmt
+	updateUserPasswordStmt *sql.Stmt
+	updateUserProfileStmt  *sql.Stmt
+}
+
+func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db: tx,
+		db:                     tx,
+		tx:                     tx,
+		createProfileStmt:      q.createProfileStmt,
+		createUserStmt:         q.createUserStmt,
+		getProfileStmt:         q.getProfileStmt,
+		getUserStmt:            q.getUserStmt,
+		updateProfileStmt:      q.updateProfileStmt,
+		updateProfileCpfStmt:   q.updateProfileCpfStmt,
+		updateUserStmt:         q.updateUserStmt,
+		updateUserPasswordStmt: q.updateUserPasswordStmt,
+		updateUserProfileStmt:  q.updateUserProfileStmt,
 	}
 }

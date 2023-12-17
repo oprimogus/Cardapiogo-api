@@ -1,4 +1,4 @@
-package database2
+package database
 
 import (
 	"context"
@@ -96,8 +96,6 @@ func (d PostgresDatabase) migrate() error {
 		return fmt.Errorf("database: could not create migration connection: %w", err)
 	}
 	log.Infof("Executing migrations on path: %s", sourceURL)	
-	log.Error(os.Getenv("DB_NAME"))
-	log.Error("file://"+sourceURL)
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://"+sourceURL,
 		dbName, driver,

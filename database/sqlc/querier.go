@@ -2,19 +2,19 @@
 // versions:
 //   sqlc v1.24.0
 
-package database
+package sqlc
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
-	//--------------------Profile----------------------------
 	CreateProfile(ctx context.Context, arg CreateProfileParams) error
-	//--------------------Users----------------------------
 	CreateUser(ctx context.Context, arg CreateUserParams) error
-	GetProfile(ctx context.Context, id int32) (Profile, error)
-	GetUser(ctx context.Context, id int32) (User, error)
+	GetProfile(ctx context.Context, id int32) (CardapioProfile, error)
+	GetUser(ctx context.Context, id uuid.UUID) (CardapioUser, error)
 	UpdateProfile(ctx context.Context, arg UpdateProfileParams) error
 	UpdateProfileCpf(ctx context.Context, arg UpdateProfileCpfParams) error
 	UpdateUser(ctx context.Context, arg UpdateUserParams) error

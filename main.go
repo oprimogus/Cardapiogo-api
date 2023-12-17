@@ -2,11 +2,10 @@ package main
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
+	"database/sql"
 	"github.com/oprimogus/cardapiogo/config/logger"
-	database "github.com/oprimogus/cardapiogo/database/sqlc"
-	"github.com/oprimogus/cardapiogo/infra/database2"
+	"github.com/oprimogus/cardapiogo/database"
+	"github.com/oprimogus/cardapiogo/database/sqlc"
 	"github.com/subosito/gotenv"
 )
 
@@ -17,23 +16,23 @@ var (
 func main() {
 	_ = gotenv.Load()
 	ctx := context.Background()
-	db := database2.GetInstance()
-	log.Info(&db)
+	db := database.GetInstance()
+	queries := sqlc.New(db.GetDB())
 
-	queries := database.New(db)
 
-	password := pgtype.Text {
+	password := sql.NullString {
 		String: "testeteste123",
 		Valid: true,
 	}
 
-	userParams := database.CreateUserParams {
+	userParams := sqlc.CreateUserParams {
 		Email: "gustavo081900@gmail.com",
 		Password: password,
-		Role: database.NullUserRole{UserRole: database.UserRoleConsumer, Valid:  true},
-		AccountProvider: database.AccountProviderGoogle,
+		Role: sqlc.NullCardapioUserRole{CardapioUserRole: sqlc.CardapioUserRoleConsumer, Valid: true},
+		AccountProvider: sqlc.CardapioAccountProviderGoogle,
 	}
 
-	queries.CreateUser(ctx, userParams)
+	a := queries.CreateUser(ctx, userParams)
+	log.Info(a)
 
 }

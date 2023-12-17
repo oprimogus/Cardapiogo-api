@@ -7,9 +7,9 @@ sql:
     #   managed: true
     gen:
       go:
-        package: "database"
+        package: "sqlc"
         out: "database/sqlc"
-        sql_package: "pgx/v5"
+        sql_package: "database/sql"
         emit_db_tags: true
         emit_prepared_queries: true
         emit_interface: true

@@ -2,370 +2,372 @@
 // versions:
 //   sqlc v1.24.0
 
-package database
+package sqlc
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"fmt"
+	"time"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
-type AccountProvider string
+type CardapioAccountProvider string
 
 const (
-	AccountProviderGoogle AccountProvider = "Google"
-	AccountProviderApple  AccountProvider = "Apple"
-	AccountProviderMeta   AccountProvider = "Meta"
+	CardapioAccountProviderGoogle CardapioAccountProvider = "Google"
+	CardapioAccountProviderApple  CardapioAccountProvider = "Apple"
+	CardapioAccountProviderMeta   CardapioAccountProvider = "Meta"
 )
 
-func (e *AccountProvider) Scan(src interface{}) error {
+func (e *CardapioAccountProvider) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = AccountProvider(s)
+		*e = CardapioAccountProvider(s)
 	case string:
-		*e = AccountProvider(s)
+		*e = CardapioAccountProvider(s)
 	default:
-		return fmt.Errorf("unsupported scan type for AccountProvider: %T", src)
+		return fmt.Errorf("unsupported scan type for CardapioAccountProvider: %T", src)
 	}
 	return nil
 }
 
-type NullAccountProvider struct {
-	AccountProvider AccountProvider `json:"account_provider"`
-	Valid           bool            `json:"valid"` // Valid is true if AccountProvider is not NULL
+type NullCardapioAccountProvider struct {
+	CardapioAccountProvider CardapioAccountProvider `json:"cardapio_account_provider"`
+	Valid                   bool                    `json:"valid"` // Valid is true if CardapioAccountProvider is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullAccountProvider) Scan(value interface{}) error {
+func (ns *NullCardapioAccountProvider) Scan(value interface{}) error {
 	if value == nil {
-		ns.AccountProvider, ns.Valid = "", false
+		ns.CardapioAccountProvider, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.AccountProvider.Scan(value)
+	return ns.CardapioAccountProvider.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullAccountProvider) Value() (driver.Value, error) {
+func (ns NullCardapioAccountProvider) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.AccountProvider), nil
+	return string(ns.CardapioAccountProvider), nil
 }
 
-type CousineTypes string
+type CardapioCousineTypes string
 
 const (
-	CousineTypesITALIANA   CousineTypes = "ITALIANA"
-	CousineTypesFRANCESA   CousineTypes = "FRANCESA"
-	CousineTypesJAPONESA   CousineTypes = "JAPONESA"
-	CousineTypesPORTUGUESA CousineTypes = "PORTUGUESA"
-	CousineTypesMEXICANA   CousineTypes = "MEXICANA"
-	CousineTypesARABE      CousineTypes = "ARABE"
-	CousineTypesBRASILEIRA CousineTypes = "BRASILEIRA"
-	CousineTypesTAILANDESA CousineTypes = "TAILANDESA"
-	CousineTypesDOCES      CousineTypes = "DOCES"
-	CousineTypesSALGADOS   CousineTypes = "SALGADOS"
+	CardapioCousineTypesITALIANA   CardapioCousineTypes = "ITALIANA"
+	CardapioCousineTypesFRANCESA   CardapioCousineTypes = "FRANCESA"
+	CardapioCousineTypesJAPONESA   CardapioCousineTypes = "JAPONESA"
+	CardapioCousineTypesPORTUGUESA CardapioCousineTypes = "PORTUGUESA"
+	CardapioCousineTypesMEXICANA   CardapioCousineTypes = "MEXICANA"
+	CardapioCousineTypesARABE      CardapioCousineTypes = "ARABE"
+	CardapioCousineTypesBRASILEIRA CardapioCousineTypes = "BRASILEIRA"
+	CardapioCousineTypesTAILANDESA CardapioCousineTypes = "TAILANDESA"
+	CardapioCousineTypesDOCES      CardapioCousineTypes = "DOCES"
+	CardapioCousineTypesSALGADOS   CardapioCousineTypes = "SALGADOS"
 )
 
-func (e *CousineTypes) Scan(src interface{}) error {
+func (e *CardapioCousineTypes) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = CousineTypes(s)
+		*e = CardapioCousineTypes(s)
 	case string:
-		*e = CousineTypes(s)
+		*e = CardapioCousineTypes(s)
 	default:
-		return fmt.Errorf("unsupported scan type for CousineTypes: %T", src)
+		return fmt.Errorf("unsupported scan type for CardapioCousineTypes: %T", src)
 	}
 	return nil
 }
 
-type NullCousineTypes struct {
-	CousineTypes CousineTypes `json:"cousine_types"`
-	Valid        bool         `json:"valid"` // Valid is true if CousineTypes is not NULL
+type NullCardapioCousineTypes struct {
+	CardapioCousineTypes CardapioCousineTypes `json:"cardapio_cousine_types"`
+	Valid                bool                 `json:"valid"` // Valid is true if CardapioCousineTypes is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullCousineTypes) Scan(value interface{}) error {
+func (ns *NullCardapioCousineTypes) Scan(value interface{}) error {
 	if value == nil {
-		ns.CousineTypes, ns.Valid = "", false
+		ns.CardapioCousineTypes, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.CousineTypes.Scan(value)
+	return ns.CardapioCousineTypes.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullCousineTypes) Value() (driver.Value, error) {
+func (ns NullCardapioCousineTypes) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.CousineTypes), nil
+	return string(ns.CardapioCousineTypes), nil
 }
 
-type OrderStatus string
+type CardapioOrderStatus string
 
 const (
-	OrderStatusCREATED  OrderStatus = "CREATED"
-	OrderStatusPROGRESS OrderStatus = "PROGRESS"
-	OrderStatusFINISHED OrderStatus = "FINISHED"
-	OrderStatusCANCELED OrderStatus = "CANCELED"
+	CardapioOrderStatusCREATED  CardapioOrderStatus = "CREATED"
+	CardapioOrderStatusPROGRESS CardapioOrderStatus = "PROGRESS"
+	CardapioOrderStatusFINISHED CardapioOrderStatus = "FINISHED"
+	CardapioOrderStatusCANCELED CardapioOrderStatus = "CANCELED"
 )
 
-func (e *OrderStatus) Scan(src interface{}) error {
+func (e *CardapioOrderStatus) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = OrderStatus(s)
+		*e = CardapioOrderStatus(s)
 	case string:
-		*e = OrderStatus(s)
+		*e = CardapioOrderStatus(s)
 	default:
-		return fmt.Errorf("unsupported scan type for OrderStatus: %T", src)
+		return fmt.Errorf("unsupported scan type for CardapioOrderStatus: %T", src)
 	}
 	return nil
 }
 
-type NullOrderStatus struct {
-	OrderStatus OrderStatus `json:"order_status"`
-	Valid       bool        `json:"valid"` // Valid is true if OrderStatus is not NULL
+type NullCardapioOrderStatus struct {
+	CardapioOrderStatus CardapioOrderStatus `json:"cardapio_order_status"`
+	Valid               bool                `json:"valid"` // Valid is true if CardapioOrderStatus is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullOrderStatus) Scan(value interface{}) error {
+func (ns *NullCardapioOrderStatus) Scan(value interface{}) error {
 	if value == nil {
-		ns.OrderStatus, ns.Valid = "", false
+		ns.CardapioOrderStatus, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.OrderStatus.Scan(value)
+	return ns.CardapioOrderStatus.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullOrderStatus) Value() (driver.Value, error) {
+func (ns NullCardapioOrderStatus) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.OrderStatus), nil
+	return string(ns.CardapioOrderStatus), nil
 }
 
-type UserRole string
+type CardapioUserRole string
 
 const (
-	UserRoleConsumer    UserRole = "Consumer"
-	UserRoleOwner       UserRole = "Owner"
-	UserRoleEmployee    UserRole = "Employee"
-	UserRoleDeliveryMan UserRole = "DeliveryMan"
-	UserRoleAdmin       UserRole = "Admin"
+	CardapioUserRoleConsumer    CardapioUserRole = "Consumer"
+	CardapioUserRoleOwner       CardapioUserRole = "Owner"
+	CardapioUserRoleEmployee    CardapioUserRole = "Employee"
+	CardapioUserRoleDeliveryMan CardapioUserRole = "DeliveryMan"
+	CardapioUserRoleAdmin       CardapioUserRole = "Admin"
 )
 
-func (e *UserRole) Scan(src interface{}) error {
+func (e *CardapioUserRole) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = UserRole(s)
+		*e = CardapioUserRole(s)
 	case string:
-		*e = UserRole(s)
+		*e = CardapioUserRole(s)
 	default:
-		return fmt.Errorf("unsupported scan type for UserRole: %T", src)
+		return fmt.Errorf("unsupported scan type for CardapioUserRole: %T", src)
 	}
 	return nil
 }
 
-type NullUserRole struct {
-	UserRole UserRole `json:"user_role"`
-	Valid    bool     `json:"valid"` // Valid is true if UserRole is not NULL
+type NullCardapioUserRole struct {
+	CardapioUserRole CardapioUserRole `json:"cardapio_user_role"`
+	Valid            bool             `json:"valid"` // Valid is true if CardapioUserRole is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullUserRole) Scan(value interface{}) error {
+func (ns *NullCardapioUserRole) Scan(value interface{}) error {
 	if value == nil {
-		ns.UserRole, ns.Valid = "", false
+		ns.CardapioUserRole, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.UserRole.Scan(value)
+	return ns.CardapioUserRole.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullUserRole) Value() (driver.Value, error) {
+func (ns NullCardapioUserRole) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.UserRole), nil
+	return string(ns.CardapioUserRole), nil
 }
 
-type Weekday string
+type CardapioWeekday string
 
 const (
-	WeekdayMONDAY    Weekday = "MONDAY"
-	WeekdayTUESDAY   Weekday = "TUESDAY"
-	WeekdayWEDNESDAY Weekday = "WEDNESDAY"
-	WeekdayTHURSDAY  Weekday = "THURSDAY"
-	WeekdayFRIDAY    Weekday = "FRIDAY"
-	WeekdaySATURDAY  Weekday = "SATURDAY"
-	WeekdaySUNDAY    Weekday = "SUNDAY"
+	CardapioWeekdayMONDAY    CardapioWeekday = "MONDAY"
+	CardapioWeekdayTUESDAY   CardapioWeekday = "TUESDAY"
+	CardapioWeekdayWEDNESDAY CardapioWeekday = "WEDNESDAY"
+	CardapioWeekdayTHURSDAY  CardapioWeekday = "THURSDAY"
+	CardapioWeekdayFRIDAY    CardapioWeekday = "FRIDAY"
+	CardapioWeekdaySATURDAY  CardapioWeekday = "SATURDAY"
+	CardapioWeekdaySUNDAY    CardapioWeekday = "SUNDAY"
 )
 
-func (e *Weekday) Scan(src interface{}) error {
+func (e *CardapioWeekday) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = Weekday(s)
+		*e = CardapioWeekday(s)
 	case string:
-		*e = Weekday(s)
+		*e = CardapioWeekday(s)
 	default:
-		return fmt.Errorf("unsupported scan type for Weekday: %T", src)
+		return fmt.Errorf("unsupported scan type for CardapioWeekday: %T", src)
 	}
 	return nil
 }
 
-type NullWeekday struct {
-	Weekday Weekday `json:"weekday"`
-	Valid   bool    `json:"valid"` // Valid is true if Weekday is not NULL
+type NullCardapioWeekday struct {
+	CardapioWeekday CardapioWeekday `json:"cardapio_weekday"`
+	Valid           bool            `json:"valid"` // Valid is true if CardapioWeekday is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullWeekday) Scan(value interface{}) error {
+func (ns *NullCardapioWeekday) Scan(value interface{}) error {
 	if value == nil {
-		ns.Weekday, ns.Valid = "", false
+		ns.CardapioWeekday, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.Weekday.Scan(value)
+	return ns.CardapioWeekday.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullWeekday) Value() (driver.Value, error) {
+func (ns NullCardapioWeekday) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.Weekday), nil
+	return string(ns.CardapioWeekday), nil
 }
 
-type Address struct {
-	ID         int32              `db:"id" json:"id"`
-	ProfileID  pgtype.Int4        `db:"profile_id" json:"profile_id"`
-	Street     string             `db:"street" json:"street"`
-	Number     string             `db:"number" json:"number"`
-	Complement string             `db:"complement" json:"complement"`
-	District   string             `db:"district" json:"district"`
-	Cep        string             `db:"cep" json:"cep"`
-	City       string             `db:"city" json:"city"`
-	State      string             `db:"state" json:"state"`
-	CreatedAt  pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt  pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+type CardapioAddress struct {
+	ID         int32         `db:"id" json:"id"`
+	ProfileID  sql.NullInt32 `db:"profile_id" json:"profile_id"`
+	Street     string        `db:"street" json:"street"`
+	Number     string        `db:"number" json:"number"`
+	Complement string        `db:"complement" json:"complement"`
+	District   string        `db:"district" json:"district"`
+	Cep        string        `db:"cep" json:"cep"`
+	City       string        `db:"city" json:"city"`
+	State      string        `db:"state" json:"state"`
+	CreatedAt  sql.NullTime  `db:"created_at" json:"created_at"`
+	UpdatedAt  sql.NullTime  `db:"updated_at" json:"updated_at"`
 }
 
-type BusinessHour struct {
-	RestaurantID int32       `db:"restaurant_id" json:"restaurant_id"`
-	Weekday      Weekday     `db:"weekday" json:"weekday"`
-	OpeningTime  pgtype.Time `db:"opening_time" json:"opening_time"`
-	ClosingTime  pgtype.Time `db:"closing_time" json:"closing_time"`
+type CardapioBusinessHour struct {
+	RestaurantID int32           `db:"restaurant_id" json:"restaurant_id"`
+	Weekday      CardapioWeekday `db:"weekday" json:"weekday"`
+	OpeningTime  time.Time       `db:"opening_time" json:"opening_time"`
+	ClosingTime  time.Time       `db:"closing_time" json:"closing_time"`
 }
 
-type CousineType struct {
-	ID   int32        `db:"id" json:"id"`
-	Name CousineTypes `db:"name" json:"name"`
+type CardapioCousineType struct {
+	ID   int32                `db:"id" json:"id"`
+	Name CardapioCousineTypes `db:"name" json:"name"`
 }
 
-type Employee struct {
-	ID        int32              `db:"id" json:"id"`
-	UsersID   pgtype.UUID        `db:"users_id" json:"users_id"`
-	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	DeletedAt pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
+type CardapioEmployee struct {
+	ID        int32         `db:"id" json:"id"`
+	UsersID   uuid.NullUUID `db:"users_id" json:"users_id"`
+	CreatedAt sql.NullTime  `db:"created_at" json:"created_at"`
+	DeletedAt sql.NullTime  `db:"deleted_at" json:"deleted_at"`
 }
 
-type EmployeeRestaurant struct {
-	EmployeeID   pgtype.Int4 `db:"employee_id" json:"employee_id"`
-	RestaurantID pgtype.Int4 `db:"restaurant_id" json:"restaurant_id"`
+type CardapioEmployeeRestaurant struct {
+	EmployeeID   sql.NullInt32 `db:"employee_id" json:"employee_id"`
+	RestaurantID sql.NullInt32 `db:"restaurant_id" json:"restaurant_id"`
 }
 
-type Item struct {
-	ID           int32              `db:"id" json:"id"`
-	RestaurantID int32              `db:"restaurant_id" json:"restaurant_id"`
-	Name         string             `db:"name" json:"name"`
-	Description  string             `db:"description" json:"description"`
-	Img          string             `db:"img" json:"img"`
-	Value        pgtype.Numeric     `db:"value" json:"value"`
-	Score        pgtype.Numeric     `db:"score" json:"score"`
-	CreatedAt    pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt    pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
-	DeletedAt    pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
+type CardapioItem struct {
+	ID           int32        `db:"id" json:"id"`
+	RestaurantID int32        `db:"restaurant_id" json:"restaurant_id"`
+	Name         string       `db:"name" json:"name"`
+	Description  string       `db:"description" json:"description"`
+	Img          string       `db:"img" json:"img"`
+	Value        string       `db:"value" json:"value"`
+	Score        string       `db:"score" json:"score"`
+	CreatedAt    sql.NullTime `db:"created_at" json:"created_at"`
+	UpdatedAt    sql.NullTime `db:"updated_at" json:"updated_at"`
+	DeletedAt    sql.NullTime `db:"deleted_at" json:"deleted_at"`
 }
 
-type Order struct {
-	ID            int32              `db:"id" json:"id"`
-	ProfileID     int32              `db:"profile_id" json:"profile_id"`
-	ShippingValue pgtype.Numeric     `db:"shipping_value" json:"shipping_value"`
-	TotalValue    pgtype.Numeric     `db:"total_value" json:"total_value"`
-	Status        OrderStatus        `db:"status" json:"status"`
-	CreatedAt     pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt     pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
-	DeletedAt     pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
+type CardapioOrder struct {
+	ID            int32               `db:"id" json:"id"`
+	ProfileID     int32               `db:"profile_id" json:"profile_id"`
+	ShippingValue string              `db:"shipping_value" json:"shipping_value"`
+	TotalValue    string              `db:"total_value" json:"total_value"`
+	Status        CardapioOrderStatus `db:"status" json:"status"`
+	CreatedAt     sql.NullTime        `db:"created_at" json:"created_at"`
+	UpdatedAt     sql.NullTime        `db:"updated_at" json:"updated_at"`
+	DeletedAt     sql.NullTime        `db:"deleted_at" json:"deleted_at"`
 }
 
-type OrdersItem struct {
+type CardapioOrderItem struct {
 	OrderID int32 `db:"order_id" json:"order_id"`
 	ItemID  int32 `db:"item_id" json:"item_id"`
 }
 
-type Owner struct {
-	ID           int32              `db:"id" json:"id"`
-	UsersID      pgtype.UUID        `db:"users_id" json:"users_id"`
-	RestaurantID pgtype.Int4        `db:"restaurant_id" json:"restaurant_id"`
-	CreatedAt    pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	DeletedAt    pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
+type CardapioOwner struct {
+	ID           int32         `db:"id" json:"id"`
+	UsersID      uuid.NullUUID `db:"users_id" json:"users_id"`
+	RestaurantID sql.NullInt32 `db:"restaurant_id" json:"restaurant_id"`
+	CreatedAt    sql.NullTime  `db:"created_at" json:"created_at"`
+	DeletedAt    sql.NullTime  `db:"deleted_at" json:"deleted_at"`
 }
 
-type PaymentMethod struct {
+type CardapioPaymentMethod struct {
 	ID          int32  `db:"id" json:"id"`
 	Name        string `db:"name" json:"name"`
 	Description string `db:"description" json:"description"`
 	IsOnline    bool   `db:"isOnline" json:"is_online"`
 }
 
-type Profile struct {
-	ID        int32              `db:"id" json:"id"`
-	Name      string             `db:"name" json:"name"`
-	LastName  string             `db:"last_name" json:"last_name"`
-	Cpf       string             `db:"cpf" json:"cpf"`
-	Phone     string             `db:"phone" json:"phone"`
-	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+type CardapioProfile struct {
+	ID        int32        `db:"id" json:"id"`
+	Name      string       `db:"name" json:"name"`
+	LastName  string       `db:"last_name" json:"last_name"`
+	Cpf       string       `db:"cpf" json:"cpf"`
+	Phone     string       `db:"phone" json:"phone"`
+	CreatedAt sql.NullTime `db:"created_at" json:"created_at"`
+	UpdatedAt sql.NullTime `db:"updated_at" json:"updated_at"`
 }
 
-type ProfileRestaurant struct {
-	UsersID       pgtype.UUID `db:"users_id" json:"users_id"`
-	RestauranteID int32       `db:"restaurante_id" json:"restaurante_id"`
+type CardapioProfileRestaurant struct {
+	ProfileID    int32 `db:"profile_id" json:"profile_id"`
+	RestaurantID int32 `db:"restaurant_id" json:"restaurant_id"`
 }
 
-type Restaurant struct {
-	ID        int32              `db:"id" json:"id"`
-	Name      string             `db:"name" json:"name"`
-	Cnpj      string             `db:"cnpj" json:"cnpj"`
-	Phone     string             `db:"phone" json:"phone"`
-	Score     pgtype.Numeric     `db:"score" json:"score"`
-	AddressID int32              `db:"address_id" json:"address_id"`
-	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
-	DeletedAt pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
+type CardapioRestaurant struct {
+	ID        int32          `db:"id" json:"id"`
+	Name      string         `db:"name" json:"name"`
+	Cnpj      string         `db:"cnpj" json:"cnpj"`
+	Phone     string         `db:"phone" json:"phone"`
+	Score     sql.NullString `db:"score" json:"score"`
+	AddressID int32          `db:"address_id" json:"address_id"`
+	CreatedAt sql.NullTime   `db:"created_at" json:"created_at"`
+	UpdatedAt sql.NullTime   `db:"updated_at" json:"updated_at"`
+	DeletedAt sql.NullTime   `db:"deleted_at" json:"deleted_at"`
 }
 
-type RestaurantsCousineType struct {
+type CardapioRestaurantCousineType struct {
 	RestaurantID  int32 `db:"restaurant_id" json:"restaurant_id"`
 	CousineTypeID int32 `db:"cousine_type_id" json:"cousine_type_id"`
 }
 
-type RestaurantsPaymentMethod struct {
-	PaymentMethodID int32 `db:"paymentMethod_id" json:"paymentmethod_id"`
+type CardapioRestaurantPaymentMethod struct {
+	PaymentMethodID int32 `db:"payment_method_id" json:"payment_method_id"`
 	RestaurantID    int32 `db:"restaurant_id" json:"restaurant_id"`
 }
 
-type User struct {
-	ID              int32              `db:"id" json:"id"`
-	ProfileID       pgtype.Int4        `db:"profile_id" json:"profile_id"`
-	Email           string             `db:"email" json:"email"`
-	Password        pgtype.Text        `db:"password" json:"password"`
-	Role            NullUserRole       `db:"role" json:"role"`
-	AccountProvider AccountProvider    `db:"account_provider" json:"account_provider"`
-	CreatedAt       pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt       pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+type CardapioUser struct {
+	ID              uuid.UUID               `db:"id" json:"id"`
+	ProfileID       sql.NullInt32           `db:"profile_id" json:"profile_id"`
+	Email           string                  `db:"email" json:"email"`
+	Password        sql.NullString          `db:"password" json:"password"`
+	Role            NullCardapioUserRole    `db:"role" json:"role"`
+	AccountProvider CardapioAccountProvider `db:"account_provider" json:"account_provider"`
+	CreatedAt       sql.NullTime            `db:"created_at" json:"created_at"`
+	UpdatedAt       sql.NullTime            `db:"updated_at" json:"updated_at"`
 }

@@ -1,5 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS cardapio;
 
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TYPE cardapio."user_role" AS ENUM (
   'Consumer',
   'Owner',
@@ -45,7 +47,7 @@ CREATE TYPE cardapio."weekday" AS ENUM (
 );
 
 CREATE TABLE cardapio."users" (
-  "id" UUID UNIQUE PRIMARY KEY NOT NULL,
+  "id" UUID DEFAULT uuid_generate_v4() UNIQUE PRIMARY KEY,
   "profile_id" integer,
   "email" varchar UNIQUE NOT NULL,
   "password" varchar(50),
