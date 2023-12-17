@@ -7,14 +7,14 @@ package sqlc
 import (
 	"context"
 
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
 	CreateProfile(ctx context.Context, arg CreateProfileParams) error
 	CreateUser(ctx context.Context, arg CreateUserParams) error
 	GetProfile(ctx context.Context, id int32) (CardapioProfile, error)
-	GetUser(ctx context.Context, id uuid.UUID) (CardapioUser, error)
+	GetUser(ctx context.Context, id pgtype.UUID) (CardapioUser, error)
 	UpdateProfile(ctx context.Context, arg UpdateProfileParams) error
 	UpdateProfileCpf(ctx context.Context, arg UpdateProfileCpfParams) error
 	UpdateUser(ctx context.Context, arg UpdateUserParams) error

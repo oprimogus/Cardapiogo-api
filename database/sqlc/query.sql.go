@@ -7,9 +7,8 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
 
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createProfile = `-- name: CreateProfile :exec
@@ -25,7 +24,7 @@ type CreateProfileParams struct {
 }
 
 func (q *Queries) CreateProfile(ctx context.Context, arg CreateProfileParams) error {
-	_, err := q.exec(ctx, q.createProfileStmt, createProfile,
+	_, err := q.db.Exec(ctx, createProfile,
 		arg.Name,
 		arg.LastName,
 		arg.Cpf,
@@ -41,13 +40,13 @@ VALUES ($1, $2, $3, $4, NOW(), NOW())
 
 type CreateUserParams struct {
 	Email           string                  `db:"email" json:"email"`
-	Password        sql.NullString          `db:"password" json:"password"`
+	Password        pgtype.Text             `db:"password" json:"password"`
 	Role            NullCardapioUserRole    `db:"role" json:"role"`
 	AccountProvider CardapioAccountProvider `db:"account_provider" json:"account_provider"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
-	_, err := q.exec(ctx, q.createUserStmt, createUser,
+	_, err := q.db.Exec(ctx, createUser,
 		arg.Email,
 		arg.Password,
 		arg.Role,
@@ -63,7 +62,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetProfile(ctx context.Context, id int32) (CardapioProfile, error) {
-	row := q.queryRow(ctx, q.getProfileStmt, getProfile, id)
+	row := q.db.QueryRow(ctx, getProfile, id)
 	var i CardapioProfile
 	err := row.Scan(
 		&i.ID,
@@ -83,8 +82,8 @@ WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (CardapioUser, error) {
-	row := q.queryRow(ctx, q.getUserStmt, getUser, id)
+func (q *Queries) GetUser(ctx context.Context, id pgtype.UUID) (CardapioUser, error) {
+	row := q.db.QueryRow(ctx, getUser, id)
 	var i CardapioUser
 	err := row.Scan(
 		&i.ID,
@@ -117,7 +116,7 @@ type UpdateProfileParams struct {
 }
 
 func (q *Queries) UpdateProfile(ctx context.Context, arg UpdateProfileParams) error {
-	_, err := q.exec(ctx, q.updateProfileStmt, updateProfile,
+	_, err := q.db.Exec(ctx, updateProfile,
 		arg.ID,
 		arg.Name,
 		arg.LastName,
@@ -140,7 +139,7 @@ type UpdateProfileCpfParams struct {
 }
 
 func (q *Queries) UpdateProfileCpf(ctx context.Context, arg UpdateProfileCpfParams) error {
-	_, err := q.exec(ctx, q.updateProfileCpfStmt, updateProfileCpf, arg.ID, arg.Cpf)
+	_, err := q.db.Exec(ctx, updateProfileCpf, arg.ID, arg.Cpf)
 	return err
 }
 
@@ -154,13 +153,13 @@ WHERE id = $1
 `
 
 type UpdateUserParams struct {
-	ID    uuid.UUID            `db:"id" json:"id"`
+	ID    pgtype.UUID          `db:"id" json:"id"`
 	Email string               `db:"email" json:"email"`
 	Role  NullCardapioUserRole `db:"role" json:"role"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.exec(ctx, q.updateUserStmt, updateUser, arg.ID, arg.Email, arg.Role)
+	_, err := q.db.Exec(ctx, updateUser, arg.ID, arg.Email, arg.Role)
 	return err
 }
 
@@ -173,12 +172,12 @@ WHERE id = $1
 `
 
 type UpdateUserPasswordParams struct {
-	ID       uuid.UUID      `db:"id" json:"id"`
-	Password sql.NullString `db:"password" json:"password"`
+	ID       pgtype.UUID `db:"id" json:"id"`
+	Password pgtype.Text `db:"password" json:"password"`
 }
 
 func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
-	_, err := q.exec(ctx, q.updateUserPasswordStmt, updateUserPassword, arg.ID, arg.Password)
+	_, err := q.db.Exec(ctx, updateUserPassword, arg.ID, arg.Password)
 	return err
 }
 
@@ -191,11 +190,11 @@ WHERE id = $1
 `
 
 type UpdateUserProfileParams struct {
-	ID        uuid.UUID     `db:"id" json:"id"`
-	ProfileID sql.NullInt32 `db:"profile_id" json:"profile_id"`
+	ID        pgtype.UUID `db:"id" json:"id"`
+	ProfileID pgtype.Int4 `db:"profile_id" json:"profile_id"`
 }
 
 func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) error {
-	_, err := q.exec(ctx, q.updateUserProfileStmt, updateUserProfile, arg.ID, arg.ProfileID)
+	_, err := q.db.Exec(ctx, updateUserProfile, arg.ID, arg.ProfileID)
 	return err
 }

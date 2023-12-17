@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"database/sql"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/oprimogus/cardapiogo/config/logger"
 	"github.com/oprimogus/cardapiogo/database"
 	"github.com/oprimogus/cardapiogo/database/sqlc"
@@ -20,7 +20,7 @@ func main() {
 	queries := sqlc.New(db.GetDB())
 
 
-	password := sql.NullString {
+	password := pgtype.Text {
 		String: "testeteste123",
 		Valid: true,
 	}

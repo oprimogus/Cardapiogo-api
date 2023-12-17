@@ -5,12 +5,10 @@
 package sqlc
 
 import (
-	"database/sql"
 	"database/sql/driver"
 	"fmt"
-	"time"
 
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type CardapioAccountProvider string
@@ -243,24 +241,24 @@ func (ns NullCardapioWeekday) Value() (driver.Value, error) {
 }
 
 type CardapioAddress struct {
-	ID         int32         `db:"id" json:"id"`
-	ProfileID  sql.NullInt32 `db:"profile_id" json:"profile_id"`
-	Street     string        `db:"street" json:"street"`
-	Number     string        `db:"number" json:"number"`
-	Complement string        `db:"complement" json:"complement"`
-	District   string        `db:"district" json:"district"`
-	Cep        string        `db:"cep" json:"cep"`
-	City       string        `db:"city" json:"city"`
-	State      string        `db:"state" json:"state"`
-	CreatedAt  sql.NullTime  `db:"created_at" json:"created_at"`
-	UpdatedAt  sql.NullTime  `db:"updated_at" json:"updated_at"`
+	ID         int32              `db:"id" json:"id"`
+	ProfileID  pgtype.Int4        `db:"profile_id" json:"profile_id"`
+	Street     string             `db:"street" json:"street"`
+	Number     string             `db:"number" json:"number"`
+	Complement string             `db:"complement" json:"complement"`
+	District   string             `db:"district" json:"district"`
+	Cep        string             `db:"cep" json:"cep"`
+	City       string             `db:"city" json:"city"`
+	State      string             `db:"state" json:"state"`
+	CreatedAt  pgtype.Timestamptz `db:"created_at" json:"created_at"`
+	UpdatedAt  pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
 }
 
 type CardapioBusinessHour struct {
 	RestaurantID int32           `db:"restaurant_id" json:"restaurant_id"`
 	Weekday      CardapioWeekday `db:"weekday" json:"weekday"`
-	OpeningTime  time.Time       `db:"opening_time" json:"opening_time"`
-	ClosingTime  time.Time       `db:"closing_time" json:"closing_time"`
+	OpeningTime  pgtype.Time     `db:"opening_time" json:"opening_time"`
+	ClosingTime  pgtype.Time     `db:"closing_time" json:"closing_time"`
 }
 
 type CardapioCousineType struct {
@@ -269,39 +267,39 @@ type CardapioCousineType struct {
 }
 
 type CardapioEmployee struct {
-	ID        int32         `db:"id" json:"id"`
-	UsersID   uuid.NullUUID `db:"users_id" json:"users_id"`
-	CreatedAt sql.NullTime  `db:"created_at" json:"created_at"`
-	DeletedAt sql.NullTime  `db:"deleted_at" json:"deleted_at"`
+	ID        int32              `db:"id" json:"id"`
+	UsersID   pgtype.UUID        `db:"users_id" json:"users_id"`
+	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
+	DeletedAt pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
 }
 
 type CardapioEmployeeRestaurant struct {
-	EmployeeID   sql.NullInt32 `db:"employee_id" json:"employee_id"`
-	RestaurantID sql.NullInt32 `db:"restaurant_id" json:"restaurant_id"`
+	EmployeeID   pgtype.Int4 `db:"employee_id" json:"employee_id"`
+	RestaurantID pgtype.Int4 `db:"restaurant_id" json:"restaurant_id"`
 }
 
 type CardapioItem struct {
-	ID           int32        `db:"id" json:"id"`
-	RestaurantID int32        `db:"restaurant_id" json:"restaurant_id"`
-	Name         string       `db:"name" json:"name"`
-	Description  string       `db:"description" json:"description"`
-	Img          string       `db:"img" json:"img"`
-	Value        string       `db:"value" json:"value"`
-	Score        string       `db:"score" json:"score"`
-	CreatedAt    sql.NullTime `db:"created_at" json:"created_at"`
-	UpdatedAt    sql.NullTime `db:"updated_at" json:"updated_at"`
-	DeletedAt    sql.NullTime `db:"deleted_at" json:"deleted_at"`
+	ID           int32              `db:"id" json:"id"`
+	RestaurantID int32              `db:"restaurant_id" json:"restaurant_id"`
+	Name         string             `db:"name" json:"name"`
+	Description  string             `db:"description" json:"description"`
+	Img          string             `db:"img" json:"img"`
+	Value        pgtype.Numeric     `db:"value" json:"value"`
+	Score        pgtype.Numeric     `db:"score" json:"score"`
+	CreatedAt    pgtype.Timestamptz `db:"created_at" json:"created_at"`
+	UpdatedAt    pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+	DeletedAt    pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
 }
 
 type CardapioOrder struct {
 	ID            int32               `db:"id" json:"id"`
 	ProfileID     int32               `db:"profile_id" json:"profile_id"`
-	ShippingValue string              `db:"shipping_value" json:"shipping_value"`
-	TotalValue    string              `db:"total_value" json:"total_value"`
+	ShippingValue pgtype.Numeric      `db:"shipping_value" json:"shipping_value"`
+	TotalValue    pgtype.Numeric      `db:"total_value" json:"total_value"`
 	Status        CardapioOrderStatus `db:"status" json:"status"`
-	CreatedAt     sql.NullTime        `db:"created_at" json:"created_at"`
-	UpdatedAt     sql.NullTime        `db:"updated_at" json:"updated_at"`
-	DeletedAt     sql.NullTime        `db:"deleted_at" json:"deleted_at"`
+	CreatedAt     pgtype.Timestamptz  `db:"created_at" json:"created_at"`
+	UpdatedAt     pgtype.Timestamptz  `db:"updated_at" json:"updated_at"`
+	DeletedAt     pgtype.Timestamptz  `db:"deleted_at" json:"deleted_at"`
 }
 
 type CardapioOrderItem struct {
@@ -310,11 +308,11 @@ type CardapioOrderItem struct {
 }
 
 type CardapioOwner struct {
-	ID           int32         `db:"id" json:"id"`
-	UsersID      uuid.NullUUID `db:"users_id" json:"users_id"`
-	RestaurantID sql.NullInt32 `db:"restaurant_id" json:"restaurant_id"`
-	CreatedAt    sql.NullTime  `db:"created_at" json:"created_at"`
-	DeletedAt    sql.NullTime  `db:"deleted_at" json:"deleted_at"`
+	ID           int32              `db:"id" json:"id"`
+	UsersID      pgtype.UUID        `db:"users_id" json:"users_id"`
+	RestaurantID pgtype.Int4        `db:"restaurant_id" json:"restaurant_id"`
+	CreatedAt    pgtype.Timestamptz `db:"created_at" json:"created_at"`
+	DeletedAt    pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
 }
 
 type CardapioPaymentMethod struct {
@@ -325,13 +323,13 @@ type CardapioPaymentMethod struct {
 }
 
 type CardapioProfile struct {
-	ID        int32        `db:"id" json:"id"`
-	Name      string       `db:"name" json:"name"`
-	LastName  string       `db:"last_name" json:"last_name"`
-	Cpf       string       `db:"cpf" json:"cpf"`
-	Phone     string       `db:"phone" json:"phone"`
-	CreatedAt sql.NullTime `db:"created_at" json:"created_at"`
-	UpdatedAt sql.NullTime `db:"updated_at" json:"updated_at"`
+	ID        int32              `db:"id" json:"id"`
+	Name      string             `db:"name" json:"name"`
+	LastName  string             `db:"last_name" json:"last_name"`
+	Cpf       string             `db:"cpf" json:"cpf"`
+	Phone     string             `db:"phone" json:"phone"`
+	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
 }
 
 type CardapioProfileRestaurant struct {
@@ -340,15 +338,15 @@ type CardapioProfileRestaurant struct {
 }
 
 type CardapioRestaurant struct {
-	ID        int32          `db:"id" json:"id"`
-	Name      string         `db:"name" json:"name"`
-	Cnpj      string         `db:"cnpj" json:"cnpj"`
-	Phone     string         `db:"phone" json:"phone"`
-	Score     sql.NullString `db:"score" json:"score"`
-	AddressID int32          `db:"address_id" json:"address_id"`
-	CreatedAt sql.NullTime   `db:"created_at" json:"created_at"`
-	UpdatedAt sql.NullTime   `db:"updated_at" json:"updated_at"`
-	DeletedAt sql.NullTime   `db:"deleted_at" json:"deleted_at"`
+	ID        int32              `db:"id" json:"id"`
+	Name      string             `db:"name" json:"name"`
+	Cnpj      string             `db:"cnpj" json:"cnpj"`
+	Phone     string             `db:"phone" json:"phone"`
+	Score     pgtype.Numeric     `db:"score" json:"score"`
+	AddressID int32              `db:"address_id" json:"address_id"`
+	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+	DeletedAt pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
 }
 
 type CardapioRestaurantCousineType struct {
@@ -362,12 +360,12 @@ type CardapioRestaurantPaymentMethod struct {
 }
 
 type CardapioUser struct {
-	ID              uuid.UUID               `db:"id" json:"id"`
-	ProfileID       sql.NullInt32           `db:"profile_id" json:"profile_id"`
+	ID              pgtype.UUID             `db:"id" json:"id"`
+	ProfileID       pgtype.Int4             `db:"profile_id" json:"profile_id"`
 	Email           string                  `db:"email" json:"email"`
-	Password        sql.NullString          `db:"password" json:"password"`
+	Password        pgtype.Text             `db:"password" json:"password"`
 	Role            NullCardapioUserRole    `db:"role" json:"role"`
 	AccountProvider CardapioAccountProvider `db:"account_provider" json:"account_provider"`
-	CreatedAt       sql.NullTime            `db:"created_at" json:"created_at"`
-	UpdatedAt       sql.NullTime            `db:"updated_at" json:"updated_at"`
+	CreatedAt       pgtype.Timestamptz      `db:"created_at" json:"created_at"`
+	UpdatedAt       pgtype.Timestamptz      `db:"updated_at" json:"updated_at"`
 }

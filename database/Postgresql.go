@@ -4,12 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
+
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
-	// Necessary
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jackc/pgx/v5/pgxpool"
+	_ "github.com/lib/pq"
 	"github.com/oprimogus/cardapiogo/config/logger"
-	"os"
 )
 
 var (
@@ -19,7 +21,8 @@ var (
 
 // PostgresDatabase struct
 type PostgresDatabase struct {
-	db *sql.DB
+	pool *pgxpool.Pool
+	sqlDB *sql.DB
 }
 
 // GetInstance of PostgresDatabase
@@ -30,40 +33,31 @@ func GetInstance() *PostgresDatabase {
 	return instance
 }
 
-// func NewInstance() *PostgresDatabase {
-// 	return createInstance()
-// }
-
 func createInstance() *PostgresDatabase {
-	var err error
 	database := &PostgresDatabase{}
 	strConnection := database.createStringConn()
-	database.db, err = database.getConnection(strConnection)
+
+	// Open connection with pgx
+	var err error
+	database.pool, err = database.getPgxConnection(strConnection)
 	if err != nil {
 		log.Error(err)
 		panic(err)
 	}
+
+	// Open connection with database/sql for migration
+	database.sqlDB, err = database.getSQLDBConnection(strConnection)
+	if err != nil {
+		log.Error(err)
+		panic(err)
+	}
+
 	err = database.migrate()
 	if err != nil {
 		log.Error(err)
 		panic(err)
 	}
 	return database
-}
-
-// Many return many of rows
-func (d PostgresDatabase) Many(ctx context.Context, query string, params ...interface{}) (*sql.Rows, error) {
-	return d.db.QueryContext(ctx, query, params...)
-}
-
-// One return one row
-func (d PostgresDatabase) One(ctx context.Context, query string, params ...interface{}) *sql.Row {
-	return d.db.QueryRowContext(ctx, query, params...)
-}
-
-// Exec SQL function
-func (d PostgresDatabase) Exec(ctx context.Context, query string, params ...interface{}) (sql.Result, error) {
-	return d.db.ExecContext(ctx, query, params...)
 }
 
 func (d PostgresDatabase) createStringConn() string {
@@ -75,34 +69,40 @@ func (d PostgresDatabase) createStringConn() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
 }
 
-func (d PostgresDatabase) getConnection(connStr string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", connStr)
+func (d PostgresDatabase) getPgxConnection(connStr string) (*pgxpool.Pool, error) {
+	pool, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
-		return nil, fmt.Errorf("database: could not open connection: %w", err)
+		return nil, fmt.Errorf("database: could not open pgx connection: %w", err)
 	}
-	err = db.Ping()
+	return pool, nil
+}
+
+func (d PostgresDatabase) getSQLDBConnection(connStr string) (*sql.DB, error) {
+	sqlDB, err := sql.Open("postgres", connStr)
 	if err != nil {
-		return nil, fmt.Errorf("database: could not establish connection: %w", err)
+		return nil, fmt.Errorf("database: could not open sql connection: %w", err)
 	}
-	return db, nil
+	return sqlDB, nil
 }
 
 func (d PostgresDatabase) migrate() error {
 	sourceURL := os.Getenv("MIGRATION_SOURCE_URL")
 	dbName := os.Getenv("DB_NAME")
 	log.Info("starting migration execution")
-	driver, err := postgres.WithInstance(d.db, &postgres.Config{})
+
+	driver, err := postgres.WithInstance(d.sqlDB, &postgres.Config{})
 	if err != nil {
-		return fmt.Errorf("database: could not create migration connection: %w", err)
+		return fmt.Errorf("database: could not create migration driver: %w", err)
 	}
-	log.Infof("Executing migrations on path: %s", sourceURL)	
+
+	log.Infof("Executing migrations on path: %s", sourceURL)
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://"+sourceURL,
 		dbName, driver,
 	)
 	if m != nil {
 		err = m.Up()
-		if err != nil && err.Error() != "no change" {
+		if err != nil && err != migrate.ErrNoChange {
 			return fmt.Errorf("database: error when executing database migration: %w", err)
 		}
 	}
@@ -110,15 +110,15 @@ func (d PostgresDatabase) migrate() error {
 	return nil
 }
 
-// GetDB return a sql.DB pointer
-func (d PostgresDatabase) GetDB() *sql.DB {
-	return d.db
+// GetDB return a pgxpool.Pool pointer
+func (d PostgresDatabase) GetDB() *pgxpool.Pool {
+	return d.pool
 }
 
 // Close connection with database
 func (d PostgresDatabase) Close() {
-	err := d.db.Close()
-	if err != nil {
-		log.Error(err)
+	d.pool.Close()
+	if d.sqlDB != nil {
+		d.sqlDB.Close()
 	}
 }

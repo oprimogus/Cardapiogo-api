@@ -38,43 +38,43 @@ func GetLogger(p string) *Logger {
 // Create Non-Formatted Logs
 
 // Debug : Create Non-Formatted Logs for debug
-func (l *Logger) Debug(v ...interface{}) {
+func (l *Logger) debug(v ...interface{}) {
     l.entry.Debug(v...)
 }
 
 // Info : Create Non-Formatted Logs for info
-func (l *Logger) Info(v ...interface{}) {
+func (l *Logger) info(v ...interface{}) {
     l.entry.Info(v...)
 }
 
 // Warning : Create Non-Formatted Logs for warning
-func (l *Logger) Warning(v ...interface{}) {
+func (l *Logger) warning(v ...interface{}) {
     l.entry.Warn(v...)
 }
 
 // Error : Create Non-Formatted Logs for error
-func (l *Logger) Error(v ...interface{}) {
+func (l *Logger) error(v ...interface{}) {
     l.entry.Error(v...)
 }
 
 // Métodos para criar logs formatados
 
 // Debugf : Create Formatted Logs for debug
-func (l *Logger) Debugf(format string, v ...interface{}) {
+func (l *Logger) debugf(format string, v ...interface{}) {
     l.entry.Debugf(format, v...)
 }
 
 // Infof : Create Formatted Logs for info
-func (l *Logger) Infof(format string, v ...interface{}) {
+func (l *Logger) infof(format string, v ...interface{}) {
     l.entry.Infof(format, v...)
 }
 
 // Warningf : Create Formatted Logs for warning
-func (l *Logger) Warningf(format string, v ...interface{}) {
+func (l *Logger) warningf(format string, v ...interface{}) {
     l.entry.Warnf(format, v...)
 }
 
 // Errorf : Create Formatted Logs for error
-func (l *Logger) Errorf(format string, v ...interface{}) {
+func (l *Logger) errorf(format string, v ...interface{}) {
     l.entry.Errorf(format, v...)
 }
