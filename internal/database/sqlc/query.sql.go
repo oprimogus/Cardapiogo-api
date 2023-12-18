@@ -12,7 +12,7 @@ import (
 )
 
 const createProfile = `-- name: CreateProfile :exec
-INSERT INTO cardapio.profile (name, last_name, cpf, phone, created_at, updated_at)
+INSERT INTO profile (name, last_name, cpf, phone, created_at, updated_at)
 VALUES ($1, $2, $3, $4, NOW(), NOW())
 `
 
@@ -34,15 +34,15 @@ func (q *Queries) CreateProfile(ctx context.Context, arg CreateProfileParams) er
 }
 
 const createUser = `-- name: CreateUser :exec
-INSERT INTO cardapio.users (email, password, role, account_provider, created_at, updated_at)
+INSERT INTO users (email, password, role, account_provider, created_at, updated_at)
 VALUES ($1, $2, $3, $4, NOW(), NOW())
 `
 
 type CreateUserParams struct {
-	Email           string                  `db:"email" json:"email"`
-	Password        pgtype.Text             `db:"password" json:"password"`
-	Role            NullCardapioUserRole    `db:"role" json:"role"`
-	AccountProvider CardapioAccountProvider `db:"account_provider" json:"account_provider"`
+	Email           string          `db:"email" json:"email"`
+	Password        pgtype.Text     `db:"password" json:"password"`
+	Role            UserRole        `db:"role" json:"role"`
+	AccountProvider AccountProvider `db:"account_provider" json:"account_provider"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
@@ -56,14 +56,14 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 }
 
 const getProfile = `-- name: GetProfile :one
-SELECT id, name, last_name, cpf, phone, created_at, updated_at FROM cardapio.profile
+SELECT id, name, last_name, cpf, phone, created_at, updated_at FROM profile
 WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetProfile(ctx context.Context, id int32) (CardapioProfile, error) {
+func (q *Queries) GetProfile(ctx context.Context, id int32) (Profile, error) {
 	row := q.db.QueryRow(ctx, getProfile, id)
-	var i CardapioProfile
+	var i Profile
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -77,14 +77,14 @@ func (q *Queries) GetProfile(ctx context.Context, id int32) (CardapioProfile, er
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, profile_id, email, password, role, account_provider, created_at, updated_at FROM cardapio.users
+SELECT id, profile_id, email, password, role, account_provider, created_at, updated_at FROM users
 WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id pgtype.UUID) (CardapioUser, error) {
+func (q *Queries) GetUser(ctx context.Context, id pgtype.UUID) (Users, error) {
 	row := q.db.QueryRow(ctx, getUser, id)
-	var i CardapioUser
+	var i Users
 	err := row.Scan(
 		&i.ID,
 		&i.ProfileID,
@@ -99,7 +99,7 @@ func (q *Queries) GetUser(ctx context.Context, id pgtype.UUID) (CardapioUser, er
 }
 
 const updateProfile = `-- name: UpdateProfile :exec
-UPDATE cardapio.profile
+UPDATE profile
 SET 
     name = $2,
     last_name = $3,
@@ -126,7 +126,7 @@ func (q *Queries) UpdateProfile(ctx context.Context, arg UpdateProfileParams) er
 }
 
 const updateProfileCpf = `-- name: UpdateProfileCpf :exec
-UPDATE cardapio.profile
+UPDATE profile
 SET 
     cpf = $2,
     updated_at = NOW()
@@ -144,7 +144,7 @@ func (q *Queries) UpdateProfileCpf(ctx context.Context, arg UpdateProfileCpfPara
 }
 
 const updateUser = `-- name: UpdateUser :exec
-UPDATE cardapio.users
+UPDATE users
 SET 
     email = $2,
     role = $3,
@@ -153,9 +153,9 @@ WHERE id = $1
 `
 
 type UpdateUserParams struct {
-	ID    pgtype.UUID          `db:"id" json:"id"`
-	Email string               `db:"email" json:"email"`
-	Role  NullCardapioUserRole `db:"role" json:"role"`
+	ID    pgtype.UUID `db:"id" json:"id"`
+	Email string      `db:"email" json:"email"`
+	Role  UserRole    `db:"role" json:"role"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
@@ -164,7 +164,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 }
 
 const updateUserPassword = `-- name: UpdateUserPassword :exec
-UPDATE cardapio.users
+UPDATE users
 SET 
     password = $2,
     updated_at = NOW()
@@ -182,7 +182,7 @@ func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPassword
 }
 
 const updateUserProfile = `-- name: UpdateUserProfile :exec
-UPDATE cardapio.users
+UPDATE users
 SET 
     profile_id = $2,
     updated_at = NOW()

@@ -11,7 +11,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
-	"github.com/oprimogus/cardapiogo/config/logger"
+	"github.com/oprimogus/cardapiogo/pkg/log"
 )
 
 var (
@@ -21,7 +21,7 @@ var (
 
 // PostgresDatabase struct
 type PostgresDatabase struct {
-	pool *pgxpool.Pool
+	pool  *pgxpool.Pool
 	sqlDB *sql.DB
 }
 

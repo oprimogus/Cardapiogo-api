@@ -1,11 +1,21 @@
 include .env
 export
 
+
+.PHONY: fmt
+
+lint:
+	@gofmt -s -w .
+
+
 install:
 	go mod tidy
 
 docker:
 	docker compose -f docker-compose.yaml up -d
+
+sqlc_generate:
+	sqlc generate -f internal/database/sqlc/sqlc.yaml
 
 run:
 	go run main.go

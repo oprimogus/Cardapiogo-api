@@ -1,1 +1,0 @@
-DROP schema IF EXISTS cardapio cascade;
