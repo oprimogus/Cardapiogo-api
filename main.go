@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/oprimogus/cardapiogo/internal/domain/user"
 	"github.com/oprimogus/cardapiogo/internal/database"
 	"github.com/oprimogus/cardapiogo/internal/database/sqlc"
 	"github.com/oprimogus/cardapiogo/pkg/log"
@@ -20,19 +21,6 @@ func main() {
 	db := database.GetInstance()
 	queries := sqlc.New(db.GetDB())
 
-	password := pgtype.Text{
-		String: "testeteste123",
-		Valid:  true,
-	}
-
-	userParams := sqlc.CreateUserParams{
-		Email:           "gustavo081900@gmail.com",
-		Password:        password,
-		Role:            sqlc.NullUserRole{UserRole: sqlc.UserRoleConsumer, Valid: true},
-		AccountProvider: sqlc.AccountProviderGoogle,
-	}
-
-	a := queries.CreateUser(ctx, userParams)
-	log.Info(a)
+	userRepository := user.NewSQLUserRepository(queries)
 
 }
