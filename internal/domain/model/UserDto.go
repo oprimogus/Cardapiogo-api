@@ -2,7 +2,7 @@ package model
 
 // CreateUserParams DTO
 type CreateUserParams struct {
-	Email           string          `db:"email" json:"email"`
+	Email           string          `db:"email" json:"email" validate:"required"`
 	Password        string          `db:"password" json:"password"`
 	Role            Role            `db:"role" json:"role"`
 	AccountProvider AccountProvider `db:"account_provider" json:"account_provider"`
@@ -11,7 +11,7 @@ type CreateUserParams struct {
 // UpdateUserParams DTO
 type UpdateUserParams struct {
 	ID    string `db:"id" json:"id"`
-	Email string      `db:"email" json:"email"`
+	Email string `db:"email" json:"email"`
 	Role  Role   `db:"role" json:"role"`
 }
 
@@ -24,5 +24,5 @@ type UpdateUserPasswordParams struct {
 // UpdateUserProfileParams DTO
 type UpdateUserProfileParams struct {
 	ID        string `db:"id" json:"id"`
-	ProfileID int `db:"profile_id" json:"profile_id"`
+	ProfileID int    `db:"profile_id" json:"profile_id"`
 }

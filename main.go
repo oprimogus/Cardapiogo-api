@@ -1,26 +1,22 @@
 package main
 
 import (
-	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/oprimogus/cardapiogo/internal/domain/user"
-	"github.com/oprimogus/cardapiogo/internal/database"
-	"github.com/oprimogus/cardapiogo/internal/database/sqlc"
-	"github.com/oprimogus/cardapiogo/pkg/log"
+	"github.com/oprimogus/cardapiogo/internal/api/router"
+	"github.com/oprimogus/cardapiogo/internal/infra/database"
+	"github.com/oprimogus/cardapiogo/internal/infra/database/sqlc"
+	"github.com/oprimogus/cardapiogo/internal/infra/factory"
+	logger "github.com/oprimogus/cardapiogo/pkg/log"
 	"github.com/subosito/gotenv"
 )
 
-var (
-	log = logger.GetLogger("Main")
-)
 
 func main() {
+	log := logger.GetLogger("Main")
+	// _ = gotenv.Load()
 	_ = gotenv.Load()
-	ctx := context.Background()
 	db := database.GetInstance()
-	queries := sqlc.New(db.GetDB())
-
-	userRepository := user.NewSQLUserRepository(queries)
+	factory := factory.NewDataBaseRepositoryFactory(db)
+	// factory := factory.NewDataBaseRepositoryFactory(db)
+	router.Initialize(factory)
 
 }

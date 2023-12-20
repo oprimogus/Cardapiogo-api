@@ -1,4 +1,4 @@
-package database
+package infradatabase
 
 import (
 	"context"
@@ -13,22 +13,22 @@ import (
 
 // UserRepositoryDatabase struct
 type UserRepositoryDatabase struct {
-	db database.PostgresDatabase
-	q sqlc.Querier
+	db *database.PostgresDatabase
+	q  sqlc.Querier
 }
 
 // NewUserRepositoryDatabase return repository of database
-func NewUserRepositoryDatabase(db database.PostgresDatabase) repository.UserRepository {
-	return UserRepositoryDatabase{db: db, q: sqlc.New(db.GetDB())}
+func NewUserRepositoryDatabase(db *database.PostgresDatabase, querier sqlc.Querier) repository.UserRepository {
+	return UserRepositoryDatabase{db: db, q: querier}
 }
 
-// CreateUser create a user in database
-func (u UserRepositoryDatabase) CreateUser (ctx context.Context, newUser model.CreateUserParams) error {
+// CreateUser create a user in database. Must receive object validated through the service
+func (u UserRepositoryDatabase) CreateUser(ctx context.Context, newUser model.CreateUserParams) error {
 
 	user := sqlc.CreateUserParams{
-		Email: newUser.Email,
-		Password: pgtype.Text{ String: newUser.Password, Valid: true},
-		Role: sqlc.UserRole(newUser.Role),
+		Email:           newUser.Email,
+		Password:        pgtype.Text{String: newUser.Password, Valid: true},
+		Role:            sqlc.UserRole(newUser.Role),
 		AccountProvider: sqlc.AccountProvider(newUser.AccountProvider),
 	}
 
@@ -37,6 +37,5 @@ func (u UserRepositoryDatabase) CreateUser (ctx context.Context, newUser model.C
 		return err
 	}
 	return nil
-
 
 }
