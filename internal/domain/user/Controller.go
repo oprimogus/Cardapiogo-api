@@ -2,11 +2,10 @@ package user
 
 import (
 	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
-	"github.com/oprimogus/cardapiogo/pkg/validator"
+	"github.com/oprimogus/cardapiogo/internal/api/validator"
 )
 
 var (

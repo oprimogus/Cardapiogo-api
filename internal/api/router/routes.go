@@ -5,7 +5,7 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/factory"
 	"github.com/oprimogus/cardapiogo/internal/domain/user"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
-	"github.com/oprimogus/cardapiogo/pkg/validator"
+	"github.com/oprimogus/cardapiogo/internal/api/validator"
 )
 
 var log = logger.GetLogger("router")
