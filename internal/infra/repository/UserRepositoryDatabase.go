@@ -2,11 +2,8 @@ package infradatabase
 
 import (
 	"context"
-
 	"github.com/jackc/pgx/v5/pgtype"
-
-	"github.com/oprimogus/cardapiogo/internal/domain/model"
-	"github.com/oprimogus/cardapiogo/internal/domain/repository"
+	"github.com/oprimogus/cardapiogo/internal/domain/user"
 	"github.com/oprimogus/cardapiogo/internal/infra/database"
 	"github.com/oprimogus/cardapiogo/internal/infra/database/sqlc"
 )
@@ -18,12 +15,12 @@ type UserRepositoryDatabase struct {
 }
 
 // NewUserRepositoryDatabase return repository of database
-func NewUserRepositoryDatabase(db *database.PostgresDatabase, querier sqlc.Querier) repository.UserRepository {
+func NewUserRepositoryDatabase(db *database.PostgresDatabase, querier sqlc.Querier) user.Repository {
 	return UserRepositoryDatabase{db: db, q: querier}
 }
 
 // CreateUser create a user in database. Must receive object validated through the service
-func (u UserRepositoryDatabase) CreateUser(ctx context.Context, newUser model.CreateUserParams) error {
+func (u UserRepositoryDatabase) CreateUser(ctx context.Context, newUser user.CreateUserParams) error {
 
 	user := sqlc.CreateUserParams{
 		Email:           newUser.Email,

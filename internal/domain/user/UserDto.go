@@ -1,4 +1,4 @@
-package model
+package user
 
 // CreateUserParams DTO
 type CreateUserParams struct {
