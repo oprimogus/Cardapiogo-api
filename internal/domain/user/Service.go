@@ -5,10 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-playground/validator/v10"
-	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
-
-var log = logger.GetLogger("UserService")
 
 // Service struct
 type Service struct {
