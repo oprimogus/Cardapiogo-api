@@ -4,18 +4,18 @@ import (
 	"context"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/oprimogus/cardapiogo/internal/domain/user"
-	"github.com/oprimogus/cardapiogo/internal/infra/database"
+	"github.com/oprimogus/cardapiogo/internal/infra/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/infra/database/sqlc"
 )
 
 // UserRepositoryDatabase struct
 type UserRepositoryDatabase struct {
-	db *database.PostgresDatabase
+	db *postgres.PostgresDatabase
 	q  sqlc.Querier
 }
 
 // NewUserRepositoryDatabase return repository of database
-func NewUserRepositoryDatabase(db *database.PostgresDatabase, querier sqlc.Querier) user.Repository {
+func NewUserRepositoryDatabase(db *postgres.PostgresDatabase, querier sqlc.Querier) user.Repository {
 	return UserRepositoryDatabase{db: db, q: querier}
 }
 
@@ -31,7 +31,7 @@ func (u UserRepositoryDatabase) CreateUser(ctx context.Context, newUser user.Cre
 
 	err := u.q.CreateUser(ctx, user)
 	if err != nil {
-		return err
+		return postgres.MapDBError(err)
 	}
 	return nil
 

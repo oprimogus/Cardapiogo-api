@@ -1,8 +1,10 @@
 package logger
 
 import (
-	"github.com/sirupsen/logrus"
 	"os"
+	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Logger Struct
@@ -15,8 +17,9 @@ func NewLogger(p string) *Logger {
 	log := logrus.New()
 	log.Out = os.Stdout
 
-	log.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
+	log.SetFormatter(&logrus.JSONFormatter{
+		TimestampFormat: time.RFC3339,
+		DataKey: "data",
 	})
 
 	entry := log.WithFields(logrus.Fields{
@@ -32,6 +35,11 @@ func NewLogger(p string) *Logger {
 func GetLogger(p string) *Logger {
 	logger := NewLogger(p)
 	return logger
+}
+
+// GetEntry retorna *logrus.Entry
+func (l *Logger) GetEntry() *logrus.Entry {
+    return l.entry
 }
 
 // Create Non-Formatted Logs

@@ -27,11 +27,11 @@ func (c *userController) CreateUserHandler(ctx *gin.Context) {
 	err := ctx.BindJSON(&userParams)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
 	}
 
-	// Validação
 	validationErr := c.validator.Validate(userParams)
-	if validationErr != nil {
+	if len(validationErr) > 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": validationErr})
 		return
 	}
@@ -39,8 +39,7 @@ func (c *userController) CreateUserHandler(ctx *gin.Context) {
 	userCreated := c.service.CreateUser(ctx, userParams)
 	if userCreated != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": userCreated})
+		return
 	}
 	ctx.Status(http.StatusCreated)
-
-	// Resto do seu código para criar o usuário...
 }

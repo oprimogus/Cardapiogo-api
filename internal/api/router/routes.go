@@ -4,11 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/oprimogus/cardapiogo/internal/domain/factory"
 	"github.com/oprimogus/cardapiogo/internal/domain/user"
-	logger "github.com/oprimogus/cardapiogo/pkg/log"
 	"github.com/oprimogus/cardapiogo/internal/api/validator"
 )
-
-var log = logger.GetLogger("router")
 
 // InitializeRoutes initialize all routes of application
 func InitializeRoutes(router *gin.Engine, factory factory.RepositoryFactory) {

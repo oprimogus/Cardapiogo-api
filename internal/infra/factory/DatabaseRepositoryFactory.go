@@ -3,19 +3,19 @@ package factory
 import (
 	"github.com/oprimogus/cardapiogo/internal/domain/factory"
 	"github.com/oprimogus/cardapiogo/internal/domain/user"
-	"github.com/oprimogus/cardapiogo/internal/infra/database"
+	"github.com/oprimogus/cardapiogo/internal/infra/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/infra/database/sqlc"
 	"github.com/oprimogus/cardapiogo/internal/infra/repository"
 )
 
 // DatabaseRepositoryFactory struct
 type DatabaseRepositoryFactory struct {
-	db      *database.PostgresDatabase
+	db      *postgres.PostgresDatabase
 	querier *sqlc.Queries
 }
 
 // NewDataBaseRepositoryFactory return repository factory
-func NewDataBaseRepositoryFactory(db *database.PostgresDatabase) factory.RepositoryFactory {
+func NewDataBaseRepositoryFactory(db *postgres.PostgresDatabase) factory.RepositoryFactory {
 	return DatabaseRepositoryFactory{db: db, querier: sqlc.New(db.GetDB())}
 }
 

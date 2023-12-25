@@ -52,19 +52,34 @@ func NewValidator(locale string) (*Validator, error) {
 }
 
 func (v *Validator) Validate(i interface{}) map[string]string {
+    out := make(map[string]string)
 
-	errs := v.validator.Struct(i).(validator.ValidationErrors)
+    // Realiza a validação
+    err := v.validator.Struct(i)
 
-	out := make(map[string]string, len(errs))
-	for _, e := range errs {
-        _, isPersonalized := personalizedValidations[e.Tag()]
-        if isPersonalized {
-            out[e.StructField()] = errorPersonalized(v.locale, e.Tag())
-        } else {
-            out[e.StructField()] = e.Translate(v.translator)
+    // Verifica se houve erros de validação
+    if err != nil {
+        // Realiza o type assertion apenas se houver erros
+        errs, ok := err.(validator.ValidationErrors)
+        if !ok {
+            // Se a asserção de tipo falhar, retorna um erro genérico ou lida com isso de maneira apropriada
+            out["error"] = "Erro de validação desconhecido"
+            return out
         }
-	}
-	return out
+
+        // Processa os erros de validação
+        for _, e := range errs {
+            _, isPersonalized := personalizedValidations[e.Tag()]
+            if isPersonalized {
+                out[e.StructField()] = errorPersonalized(v.locale, e.Tag())
+            } else {
+                out[e.StructField()] = e.Translate(v.translator)
+            }
+        }
+    }
+
+    // Retorna um mapa vazio se não houver erros ou um mapa com erros
+    return out
 }
 
 func errorPersonalized(locale string, tag string) string {
