@@ -19,7 +19,7 @@ func NewLogger(p string) *Logger {
 
 	log.SetFormatter(&logrus.JSONFormatter{
 		TimestampFormat: time.RFC3339,
-		DataKey: "data",
+		DataKey:         "data",
 	})
 
 	entry := log.WithFields(logrus.Fields{
@@ -39,7 +39,7 @@ func GetLogger(p string) *Logger {
 
 // GetEntry retorna *logrus.Entry
 func (l *Logger) GetEntry() *logrus.Entry {
-    return l.entry
+	return l.entry
 }
 
 // Create Non-Formatted Logs

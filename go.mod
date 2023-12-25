@@ -15,7 +15,6 @@ require (
 require (
 	github.com/jackc/puddle/v2 v2.2.0 // indirect
 	golang.org/x/sync v0.2.0 // indirect
-	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
 
 require (
@@ -25,7 +24,6 @@ require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
-	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/google/uuid v1.5.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect

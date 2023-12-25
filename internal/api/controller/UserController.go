@@ -43,10 +43,10 @@ func (c *userController) CreateUserHandler(ctx *gin.Context) {
 	userCreatedErr := c.service.CreateUser(ctx, userParams)
 	if userCreatedErr != nil {
 		dbErr, ok := userCreatedErr.(*errordatabase.DBError)
-		if ok {
+		if ok && dbErr != nil {
 			ctx.JSON(dbErr.HttpStatus, gin.H{"error": dbErr.Message})
 			return
-		} 
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
@@ -56,8 +56,20 @@ func (c *userController) CreateUserHandler(ctx *gin.Context) {
 func (c *userController) GetUserHandler(ctx *gin.Context) {
 	id := ctx.Params.ByName("id")
 
-	_, err := uuid.Parse(id)
-	if (err != nil) {
+	uuidValue, err := uuid.Parse(id)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
 	}
+
+	getUser, err := c.service.GetUser(ctx, uuidValue)
+	if err != nil {
+		dbErr, ok := err.(*errordatabase.DBError)
+		if ok {
+			ctx.JSON(dbErr.HttpStatus, gin.H{"error": dbErr.Message})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	ctx.JSON(http.StatusOK, getUser)
 }

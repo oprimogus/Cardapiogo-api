@@ -48,7 +48,7 @@ CREATE TABLE "users" (
   "id" UUID DEFAULT uuid_generate_v4() UNIQUE PRIMARY KEY,
   "profile_id" integer,
   "email" varchar UNIQUE NOT NULL,
-  "password" varchar(50),
+  "password" varchar,
   "role" user_role NOT NULL,
   "account_provider" account_provider NOT NULL,
   "created_at" TIMESTAMPTZ,

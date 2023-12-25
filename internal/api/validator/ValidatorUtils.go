@@ -12,20 +12,20 @@ import (
 )
 
 var personalizedValidations = map[string]bool{
-    "role": true,
-    "account_provider": true,
+	"role":             true,
+	"account_provider": true,
 }
 
 type Validator struct {
 	validator  *validator.Validate
 	translator ut.Translator
-    locale string
+	locale     string
 }
 
 func NewValidator(locale string) (*Validator, error) {
 	v := validator.New(validator.WithRequiredStructEnabled())
 	v.RegisterValidation("role", isValidUserRole)
-    v.RegisterValidation("account_provider", isValidAccountProvider)
+	v.RegisterValidation("account_provider", isValidAccountProvider)
 
 	enLocale := en.New()
 	ptLocale := pt.New()
@@ -47,46 +47,46 @@ func NewValidator(locale string) (*Validator, error) {
 	return &Validator{
 		validator:  v,
 		translator: translator,
-        locale: locale,
+		locale:     locale,
 	}, nil
 }
 
 func (v *Validator) Validate(i interface{}) map[string]string {
-    out := make(map[string]string)
+	out := make(map[string]string)
 
-    // Realiza a validação
-    err := v.validator.Struct(i)
+	// Realiza a validação
+	err := v.validator.Struct(i)
 
-    // Verifica se houve erros de validação
-    if err != nil {
-        // Realiza o type assertion apenas se houver erros
-        errs, ok := err.(validator.ValidationErrors)
-        if !ok {
-            // Se a asserção de tipo falhar, retorna um erro genérico ou lida com isso de maneira apropriada
-            out["error"] = "Erro de validação desconhecido"
-            return out
-        }
+	// Verifica se houve erros de validação
+	if err != nil {
+		// Realiza o type assertion apenas se houver erros
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			// Se a asserção de tipo falhar, retorna um erro genérico ou lida com isso de maneira apropriada
+			out["error"] = "Erro de validação desconhecido"
+			return out
+		}
 
-        // Processa os erros de validação
-        for _, e := range errs {
-            _, isPersonalized := personalizedValidations[e.Tag()]
-            if isPersonalized {
-                out[e.StructField()] = errorPersonalized(v.locale, e.Tag())
-            } else {
-                out[e.StructField()] = e.Translate(v.translator)
-            }
-        }
-    }
+		// Processa os erros de validação
+		for _, e := range errs {
+			_, isPersonalized := personalizedValidations[e.Tag()]
+			if isPersonalized {
+				out[e.StructField()] = errorPersonalized(v.locale, e.Tag())
+			} else {
+				out[e.StructField()] = e.Translate(v.translator)
+			}
+		}
+	}
 
-    // Retorna um mapa vazio se não houver erros ou um mapa com erros
-    return out
+	// Retorna um mapa vazio se não houver erros ou um mapa com erros
+	return out
 }
 
 func errorPersonalized(locale string, tag string) string {
-    if locale == "pt" {
-        return fmt.Sprintf("Valor inválido para o campo %s", tag)
-    }
-    return fmt.Sprintf("Invalid value for %s field", tag)
+	if locale == "pt" {
+		return fmt.Sprintf("Valor inválido para o campo %s", tag)
+	}
+	return fmt.Sprintf("Invalid value for %s field", tag)
 
 }
 
