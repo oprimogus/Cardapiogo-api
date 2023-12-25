@@ -2,9 +2,9 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/oprimogus/cardapiogo/internal/domain/factory"
-	"github.com/oprimogus/cardapiogo/internal/domain/user"
+	"github.com/oprimogus/cardapiogo/internal/api/controller"
 	"github.com/oprimogus/cardapiogo/internal/api/validator"
+	"github.com/oprimogus/cardapiogo/internal/domain/factory"
 )
 
 // InitializeRoutes initialize all routes of application
@@ -13,10 +13,11 @@ func InitializeRoutes(router *gin.Engine, factory factory.RepositoryFactory) {
 	if err != nil && validator == nil {
 		panic(err)
 	}
-	userController := user.NewUserController(factory.NewUserRepository(), validator)
+	userController := controller.NewUserController(factory.NewUserRepository(), validator)
 
 	basePath := "/api/v1"
 	v1 := router.Group(basePath)
 	v1.POST("user", userController.CreateUserHandler)
+	v1.GET("user/:id", userController.GetUserHandler)
 
 }

@@ -2,12 +2,14 @@ package user
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 // Repository interface
 type Repository interface {
 	CreateUser(ctx context.Context, user CreateUserParams) error
-	// GetUser(ctx context.Context, id string) (User, error)
+	GetUser(ctx context.Context, id uuid.UUID) (User, error)
 	// UpdateUser(ctx context.Context, user UpdateUserParams) error
 	// UpdateUserPassword(ctx context.Context, user UpdateUserPasswordParams) error
 	// UpdateUserProfile(ctx context.Context, user UpdateUserProfileParams) error

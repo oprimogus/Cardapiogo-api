@@ -1,6 +1,9 @@
-package postgres
+package errordatabase
 
-import "strings"
+import (
+	"net/http"
+	"strings"
+)
 
 type DBErrorType int
 
@@ -24,25 +27,20 @@ func MapDBError(err error) *DBError {
     if err == nil {
         return nil
     }
-
     switch {
     case strings.Contains(err.Error(), "duplicate key value"):
         return &DBError{
 			Type: DuplicateRecordError,
 			Message: "There is a record with this data.",
-			HttpStatus: 409,
+			HttpStatus: http.StatusConflict,
 		}
     case strings.Contains(err.Error(), "record not found"):
         return &DBError{
 			Type: RecordNotFoundError,
 			Message: "Record not found.",
-			HttpStatus: 404,
+			HttpStatus: http.StatusNotFound,
 		}
     default:
-        return &DBError{
-			Type: UnknownError,
-			Message: "Internal Server error.",
-			HttpStatus: 500,
-		}
+        return nil
     }
 }
