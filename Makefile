@@ -15,7 +15,7 @@ docker:
 	docker compose -f docker-compose.yaml up -d
 
 sqlc_generate:
-	sqlc generate -f internal/database/sqlc/sqlc.yaml
+	sqlc generate -f internal/infra/database/sqlc/sqlc.yaml
 
 run:
 	go run main.go
