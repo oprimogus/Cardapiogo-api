@@ -19,5 +19,6 @@ func InitializeRoutes(router *gin.Engine, factory factory.RepositoryFactory) {
 	v1 := router.Group(basePath)
 	v1.POST("user", userController.CreateUserHandler)
 	v1.GET("user/:id", userController.GetUserHandler)
+	v1.GET("user", userController.GetUsersListHandler)
 
 }

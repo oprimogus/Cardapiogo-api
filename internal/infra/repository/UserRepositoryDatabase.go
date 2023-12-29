@@ -38,6 +38,45 @@ func (u UserRepositoryDatabase) CreateUser(ctx context.Context, newUser user.Cre
 	return nil
 }
 
+// GetUserByID return a user of database. Must receive object validated through the service
+func (u UserRepositoryDatabase) GetUserByID(ctx context.Context, id uuid.UUID) (user.User, error) {
+	uuidBytes := id[:]
+
+	getUser, err := u.q.GetUserById(ctx, pgtype.UUID{Bytes: [16]byte(uuidBytes), Valid: true})
+	if err != nil {
+		return user.User{}, errordatabase.MapDBError(err)
+	}
+
+	return u.getUserByIDRowToUserModel(getUser)
+}
+
+// GetUsersList return a list of users
+func (u UserRepositoryDatabase) GetUsersList (ctx context.Context, items int, page int) ([]user.User, error) {
+
+	offset := items * (page - 1)
+
+	searchParams := sqlc.GetUserParams {
+		Limit: int32(items),
+		Offset: int32(offset),
+	}
+
+	listUsers, err := u.q.GetUser(ctx, searchParams)
+	if err != nil {
+		return nil, errordatabase.MapDBError(err)
+	}
+
+	listUsersModel := make([]user.User, len(listUsers))
+	for i, v := range listUsers {
+		log.Info(v)
+		user, err := u.getUserRowToUserModel(v)
+		if err != nil {
+			return nil, err
+		}
+		listUsersModel[i] = user
+	}
+	return listUsersModel, nil
+}
+
 func (u UserRepositoryDatabase) createUserDatabase(cr user.CreateUserParams) (sqlc.CreateUserParams) {
 
 	passwordSqlc := converters.ConvertStringToText(cr.Password)
@@ -50,20 +89,8 @@ func (u UserRepositoryDatabase) createUserDatabase(cr user.CreateUserParams) (sq
 	}
 }
 
-// GetUser return a user of database. Must receive object validated through the service
-func (u UserRepositoryDatabase) GetUser(ctx context.Context, id uuid.UUID) (user.User, error) {
-	uuidBytes := id[:]
-
-	getUser, err := u.q.GetUser(ctx, pgtype.UUID{Bytes: [16]byte(uuidBytes), Valid: true})
-	if err != nil {
-		return user.User{}, errordatabase.MapDBError(err)
-	}
-
-	return u.createUserModel(getUser)
-}
-
-// createUserModel convert sqlc.User to user.User
-func (u UserRepositoryDatabase) createUserModel(su sqlc.Users) (user.User, error) {
+// getUserByIDRowToUserModel convert sqlc.GetUserByIdRow to user.User
+func (u UserRepositoryDatabase) getUserByIDRowToUserModel(su sqlc.GetUserByIdRow) (user.User, error) {
 
 	uuidStr, err := converters.ConvertUUIDToString(su.ID)
 	if err != nil {
@@ -81,15 +108,6 @@ func (u UserRepositoryDatabase) createUserModel(su sqlc.Users) (user.User, error
 	var profileIDValue *int
 	if profileIDPtr != nil {
 		profileIDValue = profileIDPtr
-	}
-
-	passwordPtr, err := converters.ConvertTextToString(su.Password)
-	if err != nil {
-		return user.User{}, err
-	}
-	var passwordValue *string
-	if passwordPtr != nil {
-		passwordValue = passwordPtr
 	}
 
 	createdAtPtr, err := converters.ConvertTimestamptzToTime(su.CreatedAt)
@@ -114,13 +132,59 @@ func (u UserRepositoryDatabase) createUserModel(su sqlc.Users) (user.User, error
 		ID:              uuidValue,
 		ProfileID:       profileIDValue,
 		Email:           su.Email,
-		Password:        passwordValue,
 		Role:            types.Role(su.Role),
-		AccountProvider: types.AccountProvider(su.AccountProvider),
 		CreatedAt:       createdAtValue,
 		UpdatedAt:       updatedAtValue,
 	}
 
 	return user, nil
+}
 
+// getUserRowToUserModel convert sqlc.getUserRow to user.User
+func (u UserRepositoryDatabase) getUserRowToUserModel(su sqlc.GetUserRow) (user.User, error) {
+	uuidStr, err := converters.ConvertUUIDToString(su.ID)
+	if err != nil {
+		return user.User{}, err
+	}
+	uuidValue := ""
+	if uuidStr != nil {
+		uuidValue = *uuidStr
+	}
+
+	profileIDPtr, err := converters.ConvertInt4ToInt(su.ProfileID)
+	if err != nil {
+		return user.User{}, err
+	}
+	var profileIDValue *int
+	if profileIDPtr != nil {
+		profileIDValue = profileIDPtr
+	}
+
+	createdAtPtr, err := converters.ConvertTimestamptzToTime(su.CreatedAt)
+	if err != nil {
+		return user.User{}, err
+	}
+	var createdAtValue time.Time
+	if createdAtPtr != nil {
+		createdAtValue = *createdAtPtr
+	}
+
+	updatedAtPtr, err := converters.ConvertTimestamptzToTime(su.UpdatedAt)
+	if err != nil {
+		return user.User{}, err
+	}
+	var updatedAtValue time.Time
+	if updatedAtPtr != nil {
+		updatedAtValue = *updatedAtPtr
+	}
+
+	user := user.User{
+		ID:              uuidValue,
+		ProfileID:       profileIDValue,
+		Email:           su.Email,
+		Role:            types.Role(su.Role),
+		CreatedAt:       createdAtValue,
+		UpdatedAt:       updatedAtValue,
+	}
+	return user, nil
 }

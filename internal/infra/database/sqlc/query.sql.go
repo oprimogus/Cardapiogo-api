@@ -76,22 +76,76 @@ func (q *Queries) GetProfile(ctx context.Context, id int32) (Profile, error) {
 	return i, err
 }
 
-const getUser = `-- name: GetUser :one
-SELECT id, profile_id, email, password, role, account_provider, created_at, updated_at FROM users
+const getUser = `-- name: GetUser :many
+SELECT id, profile_id, email, role, created_at, updated_at FROM users
+ORDER BY created_at desc
+LIMIT $1 OFFSET $2
+`
+
+type GetUserParams struct {
+	Limit  int32 `db:"limit" json:"limit"`
+	Offset int32 `db:"offset" json:"offset"`
+}
+
+type GetUserRow struct {
+	ID        pgtype.UUID        `db:"id" json:"id"`
+	ProfileID pgtype.Int4        `db:"profile_id" json:"profile_id"`
+	Email     string             `db:"email" json:"email"`
+	Role      UserRole           `db:"role" json:"role"`
+	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+}
+
+func (q *Queries) GetUser(ctx context.Context, arg GetUserParams) ([]GetUserRow, error) {
+	rows, err := q.db.Query(ctx, getUser, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUserRow
+	for rows.Next() {
+		var i GetUserRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProfileID,
+			&i.Email,
+			&i.Role,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserById = `-- name: GetUserById :one
+SELECT id, profile_id, email, role, created_at, updated_at FROM users
 WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id pgtype.UUID) (Users, error) {
-	row := q.db.QueryRow(ctx, getUser, id)
-	var i Users
+type GetUserByIdRow struct {
+	ID        pgtype.UUID        `db:"id" json:"id"`
+	ProfileID pgtype.Int4        `db:"profile_id" json:"profile_id"`
+	Email     string             `db:"email" json:"email"`
+	Role      UserRole           `db:"role" json:"role"`
+	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+}
+
+func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (GetUserByIdRow, error) {
+	row := q.db.QueryRow(ctx, getUserById, id)
+	var i GetUserByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.ProfileID,
 		&i.Email,
-		&i.Password,
 		&i.Role,
-		&i.AccountProvider,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

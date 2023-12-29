@@ -29,7 +29,12 @@ func (u Service) CreateUser(ctx context.Context, newUser CreateUserParams) error
 
 // GetUser return a user from database
 func (u Service) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
-	return u.repository.GetUser(ctx, id)
+	return u.repository.GetUserByID(ctx, id)
+}
+
+// GetUsersList return a user from database
+func (u Service) GetUsersList(ctx context.Context, items int, page int) ([]User, error) {
+	return u.repository.GetUsersList(ctx, items, page)
 }
 
 // HashPassword generate a hash of password for save in database

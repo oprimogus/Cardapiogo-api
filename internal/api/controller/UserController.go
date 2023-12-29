@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -17,16 +18,19 @@ var (
 	validate = validator.New(validator.WithRequiredStructEnabled())
 )
 
-type userController struct {
+// UserController struct
+type UserController struct {
 	service   user.Service
 	validator *validatorutils.Validator
 }
 
-func NewUserController(repository user.Repository, validator *validatorutils.Validator) *userController {
-	return &userController{service: user.NewService(repository), validator: validator}
+// NewUserController return a new instance of userController
+func NewUserController(repository user.Repository, validator *validatorutils.Validator) *UserController {
+	return &UserController{service: user.NewService(repository), validator: validator}
 }
 
-func (c *userController) CreateUserHandler(ctx *gin.Context) {
+// CreateUserHandler create a user in database
+func (c *UserController) CreateUserHandler(ctx *gin.Context) {
 	var userParams user.CreateUserParams
 	err := ctx.BindJSON(&userParams)
 	if err != nil {
@@ -53,7 +57,8 @@ func (c *userController) CreateUserHandler(ctx *gin.Context) {
 	ctx.Status(http.StatusCreated)
 }
 
-func (c *userController) GetUserHandler(ctx *gin.Context) {
+// GetUserHandler return a user by id
+func (c *UserController) GetUserHandler(ctx *gin.Context) {
 	id := ctx.Params.ByName("id")
 
 	uuidValue, err := uuid.Parse(id)
@@ -72,4 +77,29 @@ func (c *userController) GetUserHandler(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, getUser)
+}
+
+// GetUsersListHandler return a paginated list of users
+func (c *UserController) GetUsersListHandler(ctx *gin.Context) {
+	items, err := strconv.Atoi(ctx.Query("items"))
+	log.Info(items)
+	if err != nil || items <= 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid value for items"})
+		return
+	}
+	page, err := strconv.Atoi(ctx.Query("page"))
+	log.Info(page)
+	if err != nil || page <= 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid value for page"})
+		return
+	}
+
+	listUsers, err := c.service.GetUsersList(ctx, items, page)
+	if err != nil {
+		ctx.JSON(http.StatusServiceUnavailable, gin.H{"error": "Error listing users"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, listUsers)
+	return
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/user"
 	"github.com/oprimogus/cardapiogo/internal/infra/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/infra/database/sqlc"
-	"github.com/oprimogus/cardapiogo/internal/infra/repository"
+	infradatabase "github.com/oprimogus/cardapiogo/internal/infra/repository"
 )
 
 // DatabaseRepositoryFactory struct

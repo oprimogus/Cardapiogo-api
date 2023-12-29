@@ -2,10 +2,15 @@
 INSERT INTO users (email, password, role, account_provider, created_at, updated_at)
 VALUES ($1, $2, $3, $4, NOW(), NOW());
 
--- name: GetUser :one
-SELECT * FROM users
+-- name: GetUserById :one
+SELECT id, profile_id, email, role, created_at, updated_at FROM users
 WHERE id = $1
 LIMIT 1;
+
+-- name: GetUser :many
+SELECT id, profile_id, email, role, created_at, updated_at FROM users
+ORDER BY created_at desc
+LIMIT $1 OFFSET $2;
 
 -- name: UpdateUser :exec
 UPDATE users
