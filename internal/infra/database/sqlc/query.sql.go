@@ -124,7 +124,7 @@ func (q *Queries) GetUser(ctx context.Context, arg GetUserParams) ([]GetUserRow,
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, profile_id, email, role, created_at, updated_at FROM users
+SELECT id, profile_id, email, password, role, created_at, updated_at FROM users
 WHERE id = $1
 LIMIT 1
 `
@@ -133,6 +133,7 @@ type GetUserByIdRow struct {
 	ID        pgtype.UUID        `db:"id" json:"id"`
 	ProfileID pgtype.Int4        `db:"profile_id" json:"profile_id"`
 	Email     string             `db:"email" json:"email"`
+	Password  pgtype.Text        `db:"password" json:"password"`
 	Role      UserRole           `db:"role" json:"role"`
 	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
@@ -145,6 +146,7 @@ func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (GetUserByIdR
 		&i.ID,
 		&i.ProfileID,
 		&i.Email,
+		&i.Password,
 		&i.Role,
 		&i.CreatedAt,
 		&i.UpdatedAt,

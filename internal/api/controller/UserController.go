@@ -5,22 +5,20 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
-	"github.com/oprimogus/cardapiogo/internal/api/validator"
+
+	httpResponses "github.com/oprimogus/cardapiogo/internal/api/controller/responses"
+	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
 	"github.com/oprimogus/cardapiogo/internal/domain/user"
 	errordatabase "github.com/oprimogus/cardapiogo/internal/errors/database"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
-var (
-	log      = logger.GetLogger("UserController")
-	validate = validator.New(validator.WithRequiredStructEnabled())
-)
+var log = logger.GetLogger("UserController")
 
 // UserController struct
 type UserController struct {
-	service   user.Service
+	service   *user.Service
 	validator *validatorutils.Validator
 }
 
@@ -46,7 +44,7 @@ func (c *UserController) CreateUserHandler(ctx *gin.Context) {
 
 	userCreatedErr := c.service.CreateUser(ctx, userParams)
 	if userCreatedErr != nil {
-		dbErr, ok := userCreatedErr.(*errordatabase.DBError)
+		dbErr, ok := userCreatedErr.(*errordatabase.DatabaseError)
 		if ok && dbErr != nil {
 			ctx.JSON(dbErr.HttpStatus, gin.H{"error": dbErr.Message})
 			return
@@ -61,15 +59,15 @@ func (c *UserController) CreateUserHandler(ctx *gin.Context) {
 func (c *UserController) GetUserHandler(ctx *gin.Context) {
 	id := ctx.Params.ByName("id")
 
-	uuidValue, err := uuid.Parse(id)
+	_, err := uuid.Parse(id)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
+		httpResponses.BadRequestMessage(ctx, err)
 	}
 
-	getUser, err := c.service.GetUser(ctx, uuidValue)
+	getUser, err := c.service.GetUser(ctx, id)
 	if err != nil {
-		dbErr, ok := err.(*errordatabase.DBError)
-		if ok {
+		dbErr, ok := err.(*errordatabase.DatabaseError)
+		if ok && dbErr != nil {
 			ctx.JSON(dbErr.HttpStatus, gin.H{"error": dbErr.Message})
 			return
 		}
@@ -82,13 +80,11 @@ func (c *UserController) GetUserHandler(ctx *gin.Context) {
 // GetUsersListHandler return a paginated list of users
 func (c *UserController) GetUsersListHandler(ctx *gin.Context) {
 	items, err := strconv.Atoi(ctx.Query("items"))
-	log.Info(items)
 	if err != nil || items <= 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid value for items"})
 		return
 	}
 	page, err := strconv.Atoi(ctx.Query("page"))
-	log.Info(page)
 	if err != nil || page <= 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid value for page"})
 		return
@@ -101,5 +97,64 @@ func (c *UserController) GetUsersListHandler(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, listUsers)
-	return
+}
+
+// UpdateUserPasswordHandler update user password
+func (c *UserController) UpdateUserPasswordHandler(ctx *gin.Context) {
+
+	var updateUserPasswordParams user.UpdateUserPasswordParams
+	err := ctx.BindJSON(&updateUserPasswordParams)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	validationErr := c.validator.Validate(updateUserPasswordParams)
+	if len(validationErr) > 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": validationErr})
+		return
+	}
+
+	err = c.service.UpdateUserPassword(ctx, updateUserPasswordParams)
+	if err != nil {
+		dbErr, ok := err.(*errordatabase.DatabaseError)
+		if ok && dbErr != nil {
+			ctx.JSON(dbErr.HttpStatus, gin.H{"error": dbErr.Message})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+// UpdateUserHandler update user password
+func (c *UserController) UpdateUserHandler(ctx *gin.Context) {
+
+	var updateUserParams user.UpdateUserParams
+	err := ctx.BindJSON(&updateUserParams)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	validationErr := c.validator.Validate(updateUserParams)
+	if len(validationErr) > 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": validationErr})
+		return
+	}
+
+	err = c.service.UpdateUser(ctx, updateUserParams)
+	if err != nil {
+		dbErr, ok := err.(*errordatabase.DatabaseError)
+		if ok && dbErr != nil {
+			ctx.JSON(dbErr.HttpStatus, gin.H{"error": dbErr.Message})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }

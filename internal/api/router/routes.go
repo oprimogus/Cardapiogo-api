@@ -2,8 +2,9 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/oprimogus/cardapiogo/internal/api/controller"
-	"github.com/oprimogus/cardapiogo/internal/api/validator"
+	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
 	"github.com/oprimogus/cardapiogo/internal/domain/factory"
 )
 
@@ -20,5 +21,7 @@ func InitializeRoutes(router *gin.Engine, factory factory.RepositoryFactory) {
 	v1.POST("user", userController.CreateUserHandler)
 	v1.GET("user/:id", userController.GetUserHandler)
 	v1.GET("user", userController.GetUsersListHandler)
+	v1.PUT("user/change-password", userController.UpdateUserPasswordHandler)
+	v1.PUT("user", userController.UpdateUserHandler)
 
 }

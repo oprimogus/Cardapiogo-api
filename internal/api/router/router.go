@@ -5,9 +5,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+
 	"github.com/oprimogus/cardapiogo/internal/domain/factory"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
-	"github.com/sirupsen/logrus"
 )
 
 // Initialize API

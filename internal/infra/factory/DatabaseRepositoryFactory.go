@@ -16,7 +16,7 @@ type DatabaseRepositoryFactory struct {
 
 // NewDataBaseRepositoryFactory return repository factory
 func NewDataBaseRepositoryFactory(db *postgres.PostgresDatabase) factory.RepositoryFactory {
-	return DatabaseRepositoryFactory{db: db, querier: sqlc.New(db.GetDB())}
+	return &DatabaseRepositoryFactory{db: db, querier: sqlc.New(db.GetDB())}
 }
 
 // NewUserRepository return a user repository

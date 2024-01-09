@@ -2,12 +2,14 @@ package validatorutils
 
 import (
 	"fmt"
+
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/pt"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 	pt_translations "github.com/go-playground/validator/v10/translations/pt"
+
 	"github.com/oprimogus/cardapiogo/internal/domain/types"
 )
 
@@ -63,7 +65,7 @@ func (v *Validator) Validate(i interface{}) map[string]string {
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
 			// Se a asserção de tipo falhar, retorna um erro genérico ou lida com isso de maneira apropriada
-			out["error"] = "Erro de validação desconhecido"
+			out["error"] = "Unknown validation error"
 			return out
 		}
 
