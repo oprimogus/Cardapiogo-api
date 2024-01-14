@@ -27,7 +27,7 @@ func NewUserRepositoryDatabase(db *postgres.PostgresDatabase, querier sqlc.Queri
 }
 
 // CreateUser create a user in database. Must receive object validated through the service
-func (u UserRepositoryDatabase) CreateUser(ctx context.Context, newUser user.CreateUserParams) error {
+func (u *UserRepositoryDatabase) CreateUser(ctx context.Context, newUser user.CreateUserParams) error {
 	err := u.q.CreateUser(ctx, u.createUserDatabase(newUser))
 	if err != nil {
 		return errors.NewDatabaseError(err)
@@ -36,24 +36,37 @@ func (u UserRepositoryDatabase) CreateUser(ctx context.Context, newUser user.Cre
 }
 
 // GetUserByID return a user of database. Must receive object validated through the service
-func (u UserRepositoryDatabase) GetUserByID(ctx context.Context, id string) (user.User, error) {
+func (u *UserRepositoryDatabase) GetUserByID(ctx context.Context, id string) (*user.User, error) {
 	log := logger.GetLogger("UserRepository", ctx)
 	uuid, err := converters.ConvertStringToUUID(id)
 	if err != nil {
-		return user.User{}, err
+		return &user.User{}, err
 	}
 
 	getUser, err := u.q.GetUserById(ctx, pgtype.UUID{Bytes: uuid.Bytes, Valid: true})
 	if err != nil {
 		log.Error(err)
-		return user.User{}, errors.NewDatabaseError(err)
+		return &user.User{}, errors.NewDatabaseError(err)
 	}
 
 	return u.fromUserByIDRowToUserModel(getUser)
 }
 
+// GetUserByEmail return a user of database.
+func (u *UserRepositoryDatabase) GetUserByEmail(ctx context.Context, email string) (*user.User, error) {
+	log := logger.GetLogger("UserRepository", ctx)
+
+	getUser, err := u.q.GetUserByEmail(ctx, email)
+	if err != nil {
+		log.Error(err)
+		return &user.User{}, errors.NewDatabaseError(err)
+	}
+
+	return u.fromUserByIDRowToUserModel(*u.fromUserByEmailRowToUserByIDRow(getUser))
+}
+
 // GetUsersList return a list of users
-func (u UserRepositoryDatabase) GetUsersList(ctx context.Context, items int, page int) ([]user.User, error) {
+func (u *UserRepositoryDatabase) GetUsersList(ctx context.Context, items int, page int) ([]*user.User, error) {
 	log := logger.GetLogger("UserRepository", ctx)
 	offset := items * (page - 1)
 
@@ -68,9 +81,9 @@ func (u UserRepositoryDatabase) GetUsersList(ctx context.Context, items int, pag
 		return nil, errors.NewDatabaseError(err)
 	}
 
-	listUsersModel := make([]user.User, len(listUsers))
+	listUsersModel := make([]*user.User, len(listUsers))
 	for i, v := range listUsers {
-		user, err := u.fromUserRowToUserModel(v)
+		user, err := u.fromUserByIDRowToUserModel(*u.fromUserRowToUserByIDRow(v))
 		log.Info(user.Email)
 		if err != nil {
 			return nil, err
@@ -81,7 +94,7 @@ func (u UserRepositoryDatabase) GetUsersList(ctx context.Context, items int, pag
 }
 
 // UpdateUserPassword update hash of password
-func (u UserRepositoryDatabase) UpdateUserPassword(ctx context.Context, updateParams user.UpdateUserPasswordParams) error {
+func (u *UserRepositoryDatabase) UpdateUserPassword(ctx context.Context, updateParams user.UpdateUserPasswordParams) error {
 	log := logger.GetLogger("UserRepository", ctx)
 	updateUserPasswordParams, err := u.createUpdateUserPasswordsParams(updateParams)
 	if err != nil {
@@ -96,7 +109,7 @@ func (u UserRepositoryDatabase) UpdateUserPassword(ctx context.Context, updatePa
 }
 
 // UpdateUser update data user with the exception of password
-func (u UserRepositoryDatabase) UpdateUser(ctx context.Context, updateParams user.UpdateUserParams) error {
+func (u *UserRepositoryDatabase) UpdateUser(ctx context.Context, updateParams user.UpdateUserParams) error {
 	log := logger.GetLogger("UserRepository", ctx)
 	params, err := u.createUpdateUserParams(updateParams)
 	if err != nil {
@@ -107,7 +120,7 @@ func (u UserRepositoryDatabase) UpdateUser(ctx context.Context, updateParams use
 }
 
 // createUserDatabase format DTO to CreateUserParams of sqlc
-func (u UserRepositoryDatabase) createUserDatabase(cr user.CreateUserParams) sqlc.CreateUserParams {
+func (u *UserRepositoryDatabase) createUserDatabase(cr user.CreateUserParams) sqlc.CreateUserParams {
 
 	passwordSqlc := converters.ConvertStringToText(cr.Password)
 
@@ -120,7 +133,7 @@ func (u UserRepositoryDatabase) createUserDatabase(cr user.CreateUserParams) sql
 }
 
 // createUpdateUserPasswordsParams format DTO to UpdateUserPasswordParams of sqlc
-func (u UserRepositoryDatabase) createUpdateUserPasswordsParams(params user.UpdateUserPasswordParams) (sqlc.UpdateUserPasswordParams, error) {
+func (u *UserRepositoryDatabase) createUpdateUserPasswordsParams(params user.UpdateUserPasswordParams) (sqlc.UpdateUserPasswordParams, error) {
 	convertedID, err := converters.ConvertStringToUUID(params.ID)
 	if err != nil {
 		return sqlc.UpdateUserPasswordParams{}, err
@@ -132,7 +145,7 @@ func (u UserRepositoryDatabase) createUpdateUserPasswordsParams(params user.Upda
 }
 
 // createUpdateUserParams format DTO to UpdateUserPasswordParams of sqlc
-func (u UserRepositoryDatabase) createUpdateUserParams(params user.UpdateUserParams) (sqlc.UpdateUserParams, error) {
+func (u *UserRepositoryDatabase) createUpdateUserParams(params user.UpdateUserParams) (sqlc.UpdateUserParams, error) {
 	convertedID, err := converters.ConvertStringToUUID(params.ID)
 	if err != nil {
 		return sqlc.UpdateUserParams{}, err
@@ -145,11 +158,11 @@ func (u UserRepositoryDatabase) createUpdateUserParams(params user.UpdateUserPar
 }
 
 // fromUserByIDRowToUserModel convert sqlc.GetUserByIdRow to user.User
-func (u UserRepositoryDatabase) fromUserByIDRowToUserModel(su sqlc.GetUserByIdRow) (user.User, error) {
+func (u *UserRepositoryDatabase) fromUserByIDRowToUserModel(su sqlc.GetUserByIdRow) (*user.User, error) {
 
 	uuidStr, err := converters.ConvertUUIDToString(su.ID)
 	if err != nil {
-		return user.User{}, err
+		return nil, err
 	}
 	uuidValue := ""
 	if uuidStr != nil {
@@ -158,12 +171,12 @@ func (u UserRepositoryDatabase) fromUserByIDRowToUserModel(su sqlc.GetUserByIdRo
 
 	passwordValue, err := converters.ConvertTextToString(su.Password)
 	if err != nil {
-		return user.User{}, err
+		return nil, err
 	}
 
 	profileIDPtr, err := converters.ConvertInt4ToInt(su.ProfileID)
 	if err != nil {
-		return user.User{}, err
+		return nil, err
 	}
 	var profileIDValue *int
 	if profileIDPtr != nil {
@@ -172,7 +185,7 @@ func (u UserRepositoryDatabase) fromUserByIDRowToUserModel(su sqlc.GetUserByIdRo
 
 	createdAtPtr, err := converters.ConvertTimestamptzToTime(su.CreatedAt)
 	if err != nil {
-		return user.User{}, err
+		return nil, err
 	}
 	var createdAtValue time.Time
 	if createdAtPtr != nil {
@@ -181,18 +194,18 @@ func (u UserRepositoryDatabase) fromUserByIDRowToUserModel(su sqlc.GetUserByIdRo
 
 	updatedAtPtr, err := converters.ConvertTimestamptzToTime(su.UpdatedAt)
 	if err != nil {
-		return user.User{}, err
+		return nil, err
 	}
 	var updatedAtValue time.Time
 	if updatedAtPtr != nil {
 		updatedAtValue = *updatedAtPtr
 	}
 
-	user := user.User{
+	user := &user.User{
 		ID:        uuidValue,
 		ProfileID: profileIDValue,
 		Email:     su.Email,
-		Password:  *passwordValue,
+		Password:  passwordValue,
 		Role:      types.Role(su.Role),
 		CreatedAt: createdAtValue,
 		UpdatedAt: updatedAtValue,
@@ -201,51 +214,30 @@ func (u UserRepositoryDatabase) fromUserByIDRowToUserModel(su sqlc.GetUserByIdRo
 	return user, nil
 }
 
-// fromUserRowToUserModel convert sqlc.getUserRow to user.User
-func (u UserRepositoryDatabase) fromUserRowToUserModel(su sqlc.GetUserRow) (user.User, error) {
-	uuidStr, err := converters.ConvertUUIDToString(su.ID)
-	if err != nil {
-		return user.User{}, err
-	}
-	uuidValue := ""
-	if uuidStr != nil {
-		uuidValue = *uuidStr
-	}
-
-	profileIDPtr, err := converters.ConvertInt4ToInt(su.ProfileID)
-	if err != nil {
-		return user.User{}, err
-	}
-	var profileIDValue *int
-	if profileIDPtr != nil {
-		profileIDValue = profileIDPtr
-	}
-
-	createdAtPtr, err := converters.ConvertTimestamptzToTime(su.CreatedAt)
-	if err != nil {
-		return user.User{}, err
-	}
-	var createdAtValue time.Time
-	if createdAtPtr != nil {
-		createdAtValue = *createdAtPtr
-	}
-
-	updatedAtPtr, err := converters.ConvertTimestamptzToTime(su.UpdatedAt)
-	if err != nil {
-		return user.User{}, err
-	}
-	var updatedAtValue time.Time
-	if updatedAtPtr != nil {
-		updatedAtValue = *updatedAtPtr
-	}
-
-	user := user.User{
-		ID:        uuidValue,
-		ProfileID: profileIDValue,
+// fromUserRowToUserByIDRow convert sqlc.GetUserRow to sqlc.GetUserByIdRow 
+func (u *UserRepositoryDatabase) fromUserRowToUserByIDRow(su sqlc.GetUserRow) *sqlc.GetUserByIdRow {
+	return &sqlc.GetUserByIdRow{
+		ID:        su.ID,
+		ProfileID: su.ProfileID,
 		Email:     su.Email,
-		Role:      types.Role(su.Role),
-		CreatedAt: createdAtValue,
-		UpdatedAt: updatedAtValue,
+		Password:  pgtype.Text{Valid: false, String: ""},
+		Role:      su.Role,
+		CreatedAt: su.CreatedAt,
+		UpdatedAt: su.UpdatedAt,
 	}
-	return user, nil
 }
+
+// fromUserByEmailRowToUserByIDRow convert sqlc.UserByEmailRow to sqlc.GetUserByIdRow 
+func (u *UserRepositoryDatabase) fromUserByEmailRowToUserByIDRow(su sqlc.GetUserByEmailRow) *sqlc.GetUserByIdRow {
+	return &sqlc.GetUserByIdRow{
+		ID:        su.ID,
+		ProfileID: su.ProfileID,
+		Email:     su.Email,
+		Password:  su.Password,
+		Role:      su.Role,
+		CreatedAt: su.CreatedAt,
+		UpdatedAt: su.UpdatedAt,
+	}
+}
+
+
