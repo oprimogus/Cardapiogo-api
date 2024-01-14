@@ -2,6 +2,7 @@ package validatorutils
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/pt"
@@ -11,6 +12,7 @@ import (
 	pt_translations "github.com/go-playground/validator/v10/translations/pt"
 
 	"github.com/oprimogus/cardapiogo/internal/domain/types"
+	"github.com/oprimogus/cardapiogo/internal/errors"
 )
 
 var personalizedValidations = map[string]bool{
@@ -53,7 +55,7 @@ func NewValidator(locale string) (*Validator, error) {
 	}, nil
 }
 
-func (v *Validator) Validate(i interface{}) map[string]string {
+func (v *Validator) Validate(i interface{}) *errors.ErrorResponse {
 	out := make(map[string]string)
 
 	// Realiza a validação
@@ -66,7 +68,7 @@ func (v *Validator) Validate(i interface{}) map[string]string {
 		if !ok {
 			// Se a asserção de tipo falhar, retorna um erro genérico ou lida com isso de maneira apropriada
 			out["error"] = "Unknown validation error"
-			return out
+			return errors.NewErrorResponse(http.StatusBadRequest, out["error"])
 		}
 
 		// Processa os erros de validação
@@ -80,16 +82,17 @@ func (v *Validator) Validate(i interface{}) map[string]string {
 		}
 	}
 
-	// Retorna um mapa vazio se não houver erros ou um mapa com erros
-	return out
+	if len(out) > 0 {
+		return errors.InvalidInput(out)
+	}
+	return nil
 }
 
 func errorPersonalized(locale string, tag string) string {
 	if locale == "pt" {
-		return fmt.Sprintf("Valor inválido para o campo %s", tag)
+		return "Valor inválido para o campo."
 	}
-	return fmt.Sprintf("Invalid value for %s field", tag)
-
+	return "Invalid value for field"
 }
 
 func isValidUserRole(fl validator.FieldLevel) bool {

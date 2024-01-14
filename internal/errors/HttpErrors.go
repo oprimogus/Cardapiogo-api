@@ -4,31 +4,6 @@ import (
 	"net/http"
 )
 
-// ErrorResponse is the response that represents an error.
-type ErrorResponse struct {
-	Status  int         `json:"status"`
-	Message string      `json:"message"`
-	Details interface{} `json:"details,omitempty"`
-}
-
-func NewErrorResponse(status int, message string, details ...interface{}) *ErrorResponse {
-	return &ErrorResponse{
-		Status: status,
-		Message: message,
-		Details: details,
-	}
-}
-
-// Error is required by the error interface.
-func (e ErrorResponse) Error() string {
-	return e.Message
-}
-
-// StatusCode is required by routing.HTTPError interface.
-func (e ErrorResponse) StatusCode() int {
-	return e.Status
-}
-
 // InternalServerError creates a new error response representing an internal server error (HTTP 500)
 func InternalServerError(msg string) *ErrorResponse {
 	if msg == "" {
@@ -74,9 +49,9 @@ type invalidField struct {
 	Error string `json:"error"`
 }
 
-func InvalidInput(errs map[string]string) *ErrorResponse{
-	details := make([]invalidField, len(errs))
+func InvalidInput(errs map[string]string) *ErrorResponse {
 
+	details := []invalidField{}
 	for i, v := range errs {
 		details = append(details, invalidField{
 			Field: i,
@@ -84,8 +59,8 @@ func InvalidInput(errs map[string]string) *ErrorResponse{
 		})
 	}
 	return &ErrorResponse{
-		Status: http.StatusBadRequest,
-		Message: "There is some problem with the data you submitted.",
-		Details: details,
+		Status:       http.StatusBadRequest,
+		ErrorMessage: "There is some problem with the data you submitted.",
+		Details:      details,
 	}
 }

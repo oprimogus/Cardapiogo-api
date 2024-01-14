@@ -10,8 +10,6 @@ import (
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
-var log = logger.GetLogger("UserService")
-
 // Service struct
 type Service struct {
 	repository Repository
@@ -44,6 +42,7 @@ func (u *Service) GetUsersList(ctx context.Context, items int, page int) ([]User
 
 // UpdateUserPassword change the password of user
 func (u *Service) UpdateUserPassword(ctx context.Context, params UpdateUserPasswordParams) error {
+	log := logger.GetLogger("UserService", ctx)
 	user, err := u.GetUser(ctx, params.ID)
 	if err != nil {
 		return err

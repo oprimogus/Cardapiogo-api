@@ -8,14 +8,12 @@ import (
 
 	"github.com/oprimogus/cardapiogo/internal/domain/types"
 	"github.com/oprimogus/cardapiogo/internal/domain/user"
-	errordatabase "github.com/oprimogus/cardapiogo/internal/errors/database"
+	"github.com/oprimogus/cardapiogo/internal/errors"
 	"github.com/oprimogus/cardapiogo/internal/infra/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/infra/database/sqlc"
 	"github.com/oprimogus/cardapiogo/pkg/converters"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
-
-var log = logger.GetLogger("UserRepository")
 
 // UserRepositoryDatabase struct
 type UserRepositoryDatabase struct {
@@ -31,15 +29,15 @@ func NewUserRepositoryDatabase(db *postgres.PostgresDatabase, querier sqlc.Queri
 // CreateUser create a user in database. Must receive object validated through the service
 func (u UserRepositoryDatabase) CreateUser(ctx context.Context, newUser user.CreateUserParams) error {
 	err := u.q.CreateUser(ctx, u.createUserDatabase(newUser))
-	log.Error(err)
 	if err != nil {
-		return errordatabase.MapDBError(err)
+		return errors.NewDatabaseError(err)
 	}
 	return nil
 }
 
 // GetUserByID return a user of database. Must receive object validated through the service
 func (u UserRepositoryDatabase) GetUserByID(ctx context.Context, id string) (user.User, error) {
+	log := logger.GetLogger("UserRepository", ctx)
 	uuid, err := converters.ConvertStringToUUID(id)
 	if err != nil {
 		return user.User{}, err
@@ -48,7 +46,7 @@ func (u UserRepositoryDatabase) GetUserByID(ctx context.Context, id string) (use
 	getUser, err := u.q.GetUserById(ctx, pgtype.UUID{Bytes: uuid.Bytes, Valid: true})
 	if err != nil {
 		log.Error(err)
-		return user.User{}, errordatabase.MapDBError(err)
+		return user.User{}, errors.NewDatabaseError(err)
 	}
 
 	return u.fromUserByIDRowToUserModel(getUser)
@@ -56,7 +54,7 @@ func (u UserRepositoryDatabase) GetUserByID(ctx context.Context, id string) (use
 
 // GetUsersList return a list of users
 func (u UserRepositoryDatabase) GetUsersList(ctx context.Context, items int, page int) ([]user.User, error) {
-
+	log := logger.GetLogger("UserRepository", ctx)
 	offset := items * (page - 1)
 
 	searchParams := sqlc.GetUserParams{
@@ -67,12 +65,13 @@ func (u UserRepositoryDatabase) GetUsersList(ctx context.Context, items int, pag
 	listUsers, err := u.q.GetUser(ctx, searchParams)
 	if err != nil {
 		log.Error(err)
-		return nil, errordatabase.MapDBError(err)
+		return nil, errors.NewDatabaseError(err)
 	}
 
 	listUsersModel := make([]user.User, len(listUsers))
 	for i, v := range listUsers {
 		user, err := u.fromUserRowToUserModel(v)
+		log.Info(user.Email)
 		if err != nil {
 			return nil, err
 		}
@@ -83,6 +82,7 @@ func (u UserRepositoryDatabase) GetUsersList(ctx context.Context, items int, pag
 
 // UpdateUserPassword update hash of password
 func (u UserRepositoryDatabase) UpdateUserPassword(ctx context.Context, updateParams user.UpdateUserPasswordParams) error {
+	log := logger.GetLogger("UserRepository", ctx)
 	updateUserPasswordParams, err := u.createUpdateUserPasswordsParams(updateParams)
 	if err != nil {
 		return err
@@ -97,7 +97,7 @@ func (u UserRepositoryDatabase) UpdateUserPassword(ctx context.Context, updatePa
 
 // UpdateUser update data user with the exception of password
 func (u UserRepositoryDatabase) UpdateUser(ctx context.Context, updateParams user.UpdateUserParams) error {
-
+	log := logger.GetLogger("UserRepository", ctx)
 	params, err := u.createUpdateUserParams(updateParams)
 	if err != nil {
 		log.Error(err)
