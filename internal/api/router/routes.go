@@ -25,7 +25,7 @@ func InitializeRoutes(router *gin.Engine, factory factory.RepositoryFactory) {
 	v1.GET("user", userController.GetUsersListHandler)
 	v1.PUT("user/change-password", userController.UpdateUserPasswordHandler)
 	v1.PUT("user", userController.UpdateUserHandler)
-	
+
 	// Oauth2.0 Domain
 	v1.GET("auth", oauthController.StartOAuthFlow)
 	v1.GET("auth/callback", oauthController.SignUpLoginOauthCallback)
