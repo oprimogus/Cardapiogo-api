@@ -11,12 +11,13 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
+
 	"github.com/oprimogus/cardapiogo/pkg/log"
 )
 
 var (
 	instance *PostgresDatabase
-	log      = logger.GetLogger("Postgres")
+	log      = logger.GetLoggerDefault("Postgres")
 )
 
 // PostgresDatabase struct
@@ -106,7 +107,7 @@ func (d PostgresDatabase) migrate() error {
 			return fmt.Errorf("database: error when executing database migration: %w", err)
 		}
 	}
-	log.Info("finalizing migrations!")
+	log.Info("Finish migrations!")
 	return nil
 }
 
