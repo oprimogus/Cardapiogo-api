@@ -14,10 +14,10 @@ type CreateUserParams struct {
 
 // UpdateUserParams DTO
 type UpdateUserParams struct {
-	ID       string     `db:"id" json:"id"`
-	Email    string     `db:"email" json:"email"`
-	Password string     `db:"password" json:"password"`
-	Role     types.Role `db:"role" json:"role"`
+	ID       string     `db:"id" json:"id" validate:"required,uuid"`
+	Email    string     `db:"email" json:"email" validate:"required,email"`
+	Password string     `db:"password" json:"password" validate:"required"`
+	Role     types.Role `db:"role" json:"role" validate:"required,role"`
 }
 
 // UpdateUserPasswordParams DTO

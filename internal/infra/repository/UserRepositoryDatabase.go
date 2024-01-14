@@ -127,7 +127,7 @@ func (u UserRepositoryDatabase) createUpdateUserPasswordsParams(params user.Upda
 	}
 	return sqlc.UpdateUserPasswordParams{
 		ID:       convertedID,
-		Password: converters.ConvertStringToText(params.Password),
+		Password: converters.ConvertStringToText(params.NewPassword),
 	}, nil
 }
 

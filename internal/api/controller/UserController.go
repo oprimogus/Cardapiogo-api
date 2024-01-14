@@ -121,10 +121,10 @@ func (c *UserController) UpdateUserPasswordHandler(ctx *gin.Context) {
 	if err != nil {
 		dbErr, ok := err.(*errors.ErrorResponse)
 		if ok && dbErr != nil {
-			ctx.JSON(dbErr.Status, dbErr.ErrorMessage)
+			ctx.JSON(dbErr.Status, dbErr)
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, dbErr)
+		ctx.JSON(dbErr.Status, dbErr)
 		return
 	}
 	ctx.Status(http.StatusOK)
@@ -150,10 +150,10 @@ func (c *UserController) UpdateUserHandler(ctx *gin.Context) {
 	if err != nil {
 		dbErr, ok := err.(*errors.ErrorResponse)
 		if ok && dbErr != nil {
-			ctx.JSON(dbErr.Status, dbErr.ErrorMessage)
+			ctx.JSON(dbErr.Status, dbErr)
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, dbErr)
+		ctx.JSON(dbErr.Status, dbErr)
 		return
 	}
 

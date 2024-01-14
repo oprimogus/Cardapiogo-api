@@ -2,12 +2,12 @@ package user
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
 
-	logger "github.com/oprimogus/cardapiogo/pkg/log"
+	"github.com/oprimogus/cardapiogo/internal/errors"
 )
 
 // Service struct
@@ -42,21 +42,13 @@ func (u *Service) GetUsersList(ctx context.Context, items int, page int) ([]User
 
 // UpdateUserPassword change the password of user
 func (u *Service) UpdateUserPassword(ctx context.Context, params UpdateUserPasswordParams) error {
-	log := logger.GetLogger("UserService", ctx)
 	user, err := u.GetUser(ctx, params.ID)
 	if err != nil {
 		return err
 	}
 
-	params.Password, err = u.HashPassword(params.Password)
-	if err != nil {
-		return err
-	}
-
-	if user.Password != params.Password {
-		log.Infof("My hash: %s", user.Password)
-		return errors.New("invalid password")
-
+	if !u.IsValidPassword(params.Password, user.Password) {
+		return errors.NewErrorResponse(http.StatusBadRequest, "Invalid Password")
 	}
 
 	params.NewPassword, err = u.HashPassword(params.NewPassword)
@@ -73,13 +65,8 @@ func (u *Service) UpdateUser(ctx context.Context, params UpdateUserParams) error
 		return err
 	}
 
-	params.Password, err = u.HashPassword(params.Password)
-	if err != nil {
-		return err
-	}
-
-	if user.Password != params.Password {
-		return errors.New("invalid password")
+	if !u.IsValidPassword(params.Password, user.Password) {
+		return errors.NewErrorResponse(http.StatusBadRequest, "Invalid Password")
 	}
 
 	return u.repository.UpdateUser(ctx, params)
@@ -91,8 +78,8 @@ func (u *Service) HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-// CheckPasswordHash verify if password hash is valid
-func (u *Service) CheckPasswordHash(password, hash string) bool {
+// CheckPasswordHash verify if password hash is valid and 
+func (u *Service) IsValidPassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
