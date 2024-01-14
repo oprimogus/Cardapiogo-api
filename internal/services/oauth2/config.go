@@ -25,7 +25,7 @@ func NewGoogleOauthConf() *oauth2.Config {
 		},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://accounts.google.com/o/oauth2/auth",
-    		TokenURL: "https://accounts.google.com/o/oauth2/token",
+			TokenURL: "https://accounts.google.com/o/oauth2/token",
 		},
 	}
 }
