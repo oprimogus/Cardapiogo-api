@@ -12,7 +12,6 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
 
-
 // UserController struct
 type UserController struct {
 	service   *user.Service

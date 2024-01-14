@@ -78,7 +78,7 @@ func (u *Service) HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-// CheckPasswordHash verify if password hash is valid and 
+// CheckPasswordHash verify if password hash is valid and
 func (u *Service) IsValidPassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil

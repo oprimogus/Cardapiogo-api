@@ -15,13 +15,19 @@ func InitializeRoutes(router *gin.Engine, factory factory.RepositoryFactory) {
 		panic(err)
 	}
 	userController := controller.NewUserController(factory.NewUserRepository(), validator)
-
+	oauthController := controller.NewOauth2Controller(factory.NewUserRepository(), validator)
 	basePath := "/api/v1"
 	v1 := router.Group(basePath)
+
+	// Users Domain
 	v1.POST("user", userController.CreateUserHandler)
 	v1.GET("user/:id", userController.GetUserHandler)
 	v1.GET("user", userController.GetUsersListHandler)
 	v1.PUT("user/change-password", userController.UpdateUserPasswordHandler)
 	v1.PUT("user", userController.UpdateUserHandler)
+	
+	// Oauth2.0 Domain
+	v1.GET("auth", oauthController.StartOAuthFlow)
+	v1.GET("auth/callback", oauthController.SignUpLoginOauthCallback)
 
 }
