@@ -7,6 +7,11 @@ SELECT id, profile_id, email, password, role, created_at, updated_at FROM users
 WHERE id = $1
 LIMIT 1;
 
+-- name: GetUserByEmail :one
+SELECT id, profile_id, email, password, role, created_at, updated_at FROM users
+WHERE email = $1
+LIMIT 1;
+
 -- name: GetUser :many
 SELECT id, profile_id, email, role, created_at, updated_at FROM users
 ORDER BY created_at desc

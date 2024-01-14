@@ -1,9 +1,10 @@
 package converters
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
-	"time"
 )
 
 // ConvertUUIDToString converts pgtype.UUID to *string. Returns nil if UUID is not valid.
@@ -53,12 +54,12 @@ func ConvertIntToInt4(i int) pgtype.Int4 {
 }
 
 // ConvertTextToString converts pgtype.Text to *string. Returns nil if Text is not valid.
-func ConvertTextToString(textVal pgtype.Text) (*string, error) {
+func ConvertTextToString(textVal pgtype.Text) (string, error) {
 	if !textVal.Valid {
-		return nil, nil
+		return "", nil
 	}
 
-	return &textVal.String, nil
+	return textVal.String, nil
 }
 
 // ConvertStringToText converts string to pgtype.Text.
