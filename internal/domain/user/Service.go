@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
-	"golang.org/x/oauth2"
 
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
@@ -31,9 +30,19 @@ func (u *Service) CreateUser(ctx context.Context, newUser CreateUserParams) erro
 	return u.repository.CreateUser(ctx, newUser)
 }
 
-// GetUser return a user from database
+// CreateUserWithOAuth create a user in database
+func (u *Service) CreateUserWithOAuth(ctx context.Context, newUser CreateUserWithOAuthParams) error {
+	return u.repository.CreateUserWithOAuth(ctx, newUser)
+}
+
+// GetUser return a user from database by ID
 func (u *Service) GetUser(ctx context.Context, id string) (*User, error) {
 	return u.repository.GetUserByID(ctx, id)
+}
+
+// GetUser return a user from database by email
+func (u *Service) GetUserByEmail(ctx context.Context, email string) (*User, error) {
+	return u.repository.GetUserByEmail(ctx, email)
 }
 
 // GetUsersList return a user from database
@@ -71,11 +80,6 @@ func (u *Service) UpdateUser(ctx context.Context, params UpdateUserParams) error
 	}
 
 	return u.repository.UpdateUser(ctx, params)
-}
-
-func (u *Service) signUp(ctx context.Context, token *oauth2.Token) error {
-	user := u.GetUser()
-
 }
 
 // HashPassword generate a hash of password for save in database

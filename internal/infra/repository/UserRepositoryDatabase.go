@@ -35,6 +35,15 @@ func (u *UserRepositoryDatabase) CreateUser(ctx context.Context, newUser user.Cr
 	return nil
 }
 
+// CreateUserWithOAuth create a user in database. Must receive object validated through the service
+func (u *UserRepositoryDatabase) CreateUserWithOAuth(ctx context.Context, newUser user.CreateUserWithOAuthParams) error {
+	err := u.q.CreateUserWithOAuth(ctx, u.createUserOAuthDatabase(newUser))
+	if err != nil {
+		return errors.NewDatabaseError(err)
+	}
+	return nil
+}
+
 // GetUserByID return a user of database. Must receive object validated through the service
 func (u *UserRepositoryDatabase) GetUserByID(ctx context.Context, id string) (*user.User, error) {
 	log := logger.GetLogger("UserRepository", ctx)
@@ -132,6 +141,16 @@ func (u *UserRepositoryDatabase) createUserDatabase(cr user.CreateUserParams) sq
 	}
 }
 
+// createUserOAuthDatabase format DTO to CreateUserWithOAuthParams of sqlc
+func (u *UserRepositoryDatabase) createUserOAuthDatabase(cr user.CreateUserWithOAuthParams) sqlc.CreateUserWithOAuthParams {
+
+	return sqlc.CreateUserWithOAuthParams{
+		Email:           cr.Email,
+		Role:            sqlc.UserRole(cr.Role),
+		AccountProvider: sqlc.AccountProvider(cr.AccountProvider),
+	}
+}
+
 // createUpdateUserPasswordsParams format DTO to UpdateUserPasswordParams of sqlc
 func (u *UserRepositoryDatabase) createUpdateUserPasswordsParams(params user.UpdateUserPasswordParams) (sqlc.UpdateUserPasswordParams, error) {
 	convertedID, err := converters.ConvertStringToUUID(params.ID)
@@ -214,7 +233,7 @@ func (u *UserRepositoryDatabase) fromUserByIDRowToUserModel(su sqlc.GetUserByIdR
 	return user, nil
 }
 
-// fromUserRowToUserByIDRow convert sqlc.GetUserRow to sqlc.GetUserByIdRow 
+// fromUserRowToUserByIDRow convert sqlc.GetUserRow to sqlc.GetUserByIdRow
 func (u *UserRepositoryDatabase) fromUserRowToUserByIDRow(su sqlc.GetUserRow) *sqlc.GetUserByIdRow {
 	return &sqlc.GetUserByIdRow{
 		ID:        su.ID,
@@ -227,7 +246,7 @@ func (u *UserRepositoryDatabase) fromUserRowToUserByIDRow(su sqlc.GetUserRow) *s
 	}
 }
 
-// fromUserByEmailRowToUserByIDRow convert sqlc.UserByEmailRow to sqlc.GetUserByIdRow 
+// fromUserByEmailRowToUserByIDRow convert sqlc.UserByEmailRow to sqlc.GetUserByIdRow
 func (u *UserRepositoryDatabase) fromUserByEmailRowToUserByIDRow(su sqlc.GetUserByEmailRow) *sqlc.GetUserByIdRow {
 	return &sqlc.GetUserByIdRow{
 		ID:        su.ID,
@@ -239,5 +258,3 @@ func (u *UserRepositoryDatabase) fromUserByEmailRowToUserByIDRow(su sqlc.GetUser
 		UpdatedAt: su.UpdatedAt,
 	}
 }
-
-

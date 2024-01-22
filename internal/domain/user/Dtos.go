@@ -12,6 +12,19 @@ type CreateUserParams struct {
 	AccountProvider types.AccountProvider `db:"account_provider" json:"account_provider" validate:"required,account_provider"`
 }
 
+// CreateUserWithOAuthParams DTO
+type CreateUserWithOAuthParams struct {
+	Email           string                `db:"email" json:"email" validate:"required,email"`
+	Role            types.Role            `db:"role" json:"role" validate:"required,role"`
+	AccountProvider types.AccountProvider `db:"account_provider" json:"account_provider" validate:"required,account_provider"`
+}
+
+// Login DTO
+type Login struct {
+	Email    string `db:"email" json:"email" validate:"required,email"`
+	Password string `db:"password" json:"password" validate:"required"`
+}
+
 // UpdateUserParams DTO
 type UpdateUserParams struct {
 	ID       string     `db:"id" json:"id" validate:"required,uuid"`

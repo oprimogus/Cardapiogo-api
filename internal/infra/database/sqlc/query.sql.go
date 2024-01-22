@@ -55,6 +55,22 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 	return err
 }
 
+const createUserWithOAuth = `-- name: CreateUserWithOAuth :exec
+INSERT INTO users (email, role, account_provider, created_at, updated_at)
+VALUES ($1, $2, $3, NOW(), NOW())
+`
+
+type CreateUserWithOAuthParams struct {
+	Email           string          `db:"email" json:"email"`
+	Role            UserRole        `db:"role" json:"role"`
+	AccountProvider AccountProvider `db:"account_provider" json:"account_provider"`
+}
+
+func (q *Queries) CreateUserWithOAuth(ctx context.Context, arg CreateUserWithOAuthParams) error {
+	_, err := q.db.Exec(ctx, createUserWithOAuth, arg.Email, arg.Role, arg.AccountProvider)
+	return err
+}
+
 const getProfile = `-- name: GetProfile :one
 SELECT id, name, last_name, cpf, phone, created_at, updated_at FROM profile
 WHERE id = $1

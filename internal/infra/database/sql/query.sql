@@ -2,6 +2,10 @@
 INSERT INTO users (email, password, role, account_provider, created_at, updated_at)
 VALUES ($1, $2, $3, $4, NOW(), NOW());
 
+-- name: CreateUserWithOAuth :exec
+INSERT INTO users (email, role, account_provider, created_at, updated_at)
+VALUES ($1, $2, $3, NOW(), NOW());
+
 -- name: GetUserById :one
 SELECT id, profile_id, email, password, role, created_at, updated_at FROM users
 WHERE id = $1

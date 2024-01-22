@@ -7,6 +7,7 @@ import (
 // Repository interface
 type Repository interface {
 	CreateUser(ctx context.Context, user CreateUserParams) error
+	CreateUserWithOAuth(ctx context.Context, user CreateUserWithOAuthParams) error
 	GetUserByID(ctx context.Context, id string) (*User, error)
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
 	GetUsersList(ctx context.Context, items int, page int) ([]*User, error)

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/oprimogus/cardapiogo/internal/api/controller"
+	"github.com/oprimogus/cardapiogo/internal/api/middleware"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
 	"github.com/oprimogus/cardapiogo/internal/domain/factory"
 )
@@ -15,19 +16,27 @@ func InitializeRoutes(router *gin.Engine, factory factory.RepositoryFactory) {
 		panic(err)
 	}
 	userController := controller.NewUserController(factory.NewUserRepository(), validator)
-	oauthController := controller.NewOauth2Controller(factory.NewUserRepository(), validator)
+	authController := controller.NewAuthController(factory.NewUserRepository(), validator)
 	basePath := "/api/v1"
+
 	v1 := router.Group(basePath)
 
-	// Users Domain
-	v1.POST("user", userController.CreateUserHandler)
-	v1.GET("user/:id", userController.GetUserHandler)
-	v1.GET("user", userController.GetUsersListHandler)
-	v1.PUT("user/change-password", userController.UpdateUserPasswordHandler)
-	v1.PUT("user", userController.UpdateUserHandler)
+	publicV1 := v1.Group("")
+	{
+		publicV1.POST("user", userController.CreateUserHandler)
+		publicV1.GET("auth", authController.StartOAuthFlow)
+		publicV1.POST("login", authController.Login)
+		// publicV1.GET("auth/callback", oauthController.SignUpLoginOauthCallback)
+	}
 
-	// Oauth2.0 Domain
-	v1.GET("auth", oauthController.StartOAuthFlow)
-	v1.GET("auth/callback", oauthController.SignUpLoginOauthCallback)
+	authMiddleware := middleware.AuthMiddleware()
 
+	protectedV1 := v1.Group("")
+	protectedV1.Use(authMiddleware)
+	{
+		protectedV1.GET("user/:id", userController.GetUserHandler)
+		protectedV1.GET("user", userController.GetUsersListHandler)
+		protectedV1.PUT("user/change-password", userController.UpdateUserPasswordHandler)
+		protectedV1.PUT("user", userController.UpdateUserHandler)
+	}
 }
