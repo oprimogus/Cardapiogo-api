@@ -37,7 +37,7 @@ func NewValidator(locale string) (*Validator, error) {
 
 	translator, found := uni.GetTranslator(locale)
 	if !found {
-		return nil, fmt.Errorf("Locale %s not found", locale)
+		return nil, fmt.Errorf("locale %s not found", locale)
 	}
 	switch locale {
 	case "en":
