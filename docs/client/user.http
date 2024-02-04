@@ -1,31 +1,36 @@
-### Login
-POST http://localhost:8080/api/v1/login
+@baseUrl = http://localhost:8080/api/v1
+
+# @name login
+POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
     "email": "trevor.philips@example.com",
     "password": "teste123"
 }
+
 ###
 
-### List users
-GET http://localhost:8080/api/v1/user
+@authToken = {{login.response.headers.Set-Cookie}}
+
+# @name listUsers
+GET {{baseUrl}}/user
     ?items=10
     &page=1
 Content-Type: application/json
-Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDcwNjUyNDMsImlzcyI6ImNhcmRhcGlvZ28iLCJwcm92aWRlciI6IkxvY2FsIiwicm9sZSI6IkNvbnN1bWVyIiwic3ViIjoiNWQyYjgwZjYtY2RkYS00NjZhLThlMjMtYjgyODhjNTZhYmNjIn0.qgD3zUr2dNTIjaW_dCo_FDxJWN49aGZlBOuwGQ8r3vc
+Cookie: {{authToken}}
 ###
 
-### Get user
-GET http://localhost:8080/api/v1/user/34e1b6a6-c241-4006-be1d-6255393edb7c
+# @name getUser
+GET {{baseUrl}}/user/34e1b6a6-c241-4006-be1d-6255393edb7c
 Content-Type: application/json
-Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDcwNjUyNDMsImlzcyI6ImNhcmRhcGlvZ28iLCJwcm92aWRlciI6IkxvY2FsIiwicm9sZSI6IkNvbnN1bWVyIiwic3ViIjoiNWQyYjgwZjYtY2RkYS00NjZhLThlMjMtYjgyODhjNTZhYmNjIn0.qgD3zUr2dNTIjaW_dCo_FDxJWN49aGZlBOuwGQ8r3vc
+Cookie: {{authToken}}
 ###
 
-### Update user
-PUT http://localhost:8080/api/v1/user
+# @name updateUser
+PUT {{baseUrl}}/user
 Content-Type: application/json
-Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDcwNjU3ODIsImlzcyI6ImNhcmRhcGlvZ28iLCJwcm92aWRlciI6IkxvY2FsIiwicm9sZSI6Ik93bmVyIiwic3ViIjoiMzRlMWI2YTYtYzI0MS00MDA2LWJlMWQtNjI1NTM5M2VkYjdjIn0.zjteUETR5UA_lOOc4_GmJasoJPCebrFUpYim90WPj3E
+Cookie: {{authToken}}
 
 {
   "id": "34e1b6a6-c241-4006-be1d-6255393edb7c",
