@@ -35,4 +35,5 @@ Configure o swaggo através deste [link](https://github.com/swaggo/gin-swagger)
     ```
     make run
     ```
-5. Acessar rotas em  ```http://localhost:8080/api/v1/swagger/index.html#/```
+
+5. Acessar rotas em  http://localhost:8080/api/v1/swagger/index.html#/
