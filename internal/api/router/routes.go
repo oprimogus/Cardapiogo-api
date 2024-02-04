@@ -2,7 +2,10 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
+	docs "github.com/oprimogus/cardapiogo/docs"
 	"github.com/oprimogus/cardapiogo/internal/api/controller"
 	"github.com/oprimogus/cardapiogo/internal/api/middleware"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
@@ -19,7 +22,11 @@ func InitializeRoutes(router *gin.Engine, factory factory.RepositoryFactory) {
 	authController := controller.NewAuthController(factory.NewUserRepository(), validator)
 	basePath := "/api/v1"
 
+	docs.SwaggerInfo.BasePath = basePath
+
 	v1 := router.Group(basePath)
+
+	v1.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	publicV1 := v1.Group("")
 	{

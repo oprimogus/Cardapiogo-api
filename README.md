@@ -10,18 +10,22 @@ Configure a CLI do [migrate](https://github.com/golang-migrate/migrate/tree/v4.1
 Configure o SQLC através deste [link](https://docs.sqlc.dev/en/stable/overview/install.html)
 
 
-## Comandos
+## Rodar o app localmente
 
 1. Instalar dependências do app
 ```
 make install
 ```
 
-2. Criar migration
+2. Rodar migrations
 ```
-make migration
+make migration_up
 ```
-3. Rodar o app
+3. Subir banco de dados e demais containers
+```
+make docker
+```
+4. Rodar o app
 ```
 make run
 ```

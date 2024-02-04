@@ -17,7 +17,11 @@ docker:
 sqlc_generate:
 	sqlc generate -f internal/infra/database/sqlc/sqlc.yaml
 
+docs:
+	swag init -g cmd/main.go
+
 run:
+	swag init -g cmd/main.go
 	go run cmd/main.go
 
 migration:

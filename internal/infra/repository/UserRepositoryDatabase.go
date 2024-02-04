@@ -212,14 +212,14 @@ func (u *UserRepositoryDatabase) fromSqlcUserToUserModel(su sqlc.Users) (*user.U
 	}
 
 	user := &user.User{
-		ID:        uuidValue,
-		ProfileID: profileIDValue,
-		Email:     su.Email,
-		Password:  passwordValue,
-		Role:      types.Role(su.Role),
+		ID:              uuidValue,
+		ProfileID:       profileIDValue,
+		Email:           su.Email,
+		Password:        passwordValue,
+		Role:            types.Role(su.Role),
 		AccountProvider: types.AccountProvider(su.AccountProvider),
-		CreatedAt: createdAtValue,
-		UpdatedAt: updatedAtValue,
+		CreatedAt:       createdAtValue,
+		UpdatedAt:       updatedAtValue,
 	}
 
 	return user, nil

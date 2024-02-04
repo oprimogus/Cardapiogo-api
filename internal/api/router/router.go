@@ -14,9 +14,11 @@ import (
 func Initialize(factory factory.RepositoryFactory) {
 
 	router := gin.New()
+	router.Use(gin.Recovery())
 	router.Use(middleware.TransactionIDMiddleware())
 	router.Use(middleware.LoggerMiddleware(logger.GetLoggerDefault("GIN")))
-	router.Use(gin.Recovery())
+	router.Use(middleware.CorsMiddleware())
+	
 
 	log := logger.GetLoggerDefault("Router")
 

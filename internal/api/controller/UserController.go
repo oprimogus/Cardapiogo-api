@@ -23,7 +23,20 @@ func NewUserController(repository user.Repository, validator *validatorutils.Val
 	return &UserController{service: user.NewService(repository), validator: validator}
 }
 
-// CreateUserHandler create a user in database
+// @BasePath /api/v1
+
+// CreateUserHandler godoc
+// @Summary Adiciona um novo usuário
+// @Description Cria um novo usuário através de login email/senha
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Param   request body user.CreateUserParams true "CreateUserParams"
+// @Success 201
+// @Failure 400  {object} errors.ErrorResponse
+// @Failure 500  {object} errors.ErrorResponse
+// @Failure 502  {object} errors.ErrorResponse
+// @Router /user [post]
 func (c *UserController) CreateUserHandler(ctx *gin.Context) {
 	var userParams user.CreateUserParams
 	err := ctx.BindJSON(&userParams)
@@ -51,7 +64,18 @@ func (c *UserController) CreateUserHandler(ctx *gin.Context) {
 	ctx.Status(http.StatusCreated)
 }
 
-// GetUserHandler return a user by id
+// GetUserHandler godoc
+// @Summary Retorna um usuário
+// @Description Retorna um usuário através do ID
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Param   id path string true "ID do usuário (UUID)"
+// @Success 200 {object} user.User
+// @Failure 400  {object} errors.ErrorResponse
+// @Failure 500  {object} errors.ErrorResponse
+// @Failure 502  {object} errors.ErrorResponse
+// @Router /user/:id [get]
 func (c *UserController) GetUserHandler(ctx *gin.Context) {
 	id := ctx.Params.ByName("id")
 
@@ -74,7 +98,19 @@ func (c *UserController) GetUserHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, getUser)
 }
 
-// GetUsersListHandler return a paginated list of users
+// GetUsersListHandler godoc
+// @Summary Retorna uma lista de usuários
+// @Description Retorna uma lista de usuários com paginação
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Param   items query number true "Número de itens por página"
+// @Param   page query number true "Página"
+// @Success 200 {array} user.User
+// @Failure 400  {object} errors.ErrorResponse
+// @Failure 500  {object} errors.ErrorResponse
+// @Failure 502  {object} errors.ErrorResponse
+// @Router /user [get]
 func (c *UserController) GetUsersListHandler(ctx *gin.Context) {
 	items, err := strconv.Atoi(ctx.Query("items"))
 	if err != nil || items <= 0 {
@@ -100,7 +136,18 @@ func (c *UserController) GetUsersListHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, listUsers)
 }
 
-// UpdateUserPasswordHandler update user password
+// UpdateUserPasswordHandler godoc
+// @Summary Atualiza a senha do usuário
+// @Description Atualiza a senha do usuário
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Param   request body user.UpdateUserPasswordParams true "UpdateUserPasswordParams"
+// @Success 200
+// @Failure 400  {object} errors.ErrorResponse
+// @Failure 500  {object} errors.ErrorResponse
+// @Failure 502  {object} errors.ErrorResponse
+// @Router /user/change-password [put]
 func (c *UserController) UpdateUserPasswordHandler(ctx *gin.Context) {
 
 	var updateUserPasswordParams user.UpdateUserPasswordParams
@@ -135,7 +182,18 @@ func (c *UserController) UpdateUserPasswordHandler(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-// UpdateUserHandler update user password
+// UpdateUserHandler godoc
+// @Summary Atualiza os dados do usuário
+// @Description Atualiza os dados do usuário
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Param   request body user.UpdateUserParams true "UpdateUserParams"
+// @Success 200
+// @Failure 400  {object} errors.ErrorResponse
+// @Failure 500  {object} errors.ErrorResponse
+// @Failure 502  {object} errors.ErrorResponse
+// @Router /user [put]
 func (c *UserController) UpdateUserHandler(ctx *gin.Context) {
 
 	var updateUserParams user.UpdateUserParams

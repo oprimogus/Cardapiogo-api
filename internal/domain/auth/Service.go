@@ -20,8 +20,8 @@ func GenerateJWTForValidation() (string, error) {
 	key := os.Getenv("JWT_SECRET")
 	expireIn := time.Now().Add(time.Hour * time.Duration(TimeExpireInHour)).Unix()
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"iss":      os.Getenv("JWT_EMISSOR"),
-		"exp":      expireIn,
+		"iss": os.Getenv("JWT_EMISSOR"),
+		"exp": expireIn,
 	})
 	s, err := t.SignedString([]byte(key))
 	if err != nil {
