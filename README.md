@@ -23,17 +23,14 @@ Configure o swaggo através deste [link](https://github.com/swaggo/gin-swagger)
     make install
     ```
 
-2. Rodar migrations
-    ```
-    make migration_up
-    ```
-3. Subir banco de dados e demais containers
+2. Subir banco de dados e demais containers
     ```
     make docker
     ```
-4. Rodar o app
+    
+3. Rodar o app
     ```
     make run
     ```
 
-5. Acessar rotas em  http://localhost:8080/api/v1/swagger/index.html#/
+4. Acessar rotas em  http://localhost:8080/api/v1/swagger/index.html#/
