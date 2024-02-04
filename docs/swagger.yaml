@@ -11,11 +11,13 @@ definitions:
     - Google
     - Apple
     - Meta
+    - Local
     type: string
     x-enum-varnames:
     - AccountProviderGoogle
     - AccountProviderApple
     - AccountProviderMeta
+    - AccountProviderLocal
   types.Role:
     enum:
     - Consumer
@@ -41,7 +43,6 @@ definitions:
       role:
         $ref: '#/definitions/types.Role'
     required:
-    - account_provider
     - email
     - password
     - role
@@ -303,7 +304,7 @@ paths:
       summary: Atualiza os dados do usuário
       tags:
       - User
-  /user/:id:
+  /user/{id}:
     get:
       consumes:
       - application/json

@@ -15,6 +15,7 @@ const (
 	NULL_VIOLATION        = "Null value not allowed for column."
 	VALUE_TOO_LONG        = "Input value too long for column."
 	INTERNAL_SERVER_ERROR = "Internal Server Error."
+	INVALID_VALUE         = "Invalid value for field."
 )
 
 func NewDatabaseError(err error) *ErrorResponse {
@@ -26,13 +27,15 @@ func NewDatabaseError(err error) *ErrorResponse {
 	if errors.As(err, &pgErr) {
 		switch pgErr.Code {
 		case "23505": // Duplicação de chave única
-			return New(http.StatusConflict, DUPLICATED_RECORD)
+			return New(http.StatusConflict, DUPLICATED_RECORD, pgErr.Message)
 		case "23503": // Violação de chave estrangeira
-			return New(http.StatusBadRequest, FOREIGN_KEY_VIOLATION)
+			return New(http.StatusBadRequest, FOREIGN_KEY_VIOLATION, pgErr.Message)
 		case "23502": // Violação de campo não nulo
-			return New(http.StatusBadRequest, NULL_VIOLATION)
+			return New(http.StatusBadRequest, NULL_VIOLATION, pgErr.Message)
 		case "22001": // Dados da string muito longos
-			return New(http.StatusBadRequest, VALUE_TOO_LONG)
+			return New(http.StatusBadRequest, VALUE_TOO_LONG, pgErr.Message)
+		case "22P02": // Inserção de dado inválido
+			return New(http.StatusBadRequest, INVALID_VALUE, pgErr.Message)
 		}
 	}
 

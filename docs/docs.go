@@ -303,56 +303,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/:id": {
-            "get": {
-                "description": "Retorna um usuário através do ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Retorna um usuário",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID do usuário (UUID)",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/user.User"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/user/change-password": {
             "put": {
                 "description": "Atualiza a senha do usuário",
@@ -401,6 +351,56 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user/{id}": {
+            "get": {
+                "description": "Retorna um usuário através do ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Retorna um usuário",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID do usuário (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -418,12 +418,14 @@ const docTemplate = `{
             "enum": [
                 "Google",
                 "Apple",
-                "Meta"
+                "Meta",
+                "Local"
             ],
             "x-enum-varnames": [
                 "AccountProviderGoogle",
                 "AccountProviderApple",
-                "AccountProviderMeta"
+                "AccountProviderMeta",
+                "AccountProviderLocal"
             ]
         },
         "types.Role": {
@@ -446,7 +448,6 @@ const docTemplate = `{
         "user.CreateUserParams": {
             "type": "object",
             "required": [
-                "account_provider",
                 "email",
                 "password",
                 "role"

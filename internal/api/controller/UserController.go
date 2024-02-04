@@ -71,11 +71,11 @@ func (c *UserController) CreateUserHandler(ctx *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param   id path string true "ID do usuário (UUID)"
-// @Success 200 {object} user.User
+// @Success 200  {object} user.User
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /user/:id [get]
+// @Router /user/{id} [get]
 func (c *UserController) GetUserHandler(ctx *gin.Context) {
 	id := ctx.Params.ByName("id")
 
