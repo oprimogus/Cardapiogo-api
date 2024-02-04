@@ -26,7 +26,7 @@ func InitializeRoutes(router *gin.Engine, factory factory.RepositoryFactory) {
 		publicV1.POST("user", userController.CreateUserHandler)
 		publicV1.GET("auth", authController.StartOAuthFlow)
 		publicV1.POST("login", authController.Login)
-		// publicV1.GET("auth/callback", oauthController.SignUpLoginOauthCallback)
+		publicV1.GET("auth/callback", authController.SignUpLoginOauthCallback)
 	}
 
 	authMiddleware := middleware.AuthMiddleware()

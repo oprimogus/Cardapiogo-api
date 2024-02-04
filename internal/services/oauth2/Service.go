@@ -34,7 +34,7 @@ func GetUserData(ctx context.Context, conf *oauth2.Config, code string) (*Google
 
 	token, err := conf.Exchange(ctx, code)
 	if err != nil {
-		return nil, errors.NewErrorResponse(http.StatusBadGateway, err.Error())
+		return nil, errors.New(http.StatusBadGateway, err.Error())
 	}
 
 	client := conf.Client(ctx, token)
@@ -42,13 +42,13 @@ func GetUserData(ctx context.Context, conf *oauth2.Config, code string) (*Google
 
 	res, err := client.Get(url)
 	if err != nil {
-		return nil, errors.NewErrorResponse(http.StatusBadGateway, err.Error())
+		return nil, errors.New(http.StatusBadGateway, err.Error())
 	}
 	defer res.Body.Close()
 
 	var userinfo GoogleUserInfo
 	if err = json.NewDecoder(res.Body).Decode(&userinfo); err != nil {
-		return nil, errors.NewErrorResponse(http.StatusBadGateway, err.Error())
+		return nil, errors.New(http.StatusBadGateway, err.Error())
 	}
 
 	return &userinfo, nil

@@ -7,17 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
-	logger "github.com/oprimogus/cardapiogo/pkg/log"
-	// "github.com/oprimogus/cardapiogo/internal/domain/auth"
-	// "github.com/oprimogus/cardapiogo/internal/domain/types"
 	"github.com/oprimogus/cardapiogo/internal/domain/auth"
-	"github.com/oprimogus/cardapiogo/internal/domain/types"
 	"github.com/oprimogus/cardapiogo/internal/domain/user"
 	"github.com/oprimogus/cardapiogo/internal/errors"
 	"github.com/oprimogus/cardapiogo/internal/services/oauth2"
 )
-
-var log = logger.GetLoggerDefault("OAuthController")
 
 // UserController struct
 type AuthController struct {
@@ -35,7 +29,7 @@ func NewAuthController(repository user.Repository, validator *validatorutils.Val
 func (c *AuthController) StartOAuthFlow(ctx *gin.Context) {
 	conf := oauth2.NewGoogleOauthConf()
 
-	jwt, err := auth.GenerateJWTOAuthWithClaims(1, string(types.AccountProviderGoogle))
+	jwt, err := auth.GenerateJWTForValidation()
 	if err != nil {
 		er := errors.InternalServerError(err.Error())
 		ctx.JSON(er.Status, er)
@@ -48,56 +42,48 @@ func (c *AuthController) StartOAuthFlow(ctx *gin.Context) {
 
 }
 
-// func (c *AuthController) SignUpLoginOauthCallback(ctx *gin.Context) {
+func (c *AuthController) SignUpLoginOauthCallback(ctx *gin.Context) {
 
-// 	stateToken := ctx.Query("state")
-// 	valid, err := auth.ValidateStateToken(stateToken)
-// 	if err != nil || !valid {
-// 		er := errors.Unauthorized("")
-// 		ctx.JSON(er.Status, er)
-// 		return
-// 	}
+	stateToken := ctx.Query("state")
+	valid, err := auth.ValidateStateToken(stateToken)
+	if err != nil || !valid {
+		er := errors.Unauthorized("")
+		ctx.JSON(er.Status, er)
+		return
+	}
 
-// 	code := ctx.Request.URL.Query().Get("code")
-// 	conf := oauth2.NewGoogleOauthConf()
-// 	userData, err := oauth2.GetUserData(ctx, conf, code)
-// 	if err != nil {
-// 		errorResponse, ok := err.(*errors.ErrorResponse)
-// 		if !ok {
-// 			ctx.JSON(http.StatusInternalServerError, errors.InternalServerError(err.Error()))
-// 			return
-// 		}
-// 		ctx.JSON(errorResponse.Status, err.Error())
-// 	}
-// 	existUser, err := c.UserService.GetUserByEmail(ctx, userData.Email)
-// 	if err != nil {
-// 		dbErr, ok := err.(*errors.ErrorResponse)
-// 		if !ok {
-// 			ctx.JSON(http.StatusInternalServerError, errors.InternalServerError(err.Error()))
-// 			return
-// 		}
-// 		if dbErr.ErrorMessage == errors.NOT_FOUND_RECORD {
-// 			err = c.UserService.CreateUserWithOAuth(ctx, user.CreateUserWithOAuthParams{
-// 				Email:           userData.Email,
-// 				Role:            types.UserRoleConsumer,
-// 				AccountProvider: types.AccountProviderGoogle,
-// 			})
-// 			if err != nil {
-// 				dbErr, ok := err.(*errors.ErrorResponse)
-// 				if !ok {
-// 					ctx.JSON(http.StatusInternalServerError, errors.InternalServerError(err.Error()))
-// 					return
-// 				}
-// 				ctx.JSON(dbErr.Status, dbErr)
-// 				return
-// 			}
-// 			err = c.UserService.Get
-// 		}
-// 	}
-
-// 	ctx.JSON(http.StatusOK, userData)
-
-// }
+	code := ctx.Request.URL.Query().Get("code")
+	conf := oauth2.NewGoogleOauthConf()
+	userData, err := oauth2.GetUserData(ctx, conf, code)
+	if err != nil {
+		errorResponse, ok := err.(*errors.ErrorResponse)
+		if !ok {
+			ctx.JSON(http.StatusInternalServerError, errors.InternalServerError(err.Error()))
+			return
+		}
+		ctx.JSON(errorResponse.Status, err.Error())
+	}
+	jwt, err := auth.LoginWithOauth(ctx, c.UserService, userData)
+	if err != nil {
+		errorResponse, ok := err.(*errors.ErrorResponse)
+		if !ok {
+			ctx.JSON(http.StatusInternalServerError, errors.InternalServerError(""))
+			return
+		}
+		ctx.JSON(errorResponse.Status, errorResponse)
+		return
+	}
+	httpOnlyCookie := http.Cookie{
+		Name:     "token",
+		Value:    jwt,
+		Expires:  time.Now().Add(time.Hour * time.Duration(auth.TimeExpireInHour)),
+		HttpOnly: false,
+		Secure:   true,
+		Path:     "/",
+	}
+	http.SetCookie(ctx.Writer, &httpOnlyCookie)
+	ctx.Redirect(http.StatusMovedPermanently, "https://weather-app-angular-jeby7qw78-oprimogus.vercel.app/weather")
+}
 
 func (c *AuthController) Login(ctx *gin.Context) {
 	var user user.Login

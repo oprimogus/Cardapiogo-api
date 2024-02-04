@@ -68,7 +68,7 @@ func (v *Validator) Validate(i interface{}) *errors.ErrorResponse {
 		if !ok {
 			// Se a asserção de tipo falhar, retorna um erro genérico ou lida com isso de maneira apropriada
 			out["error"] = "Unknown validation error"
-			return errors.NewErrorResponse(http.StatusBadRequest, out["error"])
+			return errors.New(http.StatusBadRequest, out["error"])
 		}
 
 		// Processa os erros de validação
