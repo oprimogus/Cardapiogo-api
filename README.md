@@ -1,6 +1,11 @@
 # Cardapio-go
 Repositório da API do Cardápio em Golang
 
+## Sobre o projeto
+![img](/docs/assets/banner.svg)
+- Consiste numa API para delivery de pedidos
+
+
 
 ## Depêndencias
 ### 1. Migrate CLI
