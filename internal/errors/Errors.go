@@ -7,7 +7,7 @@ type ErrorResponse struct {
 	Details      interface{} `json:"details,omitempty"`
 }
 
-func NewErrorResponse(status int, message string, details ...interface{}) *ErrorResponse {
+func New(status int, message string, details ...interface{}) *ErrorResponse {
 	return &ErrorResponse{
 		Status:       status,
 		ErrorMessage: message,
