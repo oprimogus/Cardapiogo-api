@@ -26,4 +26,6 @@ const (
 	AccountProviderApple AccountProvider = "Apple"
 	// AccountProviderMeta Enum
 	AccountProviderMeta AccountProvider = "Meta"
+	// AccountProviderMeta Enum
+	AccountProviderLocal AccountProvider = "Local"
 )

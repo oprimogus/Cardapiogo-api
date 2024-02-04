@@ -17,6 +17,7 @@ const (
 	AccountProviderGoogle AccountProvider = "Google"
 	AccountProviderApple  AccountProvider = "Apple"
 	AccountProviderMeta   AccountProvider = "Meta"
+	AccountProviderLocal  AccountProvider = "Local"
 )
 
 func (e *AccountProvider) Scan(src interface{}) error {

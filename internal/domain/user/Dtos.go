@@ -9,7 +9,7 @@ type CreateUserParams struct {
 	Email           string                `db:"email" json:"email" validate:"required,email"`
 	Password        string                `db:"password" json:"password" validate:"required"`
 	Role            types.Role            `db:"role" json:"role" validate:"required,role"`
-	AccountProvider types.AccountProvider `db:"account_provider" json:"account_provider" validate:"required,account_provider"`
+	AccountProvider types.AccountProvider `db:"account_provider" json:"account_provider"`
 }
 
 // CreateUserWithOAuthParams DTO

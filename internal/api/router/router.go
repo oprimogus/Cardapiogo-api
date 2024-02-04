@@ -19,14 +19,14 @@ func Initialize(factory factory.RepositoryFactory) {
 	if err != nil && validator == nil {
 		panic(err)
 	}
-	
+
 	log := logger.GetLoggerDefault("Router")
 
 	router := gin.New()
 	router.Use(middleware.CorsMiddleware())
 	router.Use(middleware.TransactionIDMiddleware())
 	router.Use(middleware.LoggerMiddleware(logger.GetLoggerDefault("GIN")))
-	
+
 	routes.DefaultRoutes(router, factory)
 	routes.UserRoutes(router, factory, validator)
 	routes.AuthRoutes(router, factory, validator)

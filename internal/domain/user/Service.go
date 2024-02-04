@@ -7,6 +7,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/oprimogus/cardapiogo/internal/domain/types"
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
 
@@ -27,6 +28,7 @@ func (u *Service) CreateUser(ctx context.Context, newUser CreateUserParams) erro
 		return fmt.Errorf("fail in generate hash of password: %s", err)
 	}
 	newUser.Password = hashPassword
+	newUser.AccountProvider = types.AccountProviderLocal
 	return u.repository.CreateUser(ctx, newUser)
 }
 
