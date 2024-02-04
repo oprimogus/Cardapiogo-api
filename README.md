@@ -9,23 +9,30 @@ Configure a CLI do [migrate](https://github.com/golang-migrate/migrate/tree/v4.1
 ### 2. SQLC
 Configure o SQLC através deste [link](https://docs.sqlc.dev/en/stable/overview/install.html)
 
+### 3. swaggo
+Configure o swaggo através deste [link](https://github.com/swaggo/swag)
+
+### 4. gin-swagger
+Configure o swaggo através deste [link](https://github.com/swaggo/gin-swagger)
+
 
 ## Rodar o app localmente
 
 1. Instalar dependências do app
-```
-make install
-```
+    ```
+    make install
+    ```
 
 2. Rodar migrations
-```
-make migration_up
-```
+    ```
+    make migration_up
+    ```
 3. Subir banco de dados e demais containers
-```
-make docker
-```
+    ```
+    make docker
+    ```
 4. Rodar o app
-```
-make run
-```
+    ```
+    make run
+    ```
+5. Acessar rotas em  ```http://localhost:8080/api/v1/swagger/index.html#/```
