@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/oprimogus/cardapiogo/internal/api/middleware"
+	"github.com/oprimogus/cardapiogo/internal/api/router/routes"
+	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
 	"github.com/oprimogus/cardapiogo/internal/domain/factory"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
@@ -14,15 +16,21 @@ import (
 func Initialize(factory factory.RepositoryFactory) {
 
 	router := gin.New()
-	router.Use(gin.Recovery())
+	router.Use(middleware.CorsMiddleware())
 	router.Use(middleware.TransactionIDMiddleware())
 	router.Use(middleware.LoggerMiddleware(logger.GetLoggerDefault("GIN")))
-	router.Use(middleware.CorsMiddleware())
+	router.Use(gin.Recovery())
 	
-
+	validator, err := validatorutils.NewValidator("pt")
+	if err != nil && validator == nil {
+		panic(err)
+	}
+	
 	log := logger.GetLoggerDefault("Router")
 
-	InitializeRoutes(router, factory)
+	routes.DefaultRoutes(router, factory)
+	routes.UserRoutes(router, factory, validator)
+	routes.AuthRoutes(router, factory, validator)
 
 	const host = "0.0.0.0"
 	port := os.Getenv("API_PORT")
