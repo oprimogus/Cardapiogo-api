@@ -18,7 +18,7 @@ sqlc_generate:
 	sqlc generate -f internal/infra/database/sqlc/sqlc.yaml
 
 run:
-	go run main.go
+	go run cmd/main.go
 
 migration:
 	@read -p "Enter migration name: " name; \
