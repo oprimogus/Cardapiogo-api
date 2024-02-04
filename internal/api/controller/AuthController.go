@@ -26,7 +26,7 @@ func NewAuthController(repository user.Repository, validator *validatorutils.Val
 	}
 }
 
-// StartOAuthFlow godoc
+// StartGoogleOAuthFlow godoc
 // @Summary Inicia fluxo de OAuth2
 // @Description Inicia fluxo de OAuth2
 // @Tags Auth
@@ -37,7 +37,7 @@ func NewAuthController(repository user.Repository, validator *validatorutils.Val
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
 // @Router /auth [get]
-func (c *AuthController) StartOAuthFlow(ctx *gin.Context) {
+func (c *AuthController) StartGoogleOAuthFlow(ctx *gin.Context) {
 	conf := oauth2.NewGoogleOauthConf()
 
 	jwt, err := auth.GenerateJWTForValidation()
@@ -53,7 +53,7 @@ func (c *AuthController) StartOAuthFlow(ctx *gin.Context) {
 
 }
 
-// SignUpLoginOauthCallback godoc
+// SignUpLoginGoogleOauthCallback godoc
 // @Summary Callback de login via OAuth2
 // @Description Callback de login via OAuth2
 // @Tags Auth
@@ -64,7 +64,7 @@ func (c *AuthController) StartOAuthFlow(ctx *gin.Context) {
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
 // @Router /auth/callback [get]
-func (c *AuthController) SignUpLoginOauthCallback(ctx *gin.Context) {
+func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 
 	stateToken := ctx.Query("state")
 	valid, err := auth.ValidateStateToken(stateToken)
@@ -76,7 +76,7 @@ func (c *AuthController) SignUpLoginOauthCallback(ctx *gin.Context) {
 
 	code := ctx.Request.URL.Query().Get("code")
 	conf := oauth2.NewGoogleOauthConf()
-	userData, err := oauth2.GetUserData(ctx, conf, code)
+	userData, err := oauth2.GetGoogleUserData(ctx, conf, code)
 	if err != nil {
 		errorResponse, ok := err.(*errors.ErrorResponse)
 		if !ok {

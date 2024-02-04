@@ -29,7 +29,7 @@ func NewGoogleOauthConf() *oauth2.Config {
 	}
 }
 
-func GetUserData(ctx context.Context, conf *oauth2.Config, code string) (*GoogleUserInfo, error) {
+func GetGoogleUserData(ctx context.Context, conf *oauth2.Config, code string) (*GoogleUserInfo, error) {
 	// log := logger.GetLogger("OAuth2.0", ctx)
 
 	token, err := conf.Exchange(ctx, code)
