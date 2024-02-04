@@ -58,7 +58,7 @@ func (u *Service) UpdateUserPassword(ctx context.Context, params UpdateUserPassw
 	}
 
 	if !u.IsValidPassword(params.Password, user.Password) {
-		return errors.NewErrorResponse(http.StatusBadRequest, "Invalid Password")
+		return errors.New(http.StatusBadRequest, "Invalid Password")
 	}
 
 	params.NewPassword, err = u.HashPassword(params.NewPassword)
@@ -76,7 +76,7 @@ func (u *Service) UpdateUser(ctx context.Context, params UpdateUserParams) error
 	}
 
 	if !u.IsValidPassword(params.Password, user.Password) {
-		return errors.NewErrorResponse(http.StatusBadRequest, "Invalid Password")
+		return errors.New(http.StatusBadRequest, "Invalid Password")
 	}
 
 	return u.repository.UpdateUser(ctx, params)

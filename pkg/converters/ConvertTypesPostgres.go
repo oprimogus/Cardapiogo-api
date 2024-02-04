@@ -36,13 +36,13 @@ func ConvertStringToUUID(str string) (pgtype.UUID, error) {
 }
 
 // ConvertInt4ToInt converts pgtype.Int4 to *int. Returns nil if Int4 is not valid.
-func ConvertInt4ToInt(int4Val pgtype.Int4) (*int, error) {
+func ConvertInt4ToInt(int4Val pgtype.Int4) (int, error) {
 	if !int4Val.Valid {
-		return nil, nil
+		return 0, nil
 	}
 
 	result := int(int4Val.Int32)
-	return &result, nil
+	return result, nil
 }
 
 // ConvertIntToInt4 converts int to pgtype.Int4.

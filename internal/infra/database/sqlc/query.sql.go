@@ -93,7 +93,7 @@ func (q *Queries) GetProfile(ctx context.Context, id int32) (Profile, error) {
 }
 
 const getUser = `-- name: GetUser :many
-SELECT id, profile_id, email, role, created_at, updated_at FROM users
+SELECT id, profile_id, email, role, account_provider, created_at, updated_at FROM users
 ORDER BY created_at desc
 LIMIT $1 OFFSET $2
 `
@@ -104,12 +104,13 @@ type GetUserParams struct {
 }
 
 type GetUserRow struct {
-	ID        pgtype.UUID        `db:"id" json:"id"`
-	ProfileID pgtype.Int4        `db:"profile_id" json:"profile_id"`
-	Email     string             `db:"email" json:"email"`
-	Role      UserRole           `db:"role" json:"role"`
-	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+	ID              pgtype.UUID        `db:"id" json:"id"`
+	ProfileID       pgtype.Int4        `db:"profile_id" json:"profile_id"`
+	Email           string             `db:"email" json:"email"`
+	Role            UserRole           `db:"role" json:"role"`
+	AccountProvider AccountProvider    `db:"account_provider" json:"account_provider"`
+	CreatedAt       pgtype.Timestamptz `db:"created_at" json:"created_at"`
+	UpdatedAt       pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
 }
 
 func (q *Queries) GetUser(ctx context.Context, arg GetUserParams) ([]GetUserRow, error) {
@@ -126,6 +127,7 @@ func (q *Queries) GetUser(ctx context.Context, arg GetUserParams) ([]GetUserRow,
 			&i.ProfileID,
 			&i.Email,
 			&i.Role,
+			&i.AccountProvider,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -140,30 +142,21 @@ func (q *Queries) GetUser(ctx context.Context, arg GetUserParams) ([]GetUserRow,
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, profile_id, email, password, role, created_at, updated_at FROM users
+SELECT id, profile_id, email, password, role, account_provider, created_at, updated_at FROM users
 WHERE email = $1
 LIMIT 1
 `
 
-type GetUserByEmailRow struct {
-	ID        pgtype.UUID        `db:"id" json:"id"`
-	ProfileID pgtype.Int4        `db:"profile_id" json:"profile_id"`
-	Email     string             `db:"email" json:"email"`
-	Password  pgtype.Text        `db:"password" json:"password"`
-	Role      UserRole           `db:"role" json:"role"`
-	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
-}
-
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (Users, error) {
 	row := q.db.QueryRow(ctx, getUserByEmail, email)
-	var i GetUserByEmailRow
+	var i Users
 	err := row.Scan(
 		&i.ID,
 		&i.ProfileID,
 		&i.Email,
 		&i.Password,
 		&i.Role,
+		&i.AccountProvider,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -171,30 +164,21 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, profile_id, email, password, role, created_at, updated_at FROM users
+SELECT id, profile_id, email, password, role, account_provider, created_at, updated_at FROM users
 WHERE id = $1
 LIMIT 1
 `
 
-type GetUserByIdRow struct {
-	ID        pgtype.UUID        `db:"id" json:"id"`
-	ProfileID pgtype.Int4        `db:"profile_id" json:"profile_id"`
-	Email     string             `db:"email" json:"email"`
-	Password  pgtype.Text        `db:"password" json:"password"`
-	Role      UserRole           `db:"role" json:"role"`
-	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
-}
-
-func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (GetUserByIdRow, error) {
+func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (Users, error) {
 	row := q.db.QueryRow(ctx, getUserById, id)
-	var i GetUserByIdRow
+	var i Users
 	err := row.Scan(
 		&i.ID,
 		&i.ProfileID,
 		&i.Email,
 		&i.Password,
 		&i.Role,
+		&i.AccountProvider,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

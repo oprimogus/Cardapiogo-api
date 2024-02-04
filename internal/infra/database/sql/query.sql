@@ -7,17 +7,17 @@ INSERT INTO users (email, role, account_provider, created_at, updated_at)
 VALUES ($1, $2, $3, NOW(), NOW());
 
 -- name: GetUserById :one
-SELECT id, profile_id, email, password, role, created_at, updated_at FROM users
+SELECT id, profile_id, email, password, role, account_provider, created_at, updated_at FROM users
 WHERE id = $1
 LIMIT 1;
 
 -- name: GetUserByEmail :one
-SELECT id, profile_id, email, password, role, created_at, updated_at FROM users
+SELECT id, profile_id, email, password, role, account_provider, created_at, updated_at FROM users
 WHERE email = $1
 LIMIT 1;
 
 -- name: GetUser :many
-SELECT id, profile_id, email, role, created_at, updated_at FROM users
+SELECT id, profile_id, email, role, account_provider, created_at, updated_at FROM users
 ORDER BY created_at desc
 LIMIT $1 OFFSET $2;
 
