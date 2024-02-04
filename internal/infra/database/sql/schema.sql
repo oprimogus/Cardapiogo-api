@@ -11,7 +11,8 @@ CREATE TYPE "user_role" AS ENUM (
 CREATE TYPE "account_provider" AS ENUM (
   'Google',
   'Apple',
-  'Meta'
+  'Meta',
+  'Local'
 );
 
 CREATE TYPE "cousine_types" AS ENUM (
