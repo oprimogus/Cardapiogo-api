@@ -7,14 +7,13 @@ export
 lint:
 	@gofmt -s -w .
 
-
 install:
 	go mod tidy
 
 docker:
 	docker compose -f docker-compose.yaml up -d
 
-sqlc_generate:
+sqlc:
 	sqlc generate -f internal/infra/database/sqlc/sqlc.yaml
 
 docs:
