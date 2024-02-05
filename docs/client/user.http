@@ -22,7 +22,7 @@ Cookie: {{authToken}}
 ###
 
 # @name getUser
-GET {{baseUrl}}/user/34e1b6a6-c241-4006-be1d-6255393edb7c
+GET {{baseUrl}}/user/53129c15-2c47-40e0-98b5-77a17b75c816
 Content-Type: application/json
 Cookie: {{authToken}}
 ###

@@ -30,9 +30,14 @@ import (
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
+	// env
 	_ = gotenv.Load()
+
+	// database
 	db := postgres.GetInstance()
 	defer db.Close()
+
+	// routes
 	factory := factory.NewDataBaseRepositoryFactory(db)
 	router.Initialize(factory)
 }

@@ -15,11 +15,11 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cookie, err := c.Cookie("token")
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, err.Error()))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Unauthorized(""))
 			return
 		}
 		if cookie == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, "Invalid token."))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Unauthorized(""))
 			return
 		}
 		token, err := jwt.Parse(cookie, func(token *jwt.Token) (interface{}, error) {

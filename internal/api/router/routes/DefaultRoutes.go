@@ -4,6 +4,8 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
@@ -11,7 +13,7 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/factory"
 )
 
-func DefaultRoutes(router *gin.Engine, factory factory.RepositoryFactory) {
+func DefaultRoutes(router *gin.Engine, factory factory.RepositoryFactory, reg *prometheus.Registry) {
 
 	basePath := os.Getenv("API_BASE_PATH")
 
@@ -26,6 +28,12 @@ func DefaultRoutes(router *gin.Engine, factory factory.RepositoryFactory) {
 		c.JSON(200, gin.H{
 			"message": "ok",
 		})
+	})
+
+	// Prometheus
+	v1.GET("/metrics", func(c *gin.Context) {
+		h := promhttp.HandlerFor(reg, promhttp.HandlerOpts{})
+		h.ServeHTTP(c.Writer, c.Request)
 	})
 
 }

@@ -10,8 +10,11 @@ lint:
 install:
 	go mod tidy
 
-docker:
-	docker compose -f docker-compose.yaml up -d
+docker_up:
+	docker compose -f deployments/docker-compose.yaml up -d
+
+docker_down:
+	docker compose -f deployments/docker-compose.yaml down
 
 sqlc:
 	sqlc generate -f internal/infra/database/sqlc/sqlc.yaml

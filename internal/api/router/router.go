@@ -24,10 +24,12 @@ func Initialize(factory factory.RepositoryFactory) {
 
 	router := gin.New()
 	router.Use(middleware.CorsMiddleware())
-	router.Use(middleware.TransactionIDMiddleware())
 	router.Use(middleware.LoggerMiddleware(logger.GetLoggerDefault("GIN")))
 
-	routes.DefaultRoutes(router, factory)
+	metrics := middleware.NewPrometheusMetrics()
+	router.Use(middleware.PrometheusMiddleware(metrics))
+
+	routes.DefaultRoutes(router, factory, metrics.Registry)
 	routes.UserRoutes(router, factory, validator)
 	routes.AuthRoutes(router, factory, validator)
 
