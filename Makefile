@@ -16,6 +16,9 @@ docker_up:
 docker_down:
 	docker compose -f deployments/docker-compose.yaml down
 
+mock_database:
+	go run scripts/populate_local_db.go
+
 sqlc:
 	sqlc generate -f internal/infra/database/sqlc/sqlc.yaml
 

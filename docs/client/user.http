@@ -3,12 +3,10 @@
 # @name login
 POST {{baseUrl}}/login
 Content-Type: application/json
-
 {
     "email": "trevor.philips@example.com",
     "password": "teste123"
 }
-
 ###
 
 @authToken = {{login.response.headers.Set-Cookie}}
@@ -31,7 +29,6 @@ Cookie: {{authToken}}
 PUT {{baseUrl}}/user
 Content-Type: application/json
 Cookie: {{authToken}}
-
 {
   "id": "34e1b6a6-c241-4006-be1d-6255393edb7c",
   "email": "trevor.philips@example.com",
