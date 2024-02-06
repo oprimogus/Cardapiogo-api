@@ -5,8 +5,6 @@ Repositório da API do Cardápio em Golang
 ![img](/docs/assets/banner.svg)
 - Consiste numa API para delivery de pedidos
 
-
-
 ## Depêndencias
 ### 1. Migrate CLI
 Configure a CLI do [migrate](https://github.com/golang-migrate/migrate/tree/v4.16.2/cmd/migrate) 
@@ -30,9 +28,14 @@ Configure o swaggo através deste [link](https://github.com/swaggo/gin-swagger)
 
 2. Subir banco de dados e demais containers
     ```
-    make docker
+    make docker_up
     ```
     
+3. mockar dados no banco local
+    ```
+    make mock_database
+    ```
+
 3. Rodar o app
     ```
     make run
