@@ -10,13 +10,16 @@ lint:
 install:
 	go mod tidy
 
-docker_up:
+docker-build:
+	docker build -f build/Dockerfile -t ${APP_REPO}/${APP_NAME}:latest .
+
+docker-up:
 	docker compose -f deployments/docker-compose.yaml up -d
 
-docker_down:
+docker-down:
 	docker compose -f deployments/docker-compose.yaml down
 
-mock_database:
+mock-database:
 	go run scripts/populate_local_db.go
 
 sqlc:
@@ -33,12 +36,12 @@ migration:
 	@read -p "Enter migration name: " name; \
 		migrate create -ext sql -dir ${MIGRATION_SOURCE_URL} -seq $$name
 
-migration_up: 
+migration-up: 
 	migrate -path ${MIGRATION_SOURCE_URL} -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" -verbose up
 
-migration_down: 
+migration-down: 
 	migrate -path ${MIGRATION_SOURCE_URL} -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" -verbose down 1
 
-migration_fix: 
+migration-fix: 
 	@read -p "Enter migration version: " version; \
 	migrate -path ${MIGRATION_SOURCE_URL} -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" force $$version

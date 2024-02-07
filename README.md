@@ -28,12 +28,12 @@ Configure o swaggo através deste [link](https://github.com/swaggo/gin-swagger)
 
 2. Subir banco de dados e demais containers
     ```
-    make docker_up
+    make docker-up
     ```
     
 3. mockar dados no banco local
     ```
-    make mock_database
+    make mock-database
     ```
 
 3. Rodar o app
