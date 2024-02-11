@@ -3,6 +3,7 @@
 # @name login
 POST {{baseUrl}}/login
 Content-Type: application/json
+
 {
     "email": "trevor.philips@example.com",
     "password": "teste123"
@@ -20,7 +21,7 @@ Cookie: {{authToken}}
 ###
 
 # @name getUser
-GET {{baseUrl}}/user/53129c15-2c47-40e0-98b5-77a17b75c816
+GET {{baseUrl}}/user/a0803f64-82c3-4f8f-9c12-bc8fcb54440b
 Content-Type: application/json
 Cookie: {{authToken}}
 ###
@@ -37,5 +38,10 @@ Cookie: {{authToken}}
 }
 ###
 
+
+# @name healthcheck
+GET {{baseUrl}}/health
+Content-Type: application/json
+###
 
 

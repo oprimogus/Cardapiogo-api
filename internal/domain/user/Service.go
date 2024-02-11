@@ -38,12 +38,12 @@ func (u *Service) CreateUserWithOAuth(ctx context.Context, newUser CreateUserWit
 }
 
 // GetUser return a user from database by ID
-func (u *Service) GetUser(ctx context.Context, id string) (*User, error) {
+func (u *Service) GetUser(ctx context.Context, id string) (User, error) {
 	return u.repository.GetUserByID(ctx, id)
 }
 
 // GetUser return a user from database by email
-func (u *Service) GetUserByEmail(ctx context.Context, email string) (*User, error) {
+func (u *Service) GetUserByEmail(ctx context.Context, email string) (User, error) {
 	return u.repository.GetUserByEmail(ctx, email)
 }
 

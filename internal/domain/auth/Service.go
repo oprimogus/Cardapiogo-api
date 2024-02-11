@@ -31,7 +31,7 @@ func GenerateJWTForValidation() (string, error) {
 	return s, err
 }
 
-func GenerateJWTWithClaims(user *user.User) (string, error) {
+func GenerateJWTWithClaims(user user.User) (string, error) {
 	key := os.Getenv("JWT_SECRET")
 	expireIn := time.Now().Add(time.Hour * time.Duration(TimeExpireInHour)).Unix()
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -85,22 +85,22 @@ func Login(ctx context.Context, service *user.Service, loginParams *user.Login) 
 	return "", errors.New(http.StatusBadRequest, "Invalid Password.")
 }
 
-func createUserInOauth(ctx context.Context, s *user.Service, u *user.CreateUserWithOAuthParams) (*user.User, error) {
+func createUserInOauth(ctx context.Context, s *user.Service, u *user.CreateUserWithOAuthParams) (user.User, error) {
 	err := s.CreateUserWithOAuth(ctx, *u)
 	if err != nil {
 		dbErr, ok := err.(*errors.ErrorResponse)
 		if !ok {
-			return nil, errors.InternalServerError(err.Error())
+			return user.User{}, errors.InternalServerError(err.Error())
 		}
-		return nil, dbErr
+		return user.User{}, dbErr
 	}
 	createdUser, err := s.GetUserByEmail(ctx, u.Email)
 	if err != nil {
 		dbErr, ok := err.(*errors.ErrorResponse)
 		if !ok {
-			return nil, errors.InternalServerError(err.Error())
+			return user.User{}, errors.InternalServerError(err.Error())
 		}
-		return nil, dbErr
+		return user.User{}, dbErr
 	}
 	return createdUser, nil
 }
