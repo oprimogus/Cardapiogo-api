@@ -28,6 +28,9 @@ sqlc:
 docs:
 	swag init -g cmd/main.go
 
+test:
+	go test ./... -v -cover
+
 run:
 	make docs
 	go run cmd/main.go
