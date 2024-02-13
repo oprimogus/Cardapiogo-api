@@ -2,6 +2,7 @@ package router
 
 import (
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -48,11 +49,11 @@ func Initialize(factory factory.RepositoryFactory) {
 }
 
 func setGinMode() {
-	env := os.Getenv("API_ENVIRONMENT")
-	if (env == "LOCAL" || env == "STG") {
+	env := strings.ToLower(os.Getenv("API_ENVIRONMENT"))
+	if (env == "local" || env == "staging") {
 		env = "debug"
 	}
-	if (env == "PROD") {
+	if (env == "prod") {
 		env = "release"
 	}
 
