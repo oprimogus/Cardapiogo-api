@@ -52,15 +52,7 @@ func (c *UserController) CreateUserHandler(ctx *gin.Context) {
 	}
 
 	err = c.service.CreateUser(ctx, userParams)
-	if err != nil {
-		dbErr, ok := err.(*errors.ErrorResponse)
-		if ok && dbErr != nil {
-			ctx.JSON(dbErr.Status, dbErr)
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, dbErr)
-		return
-	}
+	returnError(ctx, err)
 	ctx.Status(http.StatusCreated)
 }
 
@@ -86,15 +78,7 @@ func (c *UserController) GetUserHandler(ctx *gin.Context) {
 	}
 
 	getUser, err := c.service.GetUser(ctx, id)
-	if err != nil {
-		dbErr, ok := err.(*errors.ErrorResponse)
-		if ok && dbErr != nil {
-			ctx.JSON(dbErr.Status, dbErr.ErrorMessage)
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, dbErr)
-		return
-	}
+	returnError(ctx, err)
 	ctx.JSON(http.StatusOK, getUser)
 }
 
@@ -124,15 +108,7 @@ func (c *UserController) GetUsersListHandler(ctx *gin.Context) {
 	}
 
 	listUsers, err := c.service.GetUsersList(ctx, items, page)
-	if err != nil {
-		dbErr, ok := err.(*errors.ErrorResponse)
-		if ok && dbErr != nil {
-			ctx.JSON(dbErr.Status, dbErr.ErrorMessage)
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, dbErr)
-		return
-	}
+	returnError(ctx, err)
 	ctx.JSON(http.StatusOK, listUsers)
 }
 
@@ -170,15 +146,7 @@ func (c *UserController) UpdateUserPasswordHandler(ctx *gin.Context) {
 	}
 
 	err = c.service.UpdateUserPassword(ctx, updateUserPasswordParams)
-	if err != nil {
-		dbErr, ok := err.(*errors.ErrorResponse)
-		if ok && dbErr != nil {
-			ctx.JSON(dbErr.Status, dbErr)
-			return
-		}
-		ctx.JSON(dbErr.Status, dbErr)
-		return
-	}
+	returnError(ctx, err)
 	ctx.Status(http.StatusOK)
 }
 
@@ -216,15 +184,7 @@ func (c *UserController) UpdateUserHandler(ctx *gin.Context) {
 	}
 
 	err = c.service.UpdateUser(ctx, updateUserParams)
-	if err != nil {
-		dbErr, ok := err.(*errors.ErrorResponse)
-		if ok && dbErr != nil {
-			ctx.JSON(dbErr.Status, dbErr)
-			return
-		}
-		ctx.JSON(dbErr.Status, dbErr)
-		return
-	}
+	returnError(ctx, err)
 
 	ctx.Status(http.StatusOK)
 }

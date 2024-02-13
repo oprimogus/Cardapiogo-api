@@ -16,6 +16,7 @@ const (
 	VALUE_TOO_LONG        = "Input value too long for column."
 	INTERNAL_SERVER_ERROR = "Internal Server Error."
 	INVALID_VALUE         = "Invalid value for field."
+	UNKNOWN_ERROR = "Unknown error."
 )
 
 func NewDatabaseError(err error) *ErrorResponse {
@@ -36,6 +37,8 @@ func NewDatabaseError(err error) *ErrorResponse {
 			return New(http.StatusBadRequest, VALUE_TOO_LONG, pgErr.Message)
 		case "22P02": // Inserção de dado inválido
 			return New(http.StatusBadRequest, INVALID_VALUE, pgErr.Message)
+		default:
+			return New(http.StatusBadRequest, UNKNOWN_ERROR, pgErr.Message)
 		}
 	}
 

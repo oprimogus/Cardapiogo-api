@@ -41,11 +41,7 @@ func (c *AuthController) StartGoogleOAuthFlow(ctx *gin.Context) {
 	conf := oauth2.NewGoogleOauthConf()
 
 	jwt, err := auth.GenerateJWTForValidation()
-	if err != nil {
-		er := errors.InternalServerError(err.Error())
-		ctx.JSON(er.Status, er)
-		return
-	}
+	returnError(ctx, err)
 
 	url := conf.AuthCodeURL(jwt)
 
@@ -77,24 +73,11 @@ func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 	code := ctx.Request.URL.Query().Get("code")
 	conf := oauth2.NewGoogleOauthConf()
 	userData, err := oauth2.GetGoogleUserData(ctx, conf, code)
-	if err != nil {
-		errorResponse, ok := err.(*errors.ErrorResponse)
-		if !ok {
-			ctx.JSON(http.StatusInternalServerError, errors.InternalServerError(err.Error()))
-			return
-		}
-		ctx.JSON(errorResponse.Status, err.Error())
-	}
+	returnError(ctx, err)
+
 	jwt, err := auth.LoginWithOauth(ctx, c.UserService, userData)
-	if err != nil {
-		errorResponse, ok := err.(*errors.ErrorResponse)
-		if !ok {
-			ctx.JSON(http.StatusInternalServerError, errors.InternalServerError(""))
-			return
-		}
-		ctx.JSON(errorResponse.Status, errorResponse)
-		return
-	}
+	returnError(ctx, err)
+
 	httpOnlyCookie := http.Cookie{
 		Name:     "token",
 		Value:    jwt,
@@ -123,18 +106,10 @@ func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 func (c *AuthController) Login(ctx *gin.Context) {
 	var user user.Login
 	err := ctx.BindJSON(&user)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-		return
-	}
+	returnError(ctx, err)
+	
 	jwt, err := auth.Login(ctx, c.UserService, &user)
-	if err != nil {
-		dbErr, ok := err.(*errors.ErrorResponse)
-		if !ok {
-			ctx.JSON(http.StatusInternalServerError, err.Error())
-		}
-		ctx.JSON(dbErr.Status, dbErr.ErrorMessage)
-	}
+	returnError(ctx, err)
 
 	httpOnlyCookie := http.Cookie{
 		Name:     "token",

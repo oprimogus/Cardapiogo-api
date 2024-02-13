@@ -12,6 +12,18 @@ Content-Type: application/json
 
 @authToken = {{login.response.headers.Set-Cookie}}
 
+# @name createUser
+POST {{baseUrl}}/user
+Content-Type: application/json
+
+{
+  "email": "apollo.creed@example.com",
+  "password": "teste123",
+  "role": "Owner",
+  "account_provider": "Google"
+}
+###
+
 # @name listUsers
 GET {{baseUrl}}/user
     ?items=10
