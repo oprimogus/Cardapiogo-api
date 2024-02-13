@@ -29,7 +29,7 @@ docs:
 	swag init -g cmd/main.go
 
 run:
-	swag init -g cmd/main.go
+	make docs
 	go run cmd/main.go
 
 migration:
