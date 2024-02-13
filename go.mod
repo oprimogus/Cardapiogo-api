@@ -1,6 +1,6 @@
 module github.com/oprimogus/cardapiogo
 
-go 1.21.5
+go 1.22.0
 
 require (
 	github.com/gin-contrib/cors v1.5.0
@@ -11,6 +11,7 @@ require (
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/lib/pq v1.10.2
 	github.com/prometheus/client_golang v1.18.0
+	github.com/stretchr/testify v1.8.4
 	github.com/subosito/gotenv v1.6.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
@@ -40,7 +41,6 @@ require (
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/tools v0.17.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
