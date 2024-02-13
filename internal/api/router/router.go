@@ -22,6 +22,8 @@ func Initialize(factory factory.RepositoryFactory) {
 
 	log := logger.GetLoggerDefault("Router")
 
+	setGinMode()
+
 	router := gin.New()
 	router.Use(middleware.CorsMiddleware())
 	router.Use(middleware.LoggerMiddleware(logger.GetLoggerDefault("GIN")))
@@ -43,5 +45,16 @@ func Initialize(factory factory.RepositoryFactory) {
 
 	log.Infof("Running server in %s:%s", host, port)
 	router.Run(host + ":" + port)
+}
 
+func setGinMode() {
+	env := os.Getenv("API_ENVIRONMENT")
+	if (env == "LOCAL" || env == "STG") {
+		env = "debug"
+	}
+	if (env == "PROD") {
+		env = "release"
+	}
+
+	gin.SetMode(env)
 }
