@@ -21,24 +21,34 @@ Configure o swaggo através deste [link](https://github.com/swaggo/gin-swagger)
 
 ## Rodar o app localmente
 
-1. Instalar dependências do app
+1. Criar .env
+    ```
+    cp .env.example .env
+    ```
+
+2. Instalar dependências do app
     ```
     make install
     ```
 
-2. Subir banco de dados e demais containers
+3. Subir banco de dados e demais containers
     ```
     make docker-up
     ```
+
+4. Executar migrations
+    ```
+    make migration-up
+    ```
     
-3. mockar dados no banco local
+5. mockar dados no banco local
     ```
     make mock-database
     ```
 
-3. Rodar o app
+6. Rodar o app
     ```
     make run
     ```
 
-4. Acessar rotas em  http://localhost:8080/api/v1/swagger/index.html#/
+7. Acessar rotas em  http://localhost:8080/api/v1/swagger/index.html#/
