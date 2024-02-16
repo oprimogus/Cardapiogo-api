@@ -52,7 +52,7 @@ func (c *UserController) CreateUserHandler(ctx *gin.Context) {
 	}
 
 	err = c.service.CreateUser(ctx, userParams)
-	returnError(ctx, err)
+	validateErrorResponse(ctx, err)
 	ctx.Status(http.StatusCreated)
 }
 
@@ -78,7 +78,7 @@ func (c *UserController) GetUserHandler(ctx *gin.Context) {
 	}
 
 	getUser, err := c.service.GetUser(ctx, id)
-	returnError(ctx, err)
+	validateErrorResponse(ctx, err)
 	ctx.JSON(http.StatusOK, getUser)
 }
 
@@ -108,7 +108,7 @@ func (c *UserController) GetUsersListHandler(ctx *gin.Context) {
 	}
 
 	listUsers, err := c.service.GetUsersList(ctx, items, page)
-	returnError(ctx, err)
+	validateErrorResponse(ctx, err)
 	ctx.JSON(http.StatusOK, listUsers)
 }
 
@@ -146,7 +146,7 @@ func (c *UserController) UpdateUserPasswordHandler(ctx *gin.Context) {
 	}
 
 	err = c.service.UpdateUserPassword(ctx, updateUserPasswordParams)
-	returnError(ctx, err)
+	validateErrorResponse(ctx, err)
 	ctx.Status(http.StatusOK)
 }
 
@@ -184,7 +184,7 @@ func (c *UserController) UpdateUserHandler(ctx *gin.Context) {
 	}
 
 	err = c.service.UpdateUser(ctx, updateUserParams)
-	returnError(ctx, err)
+	validateErrorResponse(ctx, err)
 
 	ctx.Status(http.StatusOK)
 }

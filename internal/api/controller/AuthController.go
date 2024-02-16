@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
-	"github.com/oprimogus/cardapiogo/internal/domain/auth"
 	"github.com/oprimogus/cardapiogo/internal/domain/user"
 	"github.com/oprimogus/cardapiogo/internal/errors"
+	"github.com/oprimogus/cardapiogo/internal/services/auth"
 	"github.com/oprimogus/cardapiogo/internal/services/oauth2"
 )
 
@@ -41,7 +41,7 @@ func (c *AuthController) StartGoogleOAuthFlow(ctx *gin.Context) {
 	conf := oauth2.NewGoogleOauthConf()
 
 	jwt, err := auth.GenerateJWTForValidation()
-	returnError(ctx, err)
+	validateErrorResponse(ctx, err)
 
 	url := conf.AuthCodeURL(jwt)
 
@@ -73,10 +73,10 @@ func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 	code := ctx.Request.URL.Query().Get("code")
 	conf := oauth2.NewGoogleOauthConf()
 	userData, err := oauth2.GetGoogleUserData(ctx, conf, code)
-	returnError(ctx, err)
+	validateErrorResponse(ctx, err)
 
 	jwt, err := auth.LoginWithOauth(ctx, c.UserService, userData)
-	returnError(ctx, err)
+	validateErrorResponse(ctx, err)
 
 	httpOnlyCookie := http.Cookie{
 		Name:     "token",
@@ -106,10 +106,10 @@ func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 func (c *AuthController) Login(ctx *gin.Context) {
 	var user user.Login
 	err := ctx.BindJSON(&user)
-	returnError(ctx, err)
-	
+	validateErrorResponse(ctx, err)
+
 	jwt, err := auth.Login(ctx, c.UserService, &user)
-	returnError(ctx, err)
+	validateErrorResponse(ctx, err)
 
 	httpOnlyCookie := http.Cookie{
 		Name:     "token",

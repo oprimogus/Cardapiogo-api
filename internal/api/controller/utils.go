@@ -8,11 +8,11 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
 
-// returnError validate if error is an ErrorResponse and return a http response
-func returnError(ctx *gin.Context, err error) {
+// validateErrorResponse validate if error is an ErrorResponse and return a http response
+func validateErrorResponse(ctx *gin.Context, err error) {
 	if err != nil {
 		errorResponse, ok := err.(*errors.ErrorResponse)
-		if ok && errorResponse != nil {
+		if ok {
 			ctx.JSON(errorResponse.Status, errorResponse)
 			return
 		}

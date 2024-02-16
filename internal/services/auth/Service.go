@@ -72,7 +72,7 @@ func Login(ctx context.Context, service *user.Service, loginParams *user.Login) 
 		if !ok {
 			return "", errors.InternalServerError(err.Error())
 		}
-		return "", errors.New(dbErr.Status, dbErr.ErrorMessage)
+		return "", dbErr
 	}
 	isSamePassword := service.IsValidPassword(loginParams.Password, existUser.Password)
 	if isSamePassword {
@@ -82,7 +82,7 @@ func Login(ctx context.Context, service *user.Service, loginParams *user.Login) 
 		}
 		return jwt, nil
 	}
-	return "", errors.New(http.StatusBadRequest, "Invalid Password.")
+	return "", errors.New(http.StatusBadRequest, user.INVALID_PASSWORD)
 }
 
 func createUserInOauth(ctx context.Context, s *user.Service, u *user.CreateUserWithOAuthParams) (user.User, error) {
