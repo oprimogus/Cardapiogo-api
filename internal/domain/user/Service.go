@@ -11,6 +11,10 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
 
+const (
+	INVALID_PASSWORD = "Invalid Password."
+)
+
 // Service struct
 type Service struct {
 	repository Repository
@@ -60,7 +64,7 @@ func (u *Service) UpdateUserPassword(ctx context.Context, params UpdateUserPassw
 	}
 
 	if !u.IsValidPassword(params.Password, user.Password) {
-		return errors.New(http.StatusBadRequest, "Invalid Password")
+		return errors.New(http.StatusBadRequest, INVALID_PASSWORD)
 	}
 
 	params.NewPassword, err = u.HashPassword(params.NewPassword)
@@ -78,7 +82,7 @@ func (u *Service) UpdateUser(ctx context.Context, params UpdateUserParams) error
 	}
 
 	if !u.IsValidPassword(params.Password, user.Password) {
-		return errors.New(http.StatusBadRequest, "Invalid Password")
+		return errors.New(http.StatusBadRequest, INVALID_PASSWORD)
 	}
 
 	return u.repository.UpdateUser(ctx, params)
@@ -90,7 +94,7 @@ func (u *Service) HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-// CheckPasswordHash verify if password hash is valid and
+// IsValidPassword verify if password hash is valid
 func (u *Service) IsValidPassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
