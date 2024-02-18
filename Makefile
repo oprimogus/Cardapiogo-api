@@ -14,10 +14,10 @@ docker-build:
 	docker build -f build/Dockerfile -t ${APP_REPO}/${APP_NAME}:latest .
 
 docker-up:
-	docker compose -f deployments/docker-compose.yaml up -d
+	docker compose -f deployments/docker-compose-development.yaml up -d
 
 docker-down:
-	docker compose -f deployments/docker-compose.yaml down
+	docker compose -f deployments/docker-compose-development.yaml down
 
 mock-database:
 	go run scripts/populate_local_db.go
