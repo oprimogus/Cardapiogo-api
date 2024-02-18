@@ -1,7 +1,6 @@
 include .env
 export
 
-
 .PHONY: fmt
 
 lint:
