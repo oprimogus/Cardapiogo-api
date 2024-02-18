@@ -33,7 +33,7 @@ Configure o swaggo através deste [link](https://github.com/swaggo/gin-swagger)
 
 3. Subir banco de dados e demais containers
     ```
-    make docker-up
+    make dev-docker-up
     ```
 
 4. Executar migrations
