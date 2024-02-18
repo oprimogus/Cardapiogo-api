@@ -19,8 +19,8 @@ jobs:
       
       - name: Create .env file
         run: |
-          echo APP_REPO=${{ vars.APP_REPO }} >> .env
-          echo APP_NAME=${{ vars.APP_NAME }} >> .env
+          echo APP_REPO=${{ env.APP_REPO }} >> .env
+          echo APP_NAME=${{ env.APP_NAME }} >> .env
           # Repita para cada variável necessária
 
       - name: Run Tests
@@ -32,7 +32,7 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
-          username: ${{ vars.DOCKER_USER }}
+          username: ${{ env.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push
@@ -41,7 +41,9 @@ jobs:
           context: .
           file: ./build/Dockerfile
           push: true
-          tags: ${{ vars.APP_REPO }}/${{ vars.APP_NAME }}:${{ github.sha }}, latest
+          tags: |
+            ${{ env.APP_REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
+            ${{ env.APP_REPO }}/${{ env.APP_NAME }}:latest
 
   # deploy:
   #   name: Deploy
