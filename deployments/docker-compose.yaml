@@ -1,11 +1,10 @@
-version: '3.7'
+version: "3.7"
 
 services:
-
   cardapiogo-api:
     build:
-        context: ..
-        dockerfile: build/Dockerfile
+      context: ..
+      dockerfile: build/Dockerfile
     environment:
       # APP
       - APP_REPO=${APP_REPO}
@@ -55,7 +54,7 @@ services:
     volumes:
       - /var/log/journal:/var/log/journal
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro  # Adicione esta linha
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Adicione esta linha
       - ../configs/promtail.yml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
     networks:
@@ -65,7 +64,7 @@ services:
     image: grafana/loki
     ports:
       - 3100:3100
-    command: 
+    command:
       - -config.file=/etc/loki/local-config.yaml
       - -print-config-stderr=true
     networks:

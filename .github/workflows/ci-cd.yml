@@ -71,6 +71,9 @@ jobs:
             
             # Acessar o diretório da API
             cd Cardapio-go
+
+            # Atualizar branch
+            git pull origin main
             
             # Definir as variáveis de ambiente
             export API_BASE_PATH="${{ vars.API_BASE_PATH }}"
