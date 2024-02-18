@@ -3,7 +3,9 @@ version: '3.7'
 services:
 
   cardapiogo-api:
-    image: oprimogusreal/cardapiogo-api:latest
+    build:
+        context: ..
+        dockerfile: build/Dockerfile
     environment:
       # APP
       - APP_REPO=${APP_REPO}
