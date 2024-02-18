@@ -119,7 +119,7 @@ func (s *ServiceSuite) TestUpdateUserPasswordShouldReturnError() {
 func (s *ServiceSuite) TestUpdateUserShouldReturnNil() {
 	s.Repository.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Return(s.user, nil).Times(1)
 	s.Repository.EXPECT().UpdateUser(gomock.Any(), gomock.Any()).Return(nil).Times(1)
-	err := s.Service.UpdateUserPassword(context.Background(), s.updateUserPasswordParams)
+	err := s.Service.UpdateUser(context.Background(), s.updateUserParams)
 	assert.Nil(s.T(), err)
 }
 
