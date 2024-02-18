@@ -62,7 +62,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             sudo apt install make
-            git clone https://github.com/oprimogus/Cardapio-go.git
             cd Cardapio-go
             export API_BASE_PATH="${{ vars.API_BASE_PATH }}"
             export API_BASE_PATH="${{ vars.API_ENVIRONMENT }}"
