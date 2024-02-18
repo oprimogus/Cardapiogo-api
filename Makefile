@@ -1,7 +1,6 @@
 include .env
 export
 
-# teste deploy
 
 .PHONY: fmt
 
