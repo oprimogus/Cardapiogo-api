@@ -45,11 +45,36 @@ jobs:
             ${{ vars.APP_REPO }}/${{ vars.APP_NAME }}:${{ github.sha }}
             ${{ vars.APP_REPO }}/${{ vars.APP_NAME }}:latest
 
-  # deploy:
-  #   name: Deploy
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v2
+  deploy:
+    needs: build 
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            git clone https://github.com/oprimogus/Cardapio-go.git
+            cd Cardapio-go
+            export API_BASE_PATH="${{ vars.API_BASE_PATH }}"
+            export API_BASE_PATH="${{ vars.API_ENVIRONMENT }}"
+            export API_PORT="${{ vars.API_PORT }}"
+            export APP_NAME="${{ vars.APP_NAME }}"
+            export APP_REPO="${{ vars.APP_REPO }}"
+            export GOOGLE_REDIRECT_URL="${{ vars.GOOGLE_REDIRECT_URL }}"
+            export DB_HOST="${{ secrets.DB_HOST }}"
+            export DB_NAME="${{ secrets.DB_NAME }}"
+            export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+            export DB_PORT="${{ secrets.DB_PORT }}"
+            export GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
+            export GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+            export JWT_EMISSOR="${{ secrets.JWT_EMISSOR }}"
+            export JWT_SECRET="${{ secrets.JWT_SECRET }}"
+            make docker-up
 
