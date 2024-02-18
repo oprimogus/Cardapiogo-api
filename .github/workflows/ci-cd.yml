@@ -46,6 +46,7 @@ jobs:
             ${{ vars.APP_REPO }}/${{ vars.APP_NAME }}:latest
 
   deploy:
+    name: Deploy in AWS
     needs: build 
     runs-on: ubuntu-latest
     environment: production
@@ -60,6 +61,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            sudo apt install make
             git clone https://github.com/oprimogus/Cardapio-go.git
             cd Cardapio-go
             export API_BASE_PATH="${{ vars.API_BASE_PATH }}"
