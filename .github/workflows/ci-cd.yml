@@ -61,21 +61,36 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            sudo apt install make
+            # Instalar make caso não esteja instalado
+            sudo apt update && sudo apt install -y make git
+            
+            # Clonar o repositório se o diretório Cardapio-go não existir
+            if [ ! -d "Cardapio-go" ]; then
+              git clone https://github.com/oprimogus/Cardapio-go.git
+            fi
+            
+            # Acessar o diretório da API
             cd Cardapio-go
+            
+            # Definir as variáveis de ambiente
             export API_BASE_PATH="${{ vars.API_BASE_PATH }}"
-            export API_BASE_PATH="${{ vars.API_ENVIRONMENT }}"
+            export API_ENVIRONMENT="${{ vars.API_ENVIRONMENT }}"
             export API_PORT="${{ vars.API_PORT }}"
             export APP_NAME="${{ vars.APP_NAME }}"
             export APP_REPO="${{ vars.APP_REPO }}"
             export GOOGLE_REDIRECT_URL="${{ vars.GOOGLE_REDIRECT_URL }}"
             export DB_HOST="${{ secrets.DB_HOST }}"
             export DB_NAME="${{ secrets.DB_NAME }}"
+            export DB_USERNAME="${{ secrets.DB_USERNAME }}"
             export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
             export DB_PORT="${{ secrets.DB_PORT }}"
             export GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
             export GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
             export JWT_EMISSOR="${{ secrets.JWT_EMISSOR }}"
             export JWT_SECRET="${{ secrets.JWT_SECRET }}"
+            export MIGRATION_SOURCE_URL="${{ vars.MIGRATION_SOURCE_URL }}"
+            export GOOGLE_USER_INFO_URL="${{ vars.GOOGLE_USER_INFO_URL }}"
+            
+            # Subir o ambiente usando docker-compose
             make docker-up
 
