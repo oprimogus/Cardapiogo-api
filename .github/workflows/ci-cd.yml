@@ -16,5 +16,5 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: oprimogus/cardapiogo
+          repository: oprimogusreal/cardapiogo
           tags: ${{ github.sha }}, latest
