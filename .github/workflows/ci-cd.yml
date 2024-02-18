@@ -95,5 +95,6 @@ jobs:
             export GOOGLE_USER_INFO_URL="${{ vars.GOOGLE_USER_INFO_URL }}"
             
             # Subir o ambiente usando docker-compose
+            make docker-down
             make docker-up
 
