@@ -1,27 +1,24 @@
 package main
 
 import (
+	"os"
+
 	"github.com/subosito/gotenv"
 
+	"github.com/oprimogus/cardapiogo/docs"
 	"github.com/oprimogus/cardapiogo/internal/api/router"
 	"github.com/oprimogus/cardapiogo/internal/infra/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/infra/factory"
 )
 
-// @title           Cardapio-Go
-// @version         1.0
-// @description     Simple API of Cardapio
 // @termsOfService  http://swagger.io/terms/
 
 // @contact.name   Gustavo Ferreira
 // @contact.url    http://www.swagger.io/support
-// @contact.email  support@swagger.io
+// @contact.email  gustavo081900@gmail.com
 
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      0.0.0.0:8080
-// @BasePath  /api/v1
 
 // @securityDefinitions.apikey JWT Token
 // @in header Cookie: token=$VALUE
@@ -33,6 +30,8 @@ func main() {
 	// env
 	_ = gotenv.Load()
 
+	configureSwaggerDocs()
+
 	// database
 	db := postgres.GetInstance()
 	defer db.Close()
@@ -40,4 +39,14 @@ func main() {
 	// routes
 	factory := factory.NewDataBaseRepositoryFactory(db)
 	router.Initialize(factory)
+}
+
+// configureSwaggerDocs Configuração da documentação Swagger
+func configureSwaggerDocs() {
+	docs.SwaggerInfo.Title = "Cardapio-Go"
+	docs.SwaggerInfo.Description = "Simple API of Cardapio"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = os.Getenv("API_HOST") // Utiliza variável de ambiente para o host
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 }
