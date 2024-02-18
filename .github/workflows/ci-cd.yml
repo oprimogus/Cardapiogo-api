@@ -16,6 +16,12 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.22.0'
+      
+      - name: Create .env file
+        run: |
+          echo APP_REPO=${{ secrets.APP_REPO }} >> .env
+          echo APP_NAME=${{ secrets.APP_NAME }} >> .env
+          # Repita para cada variável necessária
 
       - name: Run Tests
         run: make test
