@@ -27,4 +27,4 @@ jobs:
           context: .
           file: ./build/Dockerfile
           push: true
-          tags: oprimogusreal/cardapiogo-api:${{ github.sha }}
+          tags: ${{ vars.APP_REPO }}/${{ vars.APP_NAME }}:${{ github.sha }}
