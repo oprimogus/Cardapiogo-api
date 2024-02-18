@@ -14,7 +14,7 @@ docker-build:
 	docker build -f build/Dockerfile -t ${APP_REPO}/${APP_NAME}:latest .
 
 docker-up:
-	docker compose -f deployments/docker-compose.yaml up -d
+	docker compose -f deployments/docker-compose.yaml up --build -d
 
 docker-down:
 	docker compose -f deployments/docker-compose.yaml down
