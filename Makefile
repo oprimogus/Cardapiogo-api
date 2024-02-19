@@ -2,16 +2,13 @@ include .env
 export
 
 
-.PHONY: fmt
+.PHONY: fmt lint install docker-up docker-down dev-docker-up dev-docker-down mock-database sqlc docs test run
 
 lint:
 	@gofmt -s -w .
 
 install:
 	go mod tidy
-
-docker-build:
-	docker build -f build/Dockerfile -t ${APP_REPO}/${APP_NAME}:latest .
 
 docker-up:
 	docker compose -f deployments/docker-compose.yaml up --build -d
@@ -43,14 +40,14 @@ run:
 
 migration:
 	@read -p "Enter migration name: " name; \
-		migrate create -ext sql -dir ${MIGRATION_SOURCE_URL} -seq $$name
+		migrate create -ext sql -dir internal/infra/database/migrations -seq $$name
 
 migration-up: 
-	migrate -path ${MIGRATION_SOURCE_URL} -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" -verbose up
+	migrate -path internal/infra/database/migrations -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" -verbose up
 
 migration-down: 
-	migrate -path ${MIGRATION_SOURCE_URL} -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" -verbose down 1
+	migrate -path internal/infra/database/migrations -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" -verbose down 1
 
 migration-fix: 
 	@read -p "Enter migration version: " version; \
-	migrate -path ${MIGRATION_SOURCE_URL} -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" force $$version
+	migrate -path internal/infra/database/migrations -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" force $$version

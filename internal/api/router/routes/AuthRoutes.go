@@ -16,11 +16,11 @@ func AuthRoutes(router *gin.Engine, factory factory.RepositoryFactory, validator
 
 	basePath := os.Getenv("API_BASE_PATH")
 
-	v1 := router.Group(basePath)
+	v1 := router.Group(basePath + "/v1")
 	{
-		v1.POST("login", authController.Login)
-		v1.GET("auth/google", authController.StartGoogleOAuthFlow)
-		v1.GET("auth/callback", authController.SignUpLoginGoogleOauthCallback)
+		v1.POST("/login", authController.Login)
+		v1.GET("/auth/google", authController.StartGoogleOAuthFlow)
+		v1.GET("/auth/google/callback", authController.SignUpLoginGoogleOauthCallback)
 	}
 
 }

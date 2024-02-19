@@ -17,13 +17,13 @@ func UserRoutes(router *gin.Engine, factory factory.RepositoryFactory, validator
 
 	basePath := os.Getenv("API_BASE_PATH")
 
-	v1 := router.Group(basePath)
+	v1 := router.Group(basePath + "/v1")
 	{
-		v1.POST("user", userController.CreateUserHandler)
-		v1.GET("user/:id", middleware.AuthMiddleware(), userController.GetUserHandler)
-		v1.GET("user", middleware.AuthMiddleware(), userController.GetUsersListHandler)
-		v1.PUT("user/change-password", middleware.AuthMiddleware(), userController.UpdateUserPasswordHandler)
-		v1.PUT("user", middleware.AuthMiddleware(), userController.UpdateUserHandler)
+		v1.POST("/user", userController.CreateUserHandler)
+		v1.GET("/user/:id", middleware.AuthMiddleware(), userController.GetUserHandler)
+		v1.GET("/user", middleware.AuthMiddleware(), userController.GetUsersListHandler)
+		v1.PUT("/user/change-password", middleware.AuthMiddleware(), userController.UpdateUserPasswordHandler)
+		v1.PUT("/user", middleware.AuthMiddleware(), userController.UpdateUserHandler)
 	}
 
 }

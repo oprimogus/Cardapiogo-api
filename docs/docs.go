@@ -13,7 +13,7 @@ const docTemplate = `{
         "contact": {
             "name": "Gustavo Ferreira",
             "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "email": "gustavo081900@gmail.com"
         },
         "license": {
             "name": "Apache 2.0",
@@ -24,7 +24,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth": {
+        "/auth/google": {
             "get": {
                 "description": "Inicia fluxo de OAuth2",
                 "consumes": [
@@ -62,7 +62,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/callback": {
+        "/auth/google/callback": {
             "get": {
                 "description": "Callback de login via OAuth2",
                 "consumes": [
@@ -566,12 +566,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
-	Host:             "localhost:8080",
-	BasePath:         "/api/v1",
+	Version:          "",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Cardapio-Go",
-	Description:      "Simple API of Cardapio",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

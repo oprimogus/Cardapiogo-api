@@ -46,7 +46,7 @@ func configureSwaggerDocs() {
 	docs.SwaggerInfo.Title = "Cardapio-Go"
 	docs.SwaggerInfo.Description = "Simple API of Cardapio"
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = os.Getenv("API_HOST") // Utiliza variável de ambiente para o host
-	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.Host = os.Getenv("API_HOST")
+	docs.SwaggerInfo.BasePath = "/api"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 }

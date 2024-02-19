@@ -5,33 +5,43 @@ services:
     build:
       context: ..
       dockerfile: build/Dockerfile
-    environment:
-      # APP
-      - APP_REPO=${APP_REPO}
-      - APP_NAME=${APP_NAME}
-      # DATABASE
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_NAME=${DB_NAME}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - MIGRATION_SOURCE_URL=${MIGRATION_SOURCE_URL}
-      # API
-      - API_PORT=${API_PORT}
-      - API_BASE_PATH=${API_BASE_PATH}
-      - API_ENVIRONMENT=${API_ENVIRONMENT}
-      # JWT
-      - JWT_EMISSOR=${JWT_EMISSOR}
-      - JWT_SECRET=${JWT_SECRET}
-      # OAuth2.0
-      ## GOOGLE
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_REDIRECT_URL=${GOOGLE_REDIRECT_URL}
-      ### URLS
-      - GOOGLE_USER_INFO_URL=${GOOGLE_USER_INFO_URL}
+    env_file:
+      - ../.env
+    # environment:
+    #   # APP
+    #   - APP_REPO=${APP_REPO}
+    #   - APP_NAME=${APP_NAME}
+    #   # DATABASE
+    #   - DB_HOST=${DB_HOST}
+    #   - DB_PORT=${DB_PORT}
+    #   - DB_NAME=${DB_NAME}
+    #   - DB_USERNAME=${DB_USERNAME}
+    #   - DB_PASSWORD=${DB_PASSWORD}
+    #   # API
+    #   - API_PORT=${API_PORT}
+    #   - API_BASE_PATH=${API_BASE_PATH}
+    #   - API_ENVIRONMENT=${API_ENVIRONMENT}
+    #   # JWT
+    #   - JWT_EMISSOR=${JWT_EMISSOR}
+    #   - JWT_SECRET=${JWT_SECRET}
+    #   # OAuth2.0
+    #   ## GOOGLE
+    #   - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+    #   - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    #   - GOOGLE_REDIRECT_PATH=${GOOGLE_REDIRECT_PATH}
+    #   ### URLS
+    #   - GOOGLE_USER_INFO_URL=${GOOGLE_USER_INFO_URL}
+    networks:
+      - observability
+
+  nginx:
+    image: nginx:1.25.4-alpine
     ports:
-      - "8080:8080"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../configs/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../configs/nginx/cardapiogo.conf:/etc/nginx/http.d/cardapiogo.conf
     networks:
       - observability
 
@@ -40,8 +50,6 @@ services:
     volumes:
       - ../configs/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
-    ports:
-      - "9090:9090"
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -62,8 +70,6 @@ services:
 
   loki:
     image: grafana/loki
-    ports:
-      - 3100:3100
     command:
       - -config.file=/etc/loki/local-config.yaml
       - -print-config-stderr=true
@@ -72,13 +78,12 @@ services:
 
   grafana:
     image: grafana/grafana
-    ports:
-      - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SERVER_ROOT_URL: "http://localhost/grafana/"
     depends_on:
       - prometheus
       - loki

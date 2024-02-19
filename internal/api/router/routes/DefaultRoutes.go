@@ -17,11 +17,11 @@ func DefaultRoutes(router *gin.Engine, factory factory.RepositoryFactory, reg *p
 
 	basePath := os.Getenv("API_BASE_PATH")
 
-	v1 := router.Group(basePath)
+	v1 := router.Group(basePath + "/v1")
 
 	// SWAGGER
 	docs.SwaggerInfo.BasePath = basePath
-	v1.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Health
 	v1.GET("/health", func(c *gin.Context) {

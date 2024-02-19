@@ -52,10 +52,7 @@ func ValidateStateToken(stateToken string) (bool, error) {
 	jwtKey := os.Getenv("JWT_SECRET")
 	token, err := jwt.Parse(stateToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return false, errors.BadRequest(fmt.Sprintf("signature method not expected: %v", token.Header["alg"]))
-		}
-		if !token.Valid {
-			return false, errors.BadRequest("Token not valid.")
+			return nil, errors.BadRequest(fmt.Sprintf("Unexpected signing method: %v", token.Header["alg"]))
 		}
 		return []byte(jwtKey), nil
 	})

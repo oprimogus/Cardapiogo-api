@@ -3,6 +3,7 @@ package oauth2
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -15,7 +16,11 @@ import (
 func NewGoogleOauthConf() *oauth2.Config {
 	clientID := os.Getenv("GOOGLE_CLIENT_ID")
 	clientSecret := os.Getenv("GOOGLE_CLIENT_SECRET")
-	redirectUrl := os.Getenv("GOOGLE_REDIRECT_URL")
+
+	host := os.Getenv("API_HOST")
+	redirectPath := os.Getenv("GOOGLE_REDIRECT_PATH")
+
+	redirectUrl := fmt.Sprintf("http://%s://%s", host, redirectPath)
 
 	return &oauth2.Config{
 		ClientID:     clientID,
