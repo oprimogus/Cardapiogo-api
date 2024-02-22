@@ -91,7 +91,6 @@ services:
       - observability
 
 volumes:
-  postgres-data:
   prometheus_data:
   grafana_data:
 

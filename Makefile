@@ -26,7 +26,7 @@ mock-database:
 	go run scripts/populate_local_db.go
 
 sqlc:
-	sqlc generate -f internal/infra/database/sqlc/sqlc.yaml
+	sqlc generate -f configs/sqlc.yaml
 
 docs:
 	swag init -g cmd/main.go
