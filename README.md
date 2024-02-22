@@ -41,14 +41,9 @@ Configure o swaggo através deste [link](https://github.com/swaggo/gin-swagger)
     make migration-up
     ```
     
-5. mockar dados no banco local
+5. Mockar dados no banco local
     ```
     make mock-database
     ```
 
-6. Rodar o app
-    ```
-    make run
-    ```
-
-7. Acessar rotas em  http://localhost:8080/api/v1/swagger/index.html#/
+6. Acessar rotas em  http://localhost/api/v1/swagger/index.html#/
