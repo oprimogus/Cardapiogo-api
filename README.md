@@ -1,4 +1,4 @@
-# Cardapio-go
+# Cardapiogo-api
 Repositório da API do Cardápio em Golang
 
 ## Sobre o projeto
