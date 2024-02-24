@@ -233,6 +233,7 @@ func (u *UserRepositoryDatabase) fromGetUserRowToSqlcUser(su sqlc.GetUserRow) sq
 		Email:     su.Email,
 		Password:  pgtype.Text{Valid: false, String: ""},
 		Role:      su.Role,
+		AccountProvider: su.AccountProvider,
 		CreatedAt: su.CreatedAt,
 		UpdatedAt: su.UpdatedAt,
 	}

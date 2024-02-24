@@ -5,32 +5,30 @@ services:
     build:
       context: ..
       dockerfile: build/Dockerfile
-    env_file:
-      - ../.env
-    # environment:
-    #   # APP
-    #   - APP_REPO=${APP_REPO}
-    #   - APP_NAME=${APP_NAME}
-    #   # DATABASE
-    #   - DB_HOST=${DB_HOST}
-    #   - DB_PORT=${DB_PORT}
-    #   - DB_NAME=${DB_NAME}
-    #   - DB_USERNAME=${DB_USERNAME}
-    #   - DB_PASSWORD=${DB_PASSWORD}
-    #   # API
-    #   - API_PORT=${API_PORT}
-    #   - API_BASE_PATH=${API_BASE_PATH}
-    #   - API_ENVIRONMENT=${API_ENVIRONMENT}
-    #   # JWT
-    #   - JWT_EMISSOR=${JWT_EMISSOR}
-    #   - JWT_SECRET=${JWT_SECRET}
-    #   # OAuth2.0
-    #   ## GOOGLE
-    #   - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-    #   - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-    #   - GOOGLE_REDIRECT_PATH=${GOOGLE_REDIRECT_PATH}
-    #   ### URLS
-    #   - GOOGLE_USER_INFO_URL=${GOOGLE_USER_INFO_URL}
+    environment:
+      # APP
+      - APP_REPO=${APP_REPO}
+      - APP_NAME=${APP_NAME}
+      # DATABASE
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # API
+      - API_PORT=${API_PORT}
+      - API_BASE_PATH=${API_BASE_PATH}
+      - API_ENVIRONMENT=${API_ENVIRONMENT}
+      # JWT
+      - JWT_EMISSOR=${JWT_EMISSOR}
+      - JWT_SECRET=${JWT_SECRET}
+      # OAuth2.0
+      ## GOOGLE
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_PATH=${GOOGLE_REDIRECT_PATH}
+      ### URLS
+      - GOOGLE_USER_INFO_URL=${GOOGLE_USER_INFO_URL}
     networks:
       - observability
 

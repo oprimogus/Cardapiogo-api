@@ -1,7 +1,11 @@
-@baseUrl = http://localhost:8080/api/v1
+# Nginx
+# @baseUrl = http://localhost/api
+
+# Local
+@baseUrl = http://localhost:8080/api
 
 # @name login
-POST {{baseUrl}}/login
+POST {{baseUrl}}/v1/login
 Content-Type: application/json
 
 {
@@ -13,7 +17,7 @@ Content-Type: application/json
 @authToken = {{login.response.headers.Set-Cookie}}
 
 # @name createUser
-POST {{baseUrl}}/user
+POST {{baseUrl}}/v1/user
 Content-Type: application/json
 
 {
@@ -25,7 +29,7 @@ Content-Type: application/json
 ###
 
 # @name listUsers
-GET {{baseUrl}}/user
+GET {{baseUrl}}/v1/user
     ?items=10
     &page=1
 Content-Type: application/json
@@ -33,13 +37,13 @@ Cookie: {{authToken}}
 ###
 
 # @name getUser
-GET {{baseUrl}}/user/a0803f64-82c3-4f8f-9c12-bc8fcb54440b
+GET {{baseUrl}}/v1/user/a0803f64-82c3-4f8f-9c12-bc8fcb54440b
 Content-Type: application/json
 Cookie: {{authToken}}
 ###
 
 # @name updateUser
-PUT {{baseUrl}}/user
+PUT {{baseUrl}}/v1/user
 Content-Type: application/json
 Cookie: {{authToken}}
 {
@@ -52,7 +56,7 @@ Cookie: {{authToken}}
 
 
 # @name healthcheck
-GET {{baseUrl}}/health
+GET {{baseUrl}}/v1/health
 Content-Type: application/json
 ###
 

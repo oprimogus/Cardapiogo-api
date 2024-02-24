@@ -16,7 +16,7 @@ WORKDIR /app/cmd
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main
 
 # Estágio de execução
-FROM alpine:latest  
+FROM alpine:3.19  
 
 # Defina o diretório de trabalho
 WORKDIR /root/
