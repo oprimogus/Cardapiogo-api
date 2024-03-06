@@ -27,8 +27,8 @@ func NewUserRepositoryDatabase(db *postgres.PostgresDatabase, querier sqlc.Queri
 }
 
 // CreateUser create a user in database. Must receive object validated through the service
-func (u *UserRepositoryDatabase) CreateUser(ctx context.Context, newUser user.CreateUserParams) error {
-	err := u.q.CreateUser(ctx, u.createUserDatabase(newUser))
+func (u *UserRepositoryDatabase) CreateUser(ctx context.Context, params user.CreateUserParams) error {
+	err := u.q.CreateUser(ctx, u.createUserDatabase(params))
 	if err != nil {
 		return errors.NewDatabaseError(err)
 	}
@@ -36,8 +36,8 @@ func (u *UserRepositoryDatabase) CreateUser(ctx context.Context, newUser user.Cr
 }
 
 // CreateUserWithOAuth create a user in database. Must receive object validated through the service
-func (u *UserRepositoryDatabase) CreateUserWithOAuth(ctx context.Context, newUser user.CreateUserWithOAuthParams) error {
-	err := u.q.CreateUserWithOAuth(ctx, u.createUserOAuthDatabase(newUser))
+func (u *UserRepositoryDatabase) CreateUserWithOAuth(ctx context.Context, params user.CreateUserWithOAuthParams) error {
+	err := u.q.CreateUserWithOAuth(ctx, u.createUserOAuthDatabase(params))
 	if err != nil {
 		return errors.NewDatabaseError(err)
 	}
@@ -102,25 +102,38 @@ func (u *UserRepositoryDatabase) GetUsersList(ctx context.Context, items int, pa
 }
 
 // UpdateUserPassword update hash of password
-func (u *UserRepositoryDatabase) UpdateUserPassword(ctx context.Context, updateParams user.UpdateUserPasswordParams) error {
-	updateUserPasswordParams, err := u.createUpdateUserPasswordsParams(updateParams)
+func (u *UserRepositoryDatabase) UpdateUserPassword(ctx context.Context, params user.UpdateUserPasswordParams) error {
+	updateUserPasswordParams, err := u.createUpdateUserPasswordsParams(params)
 	if err != nil {
 		return err
 	}
 	err = u.q.UpdateUserPassword(ctx, updateUserPasswordParams)
 	if err != nil {
-		return err
+		return errors.NewDatabaseError(err)
 	}
 	return nil
 }
 
 // UpdateUser update data user with the exception of password
-func (u *UserRepositoryDatabase) UpdateUser(ctx context.Context, updateParams user.UpdateUserParams) error {
-	params, err := u.createUpdateUserParams(updateParams)
+func (u *UserRepositoryDatabase) UpdateUser(ctx context.Context, params user.UpdateUserParams) error {
+	updateParams, err := u.createUpdateUserParams(params)
+	if err != nil {
+		return errors.NewDatabaseError(err)
+	}
+	return u.q.UpdateUser(ctx, updateParams)
+}
+
+// UpdateUserProfile update the user profile association
+func (u *UserRepositoryDatabase) UpdateUserProfile(ctx context.Context, params user.UpdateUserProfileParams) error {
+	convertedParams, err := u.createUpdateUserProfileParams(params)
 	if err != nil {
 		return err
 	}
-	return u.q.UpdateUser(ctx, params)
+	err = u.q.UpdateUserProfile(ctx, convertedParams)
+	if err != nil {
+		return errors.NewDatabaseError(err)
+	}
+	return nil
 }
 
 // createUserDatabase format DTO to CreateUserParams of sqlc
@@ -228,13 +241,26 @@ func (u *UserRepositoryDatabase) fromSqlcUserToUserModel(su sqlc.Users) (user.Us
 // fromGetUserRowToSqlcUser convert sqlc.GetUserRow to user.Users
 func (u *UserRepositoryDatabase) fromGetUserRowToSqlcUser(su sqlc.GetUserRow) sqlc.Users {
 	return sqlc.Users{
-		ID:        su.ID,
-		ProfileID: su.ProfileID,
-		Email:     su.Email,
-		Password:  pgtype.Text{Valid: false, String: ""},
-		Role:      su.Role,
+		ID:              su.ID,
+		ProfileID:       su.ProfileID,
+		Email:           su.Email,
+		Password:        pgtype.Text{Valid: false, String: ""},
+		Role:            su.Role,
 		AccountProvider: su.AccountProvider,
-		CreatedAt: su.CreatedAt,
-		UpdatedAt: su.UpdatedAt,
+		CreatedAt:       su.CreatedAt,
+		UpdatedAt:       su.UpdatedAt,
 	}
+}
+// createUpdateUserProfileParams convert user.UpdateUserProfileParams to sqlc.UpdateUserProfileParams
+func (u *UserRepositoryDatabase) createUpdateUserProfileParams(su user.UpdateUserProfileParams) (sqlc.UpdateUserProfileParams, error) {
+	id, err := converters.ConvertStringToUUID(su.ID)
+	if err != nil {
+		return sqlc.UpdateUserProfileParams{}, err
+	}
+	profileId := converters.ConvertIntToInt4(su.ProfileID)
+
+	return sqlc.UpdateUserProfileParams{
+		ID: id,
+		ProfileID: profileId,
+	}, nil
 }

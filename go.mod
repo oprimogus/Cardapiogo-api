@@ -8,7 +8,6 @@ require (
 	github.com/go-playground/validator/v10 v10.17.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/golang-migrate/migrate/v4 v4.16.2
-	github.com/golang/mock v1.6.0
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/lib/pq v1.10.2
 	github.com/prometheus/client_golang v1.18.0
@@ -17,6 +16,7 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.3
+	go.uber.org/mock v0.4.0
 	golang.org/x/oauth2 v0.16.0
 )
 
