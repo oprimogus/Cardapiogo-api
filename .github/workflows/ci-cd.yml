@@ -23,6 +23,9 @@ jobs:
           echo APP_NAME=${{ vars.APP_NAME }} >> .env
 
       - name: Run Tests
+        run: make lint
+
+      - name: Run Tests
         run: make test
 
       - name: Set up Docker Buildx

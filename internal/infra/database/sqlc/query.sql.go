@@ -11,26 +11,29 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createProfile = `-- name: CreateProfile :exec
+const createProfileAndReturnID = `-- name: CreateProfileAndReturnID :one
 INSERT INTO profile (name, last_name, cpf, phone, created_at, updated_at)
 VALUES ($1, $2, $3, $4, NOW(), NOW())
+RETURNING id
 `
 
-type CreateProfileParams struct {
+type CreateProfileAndReturnIDParams struct {
 	Name     string `db:"name" json:"name"`
 	LastName string `db:"last_name" json:"last_name"`
 	Cpf      string `db:"cpf" json:"cpf"`
 	Phone    string `db:"phone" json:"phone"`
 }
 
-func (q *Queries) CreateProfile(ctx context.Context, arg CreateProfileParams) error {
-	_, err := q.db.Exec(ctx, createProfile,
+func (q *Queries) CreateProfileAndReturnID(ctx context.Context, arg CreateProfileAndReturnIDParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createProfileAndReturnID,
 		arg.Name,
 		arg.LastName,
 		arg.Cpf,
 		arg.Phone,
 	)
-	return err
+	var id int32
+	err := row.Scan(&id)
+	return id, err
 }
 
 const createUser = `-- name: CreateUser :exec
@@ -71,14 +74,14 @@ func (q *Queries) CreateUserWithOAuth(ctx context.Context, arg CreateUserWithOAu
 	return err
 }
 
-const getProfile = `-- name: GetProfile :one
+const getProfileByID = `-- name: GetProfileByID :one
 SELECT id, name, last_name, cpf, phone, created_at, updated_at FROM profile
 WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetProfile(ctx context.Context, id int32) (Profile, error) {
-	row := q.db.QueryRow(ctx, getProfile, id)
+func (q *Queries) GetProfileByID(ctx context.Context, id int32) (Profile, error) {
+	row := q.db.QueryRow(ctx, getProfileByID, id)
 	var i Profile
 	err := row.Scan(
 		&i.ID,

@@ -32,8 +32,10 @@ func Initialize(factory factory.RepositoryFactory) {
 	router.Use(middleware.PrometheusMiddleware(metrics))
 
 	routes.DefaultRoutes(router, factory, metrics.Registry)
-	routes.UserRoutes(router, factory, validator)
 	routes.AuthRoutes(router, factory, validator)
+	routes.UserRoutes(router, factory, validator)
+	routes.ProfileRoutes(router, factory, validator)
+	
 
 	router.Use(gin.Recovery())
 

@@ -43,11 +43,12 @@ SET
     updated_at = NOW()
 WHERE id = $1;
 
--- name: CreateProfile :exec
+-- name: CreateProfileAndReturnID :one
 INSERT INTO profile (name, last_name, cpf, phone, created_at, updated_at)
-VALUES ($1, $2, $3, $4, NOW(), NOW());
+VALUES ($1, $2, $3, $4, NOW(), NOW())
+RETURNING id;
 
--- name: GetProfile :one
+-- name: GetProfileByID :one
 SELECT * FROM profile
 WHERE id = $1
 LIMIT 1;

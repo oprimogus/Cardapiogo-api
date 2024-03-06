@@ -1,0 +1,27 @@
+# Local
+@baseUrl = http://localhost:8080/api
+
+# @name login
+POST {{baseUrl}}/v1/login
+Content-Type: application/json
+
+{
+    //"email": "carl.johnson@example.com",
+    "email": "apollo.creed@example.com",
+    "password": "teste123"
+}
+###
+
+@authToken = {{login.response.headers.Set-Cookie}}
+
+# @name CreateProfile
+POST {{baseUrl}}/v1/profile
+Content-Type: application/json
+Cookie: {{authToken}}
+
+{
+    "name": "Apollo",
+    "last_name": "Creed",
+    "cpf": "50338097848",
+    "phone": "13997590578"
+}

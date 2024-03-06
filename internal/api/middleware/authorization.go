@@ -20,7 +20,7 @@ func AuthorizationMiddleware(allowedRoles []types.Role) gin.HandlerFunc {
 		userRoleString, ok := userRoleInterface.(string)
 		if !ok {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errors.InternalServerError("Error in process userRole"))
-            return
+			return
 		}
 
 		userRole := types.Role(userRoleString)

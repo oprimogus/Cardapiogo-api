@@ -7,7 +7,7 @@ Repositório da API do Cardápio em Golang
 
 ## Depêndencias
 ### 1. Migrate CLI
-Configure a CLI do [migrate](https://github.com/golang-migrate/migrate/tree/v4.16.2/cmd/migrate) 
+Configure o Migrate através deste [link](https://github.com/golang-migrate/migrate/tree/v4.16.2/cmd/migrate) 
 
 ### 2. SQLC
 Configure o SQLC através deste [link](https://docs.sqlc.dev/en/stable/overview/install.html)
@@ -18,8 +18,11 @@ Configure o swaggo através deste [link](https://github.com/swaggo/swag)
 ### 4. gin-swagger
 Configure o swaggo através deste [link](https://github.com/swaggo/gin-swagger)
 
+### 5. validator
+Documentação disponível em [link](https://github.com/go-playground/validator)
 
-## Rodar o app localmente
+
+## Primeira vez ao rodar o app localmente
 
 1. Criar .env
     ```
@@ -46,4 +49,8 @@ Configure o swaggo através deste [link](https://github.com/swaggo/gin-swagger)
     make mock-database
     ```
 
-6. Acessar rotas em  http://localhost/api/v1/swagger/index.html#/
+6. Rodar a API
+    ```
+    make run
+    ```
+7. Acessar rotas em  http://localhost/api/v1/swagger/index.html#/
