@@ -1,6 +1,3 @@
-# Nginx
-# @baseUrl = http://localhost/api
-
 # Local
 @baseUrl = http://localhost:8080/api
 
@@ -9,7 +6,8 @@ POST {{baseUrl}}/v1/login
 Content-Type: application/json
 
 {
-    "email": "trevor.philips@example.com",
+    "email": "carl.johnson@example.com",
+    //"email": "apollo.creed@example.com",
     "password": "teste123"
 }
 ###
