@@ -9,6 +9,7 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/api/middleware"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
 	"github.com/oprimogus/cardapiogo/internal/domain/factory"
+	"github.com/oprimogus/cardapiogo/internal/domain/types"
 )
 
 func UserRoutes(router *gin.Engine, factory factory.RepositoryFactory, validator *validatorutils.Validator) {
@@ -20,10 +21,10 @@ func UserRoutes(router *gin.Engine, factory factory.RepositoryFactory, validator
 	v1 := router.Group(basePath + "/v1")
 	{
 		v1.POST("/user", userController.CreateUserHandler)
-		v1.GET("/user/:id", middleware.AuthMiddleware(), userController.GetUserHandler)
-		v1.GET("/user", middleware.AuthMiddleware(), userController.GetUsersListHandler)
-		v1.PUT("/user/change-password", middleware.AuthMiddleware(), userController.UpdateUserPasswordHandler)
-		v1.PUT("/user", middleware.AuthMiddleware(), userController.UpdateUserHandler)
+		v1.GET("/user/:id", middleware.AuthenticationMiddleware(), userController.GetUserHandler)
+		v1.GET("/user", middleware.AuthenticationMiddleware(), middleware.AuthorizationMiddleware([]types.Role{types.UserRoleAdmin}), userController.GetUsersListHandler)
+		v1.PUT("/user/change-password", middleware.AuthenticationMiddleware(), userController.UpdateUserPasswordHandler)
+		v1.PUT("/user", middleware.AuthenticationMiddleware(), userController.UpdateUserHandler)
 	}
 
 }

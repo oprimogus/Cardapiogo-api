@@ -139,11 +139,7 @@ func (c *UserController) UpdateUserPasswordHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = validatorutils.IsSameUser(ctx, updateUserPasswordParams.ID)
-	if err != nil {
-		ctx.JSON(http.StatusForbidden, err)
-		return
-	}
+	validateIsSameUser(ctx, updateUserPasswordParams.ID)
 
 	err = c.service.UpdateUserPassword(ctx, updateUserPasswordParams)
 	validateErrorResponse(ctx, err)
@@ -177,11 +173,7 @@ func (c *UserController) UpdateUserHandler(ctx *gin.Context) {
 		return
 	}
 
-	err = validatorutils.IsSameUser(ctx, updateUserParams.ID)
-	if err != nil {
-		ctx.JSON(http.StatusForbidden, err)
-		return
-	}
+	validateIsSameUser(ctx, updateUserParams.ID)
 
 	err = c.service.UpdateUser(ctx, updateUserParams)
 	validateErrorResponse(ctx, err)

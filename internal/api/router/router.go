@@ -23,9 +23,8 @@ func Initialize(factory factory.RepositoryFactory) {
 
 	log := logger.GetLoggerDefault("Router")
 
-	setGinMode()
-
 	router := gin.New()
+	setGinMode()
 	router.Use(middleware.CorsMiddleware())
 	router.Use(middleware.LoggerMiddleware(logger.GetLoggerDefault("GIN")))
 

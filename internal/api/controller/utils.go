@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
 
@@ -19,5 +20,12 @@ func validateErrorResponse(ctx *gin.Context, err error) {
 		ctx.JSON(http.StatusInternalServerError, errors.New(http.StatusInternalServerError, err.Error()))
 		return
 	}
+}
 
+func validateIsSameUser(ctx *gin.Context, id string) {
+	err := validatorutils.IsSameUser(ctx, id)
+	if err != nil {
+		ctx.JSON(http.StatusForbidden, err)
+		return
+	}
 }
