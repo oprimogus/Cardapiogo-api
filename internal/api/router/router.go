@@ -49,10 +49,10 @@ func Initialize(factory factory.RepositoryFactory) {
 
 func setGinMode() {
 	env := strings.ToLower(os.Getenv("API_ENVIRONMENT"))
-	if (env == "local" || env == "staging") {
+	if env == "local" || env == "staging" {
 		gin.SetMode(gin.DebugMode)
 	}
-	if (env == "prod") {
+	if env == "prod" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 }

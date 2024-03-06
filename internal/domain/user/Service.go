@@ -88,6 +88,11 @@ func (u *Service) UpdateUser(ctx context.Context, params UpdateUserParams) error
 	return u.repository.UpdateUser(ctx, params)
 }
 
+// UpdateUserProfile set the profile of a user
+func (u *Service) UpdateUserProfile(ctx context.Context, params UpdateUserProfileParams) error {
+	return u.repository.UpdateUserProfile(ctx, params)
+}
+
 // HashPassword generate a hash of password for save in database
 func (u *Service) HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)

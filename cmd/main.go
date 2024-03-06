@@ -37,8 +37,8 @@ func main() {
 	defer db.Close()
 
 	// routes
-	factory := factory.NewDataBaseRepositoryFactory(db)
-	router.Initialize(factory)
+	factoryRepository := factory.NewDataBaseRepositoryFactory(db)
+	router.Initialize(factoryRepository)
 }
 
 // configureSwaggerDocs Configuração da documentação Swagger
