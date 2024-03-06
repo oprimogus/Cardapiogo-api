@@ -11,7 +11,7 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+func AuthenticationMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cookie, err := c.Cookie("token")
 		if err != nil {
@@ -37,13 +37,13 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			c.Set("userID", claims["sub"])
-		} else {
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok && !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, err.Error()))
 			return
 		}
-
+		c.Set("userRole", claims["role"].(string))
+		c.Set("userID", claims["sub"].(string))
 		c.Next()
 	}
 }
