@@ -3,6 +3,7 @@ package validatorutils
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/pt"
@@ -21,7 +22,7 @@ var personalizedValidations = map[string]bool{
 }
 
 type Validator struct {
-	validator  *validator.Validate
+	Validator  *validator.Validate
 	translator ut.Translator
 	locale     string
 }
@@ -30,6 +31,7 @@ func NewValidator(locale string) (*Validator, error) {
 	v := validator.New(validator.WithRequiredStructEnabled())
 	v.RegisterValidation("role", isValidUserRole)
 	v.RegisterValidation("account_provider", isValidAccountProvider)
+	v.RegisterValidation("cpf", IsValidCpf)
 
 	enLocale := en.New()
 	ptLocale := pt.New()
@@ -49,7 +51,7 @@ func NewValidator(locale string) (*Validator, error) {
 	}
 
 	return &Validator{
-		validator:  v,
+		Validator:  v,
 		translator: translator,
 		locale:     locale,
 	}, nil
@@ -58,20 +60,15 @@ func NewValidator(locale string) (*Validator, error) {
 func (v *Validator) Validate(i interface{}) *errors.ErrorResponse {
 	out := make(map[string]string)
 
-	// Realiza a validação
-	err := v.validator.Struct(i)
+	err := v.Validator.Struct(i)
 
-	// Verifica se houve erros de validação
 	if err != nil {
-		// Realiza o type assertion apenas se houver erros
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
-			// Se a asserção de tipo falhar, retorna um erro genérico ou lida com isso de maneira apropriada
 			out["error"] = "Unknown validation error"
 			return errors.New(http.StatusBadRequest, out["error"])
 		}
 
-		// Processa os erros de validação
 		for _, e := range errs {
 			_, isPersonalized := personalizedValidations[e.Tag()]
 			if isPersonalized {
@@ -110,8 +107,8 @@ func isValidUserRole(fl validator.FieldLevel) bool {
 }
 
 func isValidAccountProvider(fl validator.FieldLevel) bool {
-	role := fl.Field().String()
-	switch types.AccountProvider(role) {
+	accountProvider := fl.Field().String()
+	switch types.AccountProvider(accountProvider) {
 	case types.AccountProviderApple,
 		types.AccountProviderGoogle,
 		types.AccountProviderMeta:
@@ -119,4 +116,42 @@ func isValidAccountProvider(fl validator.FieldLevel) bool {
 	default:
 		return false
 	}
+}
+
+func IsValidCpf(fl validator.FieldLevel) bool {
+	cpf := fl.Field().String()
+
+	if len(cpf) != 11 {
+		return false
+	}
+	if isAllEqual(cpf) {
+		return false
+	}
+	d1 := calculateDigitCpf(cpf, 10)
+	d2 := calculateDigitCpf(cpf, 11)
+	return strconv.Itoa(d1) == cpf[9:10] && strconv.Itoa(d2) == cpf[10:11]
+}
+
+func isAllEqual(value string) bool {
+	for i := range value {
+		if value[i] != value[0] {
+			return false
+		}
+	}
+	return true
+}
+
+func calculateDigitCpf(cpf string, weight int) int {
+    sum := 0
+	count := weight - 1
+    for i := 0; i < count; i++ {
+        number, _ := strconv.Atoi(string(cpf[i]))
+        sum += number * weight
+        weight--
+    }
+    rest := sum % 11
+    if rest < 2 {
+        return 0
+    }
+    return 11 - rest
 }

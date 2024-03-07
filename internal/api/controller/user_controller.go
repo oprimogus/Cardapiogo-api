@@ -12,13 +12,11 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
 
-// UserController struct
 type UserController struct {
 	service   *user.Service
 	validator *validatorutils.Validator
 }
 
-// NewUserController return a new instance of userController
 func NewUserController(repository user.Repository, validator *validatorutils.Validator) *UserController {
 	return &UserController{service: user.NewService(repository), validator: validator}
 }

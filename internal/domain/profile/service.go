@@ -7,6 +7,10 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
 
+const (
+	ExistRegisteredProfile = "The user already has a registered profile."
+)
+
 type Service struct {
 	repository     Repository
 	userRepository user.Repository
@@ -22,7 +26,7 @@ func (u *Service) CreateProfile(ctx context.Context, userID string, params Creat
 		return err
 	}
 	if user.ProfileID != 0 {
-		return errors.ConflictError("The user already has a registered profile")
+		return errors.ConflictError(ExistRegisteredProfile)
 	}
 	return u.repository.CreateProfile(ctx, userID, params)
 }

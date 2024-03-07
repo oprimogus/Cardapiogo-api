@@ -14,7 +14,7 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/types"
 	"github.com/oprimogus/cardapiogo/internal/domain/user"
 	"github.com/oprimogus/cardapiogo/internal/errors"
-	mockuser "github.com/oprimogus/cardapiogo/internal/infra/mocks"
+	mock_user "github.com/oprimogus/cardapiogo/internal/infra/mocks/user"
 )
 
 const (
@@ -27,7 +27,7 @@ const (
 type ServiceSuite struct {
 	suite.Suite
 	controller               *gomock.Controller
-	Repository               *mockuser.MockRepository
+	Repository               *mock_user.MockRepository
 	Service                  *user.Service
 	createUserParams         user.CreateUserParams
 	updateUserPasswordParams user.UpdateUserPasswordParams
@@ -45,7 +45,7 @@ func (s *ServiceSuite) ServiceSuiteDown(t *testing.T) {
 
 func (s *ServiceSuite) SetupTest() {
 	s.controller = gomock.NewController(s.T())
-	s.Repository = mockuser.NewMockRepository(s.controller)
+	s.Repository = mock_user.NewMockRepository(s.controller)
 	s.Service = user.NewService(s.Repository)
 	s.createUserParams = user.CreateUserParams{
 		Email:           EMAIL,

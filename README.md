@@ -25,7 +25,7 @@ Documentação disponível em [link](https://github.com/go-playground/validator)
 Documentação disponível em [link](https://github.com/uber-go/mock)
 - Exemplo de geração de mock
 ```
-mockgen -source=internal/domain/user/Repository.go -destination=internal/infra/mocks/mock-user.go
+mockgen -source=internal/domain/profile/repository.go -destination=internal/infra/mocks/mock_profile.go
 ```
 
 

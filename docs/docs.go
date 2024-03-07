@@ -149,6 +149,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/profile": {
+            "post": {
+                "description": "Cria um perfil e atribui a um usuário",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Cria um perfil e atribui a um usuário",
+                "parameters": [
+                    {
+                        "description": "CreateProfileParams",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/profile.CreateProfileParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "get": {
                 "description": "Retorna uma lista de usuários com paginação",
@@ -413,6 +462,31 @@ const docTemplate = `{
                 }
             }
         },
+        "profile.CreateProfileParams": {
+            "type": "object",
+            "required": [
+                "last_name",
+                "name",
+                "phone"
+            ],
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 40
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "phone": {
+                    "type": "string",
+                    "maxLength": 11
+                }
+            }
+        },
         "types.AccountProvider": {
             "type": "string",
             "enum": [
@@ -448,6 +522,7 @@ const docTemplate = `{
         "user.CreateUserParams": {
             "type": "object",
             "required": [
+                "account_provider",
                 "email",
                 "password",
                 "role"

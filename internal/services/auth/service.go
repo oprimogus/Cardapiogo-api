@@ -65,11 +65,7 @@ func ValidateStateToken(stateToken string) (bool, error) {
 func Login(ctx context.Context, service *user.Service, loginParams *user.Login) (string, error) {
 	existUser, err := service.GetUserByEmail(ctx, loginParams.Email)
 	if err != nil {
-		dbErr, ok := err.(*errors.ErrorResponse)
-		if !ok {
-			return "", errors.InternalServerError(err.Error())
-		}
-		return "", dbErr
+		return "", err
 	}
 	isSamePassword := service.IsValidPassword(loginParams.Password, existUser.Password)
 	if isSamePassword {
@@ -85,19 +81,11 @@ func Login(ctx context.Context, service *user.Service, loginParams *user.Login) 
 func createUserInOauth(ctx context.Context, s *user.Service, u *user.CreateUserWithOAuthParams) (user.User, error) {
 	err := s.CreateUserWithOAuth(ctx, *u)
 	if err != nil {
-		dbErr, ok := err.(*errors.ErrorResponse)
-		if !ok {
-			return user.User{}, errors.InternalServerError(err.Error())
-		}
-		return user.User{}, dbErr
+		return user.User{}, err
 	}
 	createdUser, err := s.GetUserByEmail(ctx, u.Email)
 	if err != nil {
-		dbErr, ok := err.(*errors.ErrorResponse)
-		if !ok {
-			return user.User{}, errors.InternalServerError(err.Error())
-		}
-		return user.User{}, dbErr
+		return user.User{}, err
 	}
 	return createdUser, nil
 }
@@ -105,11 +93,7 @@ func createUserInOauth(ctx context.Context, s *user.Service, u *user.CreateUserW
 func LoginWithOauth(ctx context.Context, s *user.Service, userData *oauth2.GoogleUserInfo) (string, error) {
 	existUser, err := s.GetUserByEmail(ctx, userData.Email)
 	if err != nil {
-		dbErr, ok := err.(*errors.ErrorResponse)
-		if !ok {
-			return "", errors.InternalServerError(err.Error())
-		}
-		if dbErr.ErrorMessage == errors.NOT_FOUND_RECORD {
+		if err.Error() == errors.NOT_FOUND_RECORD {
 			u := user.CreateUserWithOAuthParams{
 				Email:           userData.Email,
 				Role:            types.UserRoleConsumer,
@@ -133,5 +117,4 @@ func LoginWithOauth(ctx context.Context, s *user.Service, userData *oauth2.Googl
 		return "", err
 	}
 	return jwt, nil
-
 }

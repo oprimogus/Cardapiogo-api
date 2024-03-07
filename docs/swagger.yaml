@@ -5,6 +5,24 @@ definitions:
       error:
         type: string
     type: object
+  profile.CreateProfileParams:
+    properties:
+      cpf:
+        type: string
+      last_name:
+        maxLength: 40
+        type: string
+      name:
+        maxLength: 25
+        type: string
+      phone:
+        maxLength: 11
+        type: string
+    required:
+    - last_name
+    - name
+    - phone
+    type: object
   types.AccountProvider:
     enum:
     - Google
@@ -42,6 +60,7 @@ definitions:
       role:
         $ref: '#/definitions/types.Role'
     required:
+    - account_provider
     - email
     - password
     - role
@@ -197,6 +216,38 @@ paths:
       summary: Login de usuário com email e senha
       tags:
       - Auth
+  /profile:
+    post:
+      consumes:
+      - application/json
+      description: Cria um perfil e atribui a um usuário
+      parameters:
+      - description: CreateProfileParams
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/profile.CreateProfileParams'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      summary: Cria um perfil e atribui a um usuário
+      tags:
+      - Profile
   /user:
     get:
       consumes:
