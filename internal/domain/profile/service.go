@@ -8,7 +8,7 @@ import (
 )
 
 type Service struct {
-	repository Repository
+	repository     Repository
 	userRepository user.Repository
 }
 

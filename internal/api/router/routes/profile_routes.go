@@ -19,7 +19,7 @@ func ProfileRoutes(router *gin.Engine, factory factory.RepositoryFactory, valida
 
 	v1 := router.Group(basePath + "/v1")
 	{
-		v1.POST("/profile", middleware.AuthenticationMiddleware() , profileController.CreateProfileHandler)
+		v1.POST("/profile", middleware.AuthenticationMiddleware(), profileController.CreateProfileHandler)
 	}
 
 }

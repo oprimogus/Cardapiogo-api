@@ -19,7 +19,7 @@ func NewProfileRepositoryDatabase(db *postgres.PostgresDatabase, querier sqlc.Qu
 	return &ProfileRepositoryDatabase{db: db, q: querier}
 }
 
-func (p *ProfileRepositoryDatabase) CreateProfile(ctx context.Context, userID string, params profile.CreateProfileParams ) error {
+func (p *ProfileRepositoryDatabase) CreateProfile(ctx context.Context, userID string, params profile.CreateProfileParams) error {
 	tx, err := p.db.GetDB().Begin(ctx)
 	if err != nil {
 		return errors.NewDatabaseError(err)
@@ -27,10 +27,10 @@ func (p *ProfileRepositoryDatabase) CreateProfile(ctx context.Context, userID st
 	defer tx.Rollback(ctx)
 
 	sqlcParams := sqlc.CreateProfileAndReturnIDParams{
-		Name: params.Name,
+		Name:     params.Name,
 		LastName: params.LastName,
-		Cpf: params.CPF,
-		Phone: params.Phone,
+		Cpf:      params.CPF,
+		Phone:    params.Phone,
 	}
 	profileID, err := p.q.CreateProfileAndReturnID(ctx, sqlcParams)
 	if err != nil {
@@ -43,7 +43,7 @@ func (p *ProfileRepositoryDatabase) CreateProfile(ctx context.Context, userID st
 	}
 
 	updateUserProfileParams := sqlc.UpdateUserProfileParams{
-		ID: userUUID,
+		ID:        userUUID,
 		ProfileID: converters.ConvertInt32ToInt4(profileID),
 	}
 

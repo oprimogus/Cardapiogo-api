@@ -35,7 +35,6 @@ func Initialize(factory factory.RepositoryFactory) {
 	routes.AuthRoutes(router, factory, validator)
 	routes.UserRoutes(router, factory, validator)
 	routes.ProfileRoutes(router, factory, validator)
-	
 
 	router.Use(gin.Recovery())
 
