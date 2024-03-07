@@ -16,10 +16,17 @@ Configure o SQLC através deste [link](https://docs.sqlc.dev/en/stable/overview/
 Configure o swaggo através deste [link](https://github.com/swaggo/swag)
 
 ### 4. gin-swagger
-Configure o swaggo através deste [link](https://github.com/swaggo/gin-swagger)
+Documentação disponível em [link](https://github.com/swaggo/gin-swagger)
 
 ### 5. validator
 Documentação disponível em [link](https://github.com/go-playground/validator)
+
+### 6. go-mock
+Documentação disponível em [link](https://github.com/uber-go/mock)
+- Exemplo de geração de mock
+```
+mockgen -source=internal/domain/user/Repository.go -destination=internal/infra/mocks/mock-user.go
+```
 
 
 ## Primeira vez ao rodar o app localmente
@@ -53,4 +60,5 @@ Documentação disponível em [link](https://github.com/go-playground/validator)
     ```
     make run
     ```
+    
 7. Acessar rotas em  http://localhost/api/v1/swagger/index.html#/
