@@ -24,7 +24,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/google": {
+        "/v1/auth/google": {
             "get": {
                 "description": "Inicia fluxo de OAuth2",
                 "consumes": [
@@ -62,7 +62,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/google/callback": {
+        "/v1/auth/google/callback": {
             "get": {
                 "description": "Callback de login via OAuth2",
                 "consumes": [
@@ -100,7 +100,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/login": {
+        "/v1/login": {
             "post": {
                 "description": "Login de usuário com email e senha",
                 "consumes": [
@@ -149,7 +149,93 @@ const docTemplate = `{
                 }
             }
         },
-        "/profile": {
+        "/v1/profile": {
+            "get": {
+                "description": "Retorna o perfil do usuário",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Retorna o perfil do usuário",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/profile.Profile"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza os dados do perfil do usuário",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Atualiza os dados do perfil do usuário",
+                "parameters": [
+                    {
+                        "description": "UpdateProfileParams",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/profile.UpdateProfileParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Cria um perfil e atribui a um usuário",
                 "consumes": [
@@ -198,7 +284,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user": {
+        "/v1/user": {
             "get": {
                 "description": "Retorna uma lista de usuários com paginação",
                 "consumes": [
@@ -352,7 +438,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/change-password": {
+        "/v1/user/change-password": {
             "put": {
                 "description": "Atualiza a senha do usuário",
                 "consumes": [
@@ -401,7 +487,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/{id}": {
+        "/v1/user/{id}": {
             "get": {
                 "description": "Retorna um usuário através do ID",
                 "consumes": [
@@ -473,6 +559,45 @@ const docTemplate = `{
                 "cpf": {
                     "type": "string"
                 },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 40
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "phone": {
+                    "type": "string",
+                    "maxLength": 11
+                }
+            }
+        },
+        "profile.Profile": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "profile.UpdateProfileParams": {
+            "type": "object",
+            "required": [
+                "last_name",
+                "name",
+                "phone"
+            ],
+            "properties": {
                 "last_name": {
                     "type": "string",
                     "maxLength": 40

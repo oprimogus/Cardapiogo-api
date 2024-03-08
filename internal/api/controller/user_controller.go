@@ -21,8 +21,6 @@ func NewUserController(repository user.Repository, validator *validatorutils.Val
 	return &UserController{service: user.NewService(repository), validator: validator}
 }
 
-// @BasePath /api/v1
-
 // CreateUserHandler godoc
 // @Summary Adiciona um novo usuário
 // @Description Cria um novo usuário através de login email/senha
@@ -34,7 +32,7 @@ func NewUserController(repository user.Repository, validator *validatorutils.Val
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /user [post]
+// @Router /v1/user [post]
 func (c *UserController) CreateUserHandler(ctx *gin.Context) {
 	var userParams user.CreateUserParams
 	err := ctx.BindJSON(&userParams)
@@ -65,7 +63,7 @@ func (c *UserController) CreateUserHandler(ctx *gin.Context) {
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /user/{id} [get]
+// @Router /v1/user/{id} [get]
 func (c *UserController) GetUserHandler(ctx *gin.Context) {
 	id := ctx.Params.ByName("id")
 
@@ -92,7 +90,7 @@ func (c *UserController) GetUserHandler(ctx *gin.Context) {
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /user [get]
+// @Router /v1/user [get]
 func (c *UserController) GetUsersListHandler(ctx *gin.Context) {
 	items, err := strconv.Atoi(ctx.Query("items"))
 	if err != nil || items <= 0 {
@@ -121,7 +119,7 @@ func (c *UserController) GetUsersListHandler(ctx *gin.Context) {
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /user/change-password [put]
+// @Router /v1/user/change-password [put]
 func (c *UserController) UpdateUserPasswordHandler(ctx *gin.Context) {
 
 	var updateUserPasswordParams user.UpdateUserPasswordParams
@@ -155,7 +153,7 @@ func (c *UserController) UpdateUserPasswordHandler(ctx *gin.Context) {
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /user [put]
+// @Router /v1/user [put]
 func (c *UserController) UpdateUserHandler(ctx *gin.Context) {
 
 	var updateUserParams user.UpdateUserParams

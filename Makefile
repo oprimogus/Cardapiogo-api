@@ -25,6 +25,10 @@ dev-docker-down:
 mock-database:
 	go run scripts/populate_local_db.go
 
+mock:
+	@read -p "Enter mock interface path: " name; \
+		mockgen -source=internal/domain/$$name/repository.go -destination=internal/infra/mocks/$$name/mock_$$name.go 
+
 sqlc:
 	sqlc generate -f configs/sqlc.yaml
 

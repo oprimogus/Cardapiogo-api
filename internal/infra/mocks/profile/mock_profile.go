@@ -53,3 +53,47 @@ func (mr *MockRepositoryMockRecorder) CreateProfile(ctx, userID, params any) *go
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProfile", reflect.TypeOf((*MockRepository)(nil).CreateProfile), ctx, userID, params)
 }
+
+// GetProfileByID mocks base method.
+func (m *MockRepository) GetProfileByID(ctx context.Context, profileID int) (profile.Profile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProfileByID", ctx, profileID)
+	ret0, _ := ret[0].(profile.Profile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProfileByID indicates an expected call of GetProfileByID.
+func (mr *MockRepositoryMockRecorder) GetProfileByID(ctx, profileID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfileByID", reflect.TypeOf((*MockRepository)(nil).GetProfileByID), ctx, profileID)
+}
+
+// GetProfileByUserID mocks base method.
+func (m *MockRepository) GetProfileByUserID(ctx context.Context, userID string) (profile.Profile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProfileByUserID", ctx, userID)
+	ret0, _ := ret[0].(profile.Profile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProfileByUserID indicates an expected call of GetProfileByUserID.
+func (mr *MockRepositoryMockRecorder) GetProfileByUserID(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfileByUserID", reflect.TypeOf((*MockRepository)(nil).GetProfileByUserID), ctx, userID)
+}
+
+// UpdateProfile mocks base method.
+func (m *MockRepository) UpdateProfile(ctx context.Context, userID string, params profile.UpdateProfileParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProfile", ctx, userID, params)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateProfile indicates an expected call of UpdateProfile.
+func (mr *MockRepositoryMockRecorder) UpdateProfile(ctx, userID, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProfile", reflect.TypeOf((*MockRepository)(nil).UpdateProfile), ctx, userID, params)
+}

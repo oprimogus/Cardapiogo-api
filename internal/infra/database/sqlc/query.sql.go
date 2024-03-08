@@ -75,22 +75,55 @@ func (q *Queries) CreateUserWithOAuth(ctx context.Context, arg CreateUserWithOAu
 }
 
 const getProfileByID = `-- name: GetProfileByID :one
-SELECT id, name, last_name, cpf, phone, created_at, updated_at FROM profile
+SELECT id, name, last_name, cpf, phone FROM profile
 WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetProfileByID(ctx context.Context, id int32) (Profile, error) {
+type GetProfileByIDRow struct {
+	ID       int32  `db:"id" json:"id"`
+	Name     string `db:"name" json:"name"`
+	LastName string `db:"last_name" json:"last_name"`
+	Cpf      string `db:"cpf" json:"cpf"`
+	Phone    string `db:"phone" json:"phone"`
+}
+
+func (q *Queries) GetProfileByID(ctx context.Context, id int32) (GetProfileByIDRow, error) {
 	row := q.db.QueryRow(ctx, getProfileByID, id)
-	var i Profile
+	var i GetProfileByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.LastName,
 		&i.Cpf,
 		&i.Phone,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getProfileByUserID = `-- name: GetProfileByUserID :one
+SELECT id, name, last_name, cpf, phone FROM profile p
+inner join (SELECT profile_id from users where users.id = $1) u on p.id = u.profile_id
+LIMIT 1
+`
+
+type GetProfileByUserIDRow struct {
+	ID       int32  `db:"id" json:"id"`
+	Name     string `db:"name" json:"name"`
+	LastName string `db:"last_name" json:"last_name"`
+	Cpf      string `db:"cpf" json:"cpf"`
+	Phone    string `db:"phone" json:"phone"`
+}
+
+func (q *Queries) GetProfileByUserID(ctx context.Context, id pgtype.UUID) (GetProfileByUserIDRow, error) {
+	row := q.db.QueryRow(ctx, getProfileByUserID, id)
+	var i GetProfileByUserIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.LastName,
+		&i.Cpf,
+		&i.Phone,
 	)
 	return i, err
 }
@@ -195,14 +228,18 @@ SET
     last_name = $3,
     phone = $4,
     updated_at = NOW()
-WHERE id = $1
+WHERE id = (
+    SELECT profile_id
+    FROM users
+    WHERE users.id = $1
+)
 `
 
 type UpdateProfileParams struct {
-	ID       int32  `db:"id" json:"id"`
-	Name     string `db:"name" json:"name"`
-	LastName string `db:"last_name" json:"last_name"`
-	Phone    string `db:"phone" json:"phone"`
+	ID       pgtype.UUID `db:"id" json:"id"`
+	Name     string      `db:"name" json:"name"`
+	LastName string      `db:"last_name" json:"last_name"`
+	Phone    string      `db:"phone" json:"phone"`
 }
 
 func (q *Queries) UpdateProfile(ctx context.Context, arg UpdateProfileParams) error {

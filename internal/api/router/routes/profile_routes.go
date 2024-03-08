@@ -20,6 +20,8 @@ func ProfileRoutes(router *gin.Engine, factory factory.RepositoryFactory, valida
 	v1 := router.Group(basePath + "/v1")
 	{
 		v1.POST("/profile", middleware.AuthenticationMiddleware(), profileController.CreateProfileHandler)
+		v1.GET("/profile", middleware.AuthenticationMiddleware(), profileController.GetProfileByUserIDHandler)
+		v1.PUT("/profile", middleware.AuthenticationMiddleware(), profileController.UpdateProfileHandler)
 	}
 
 }

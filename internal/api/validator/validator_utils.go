@@ -142,16 +142,16 @@ func isAllEqual(value string) bool {
 }
 
 func calculateDigitCpf(cpf string, weight int) int {
-    sum := 0
+	sum := 0
 	count := weight - 1
-    for i := 0; i < count; i++ {
-        number, _ := strconv.Atoi(string(cpf[i]))
-        sum += number * weight
-        weight--
-    }
-    rest := sum % 11
-    if rest < 2 {
-        return 0
-    }
-    return 11 - rest
+	for i := 0; i < count; i++ {
+		number, _ := strconv.Atoi(string(cpf[i]))
+		sum += number * weight
+		weight--
+	}
+	rest := sum % 11
+	if rest < 2 {
+		return 0
+	}
+	return 11 - rest
 }

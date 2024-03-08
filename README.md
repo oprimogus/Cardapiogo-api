@@ -61,4 +61,4 @@ mockgen -source=internal/domain/profile/repository.go -destination=internal/infr
     make run
     ```
     
-7. Acessar rotas em  http://localhost/api/v1/swagger/index.html#/
+7. Acessar rotas em  http://localhost:8080/api/v1/swagger/index.html#/

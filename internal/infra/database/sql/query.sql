@@ -49,8 +49,13 @@ VALUES ($1, $2, $3, $4, NOW(), NOW())
 RETURNING id;
 
 -- name: GetProfileByID :one
-SELECT * FROM profile
+SELECT id, name, last_name, cpf, phone FROM profile
 WHERE id = $1
+LIMIT 1;
+
+-- name: GetProfileByUserID :one
+SELECT id, name, last_name, cpf, phone FROM profile p
+inner join (SELECT profile_id from users where users.id = $1) u on p.id = u.profile_id
 LIMIT 1;
 
 -- name: UpdateProfile :exec
@@ -60,7 +65,11 @@ SET
     last_name = $3,
     phone = $4,
     updated_at = NOW()
-WHERE id = $1;
+WHERE id = (
+    SELECT profile_id
+    FROM users
+    WHERE users.id = $1
+);
 
 -- name: UpdateProfileCpf :exec
 UPDATE profile

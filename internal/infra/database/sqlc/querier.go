@@ -14,7 +14,8 @@ type Querier interface {
 	CreateProfileAndReturnID(ctx context.Context, arg CreateProfileAndReturnIDParams) (int32, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) error
 	CreateUserWithOAuth(ctx context.Context, arg CreateUserWithOAuthParams) error
-	GetProfileByID(ctx context.Context, id int32) (Profile, error)
+	GetProfileByID(ctx context.Context, id int32) (GetProfileByIDRow, error)
+	GetProfileByUserID(ctx context.Context, id pgtype.UUID) (GetProfileByUserIDRow, error)
 	GetUser(ctx context.Context, arg GetUserParams) ([]GetUserRow, error)
 	GetUserByEmail(ctx context.Context, email string) (Users, error)
 	GetUserById(ctx context.Context, id pgtype.UUID) (Users, error)

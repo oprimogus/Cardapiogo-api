@@ -55,7 +55,7 @@ func (s *ServiceSuite) SetupTest() {
 		Name:     "John",
 		LastName: "Marston",
 		CPF:      "69950517850",
-		Phone: "13997590578",
+		Phone:    "13997590578",
 	}
 }
 

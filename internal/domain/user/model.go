@@ -6,7 +6,6 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/types"
 )
 
-// User Model
 type User struct {
 	ID              string                `db:"id" json:"id"`
 	ProfileID       int                   `db:"profile_id" json:"profile_id"`

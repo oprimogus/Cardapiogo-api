@@ -12,7 +12,7 @@ import (
 
 type ServiceSuite struct {
 	suite.Suite
-	validator  *validator.Validate
+	validator *validator.Validate
 }
 
 func TestServiceStart(t *testing.T) {

@@ -36,7 +36,7 @@ func NewAuthController(repository user.Repository, validator *validatorutils.Val
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /auth/google [get]
+// @Router /v1/auth/google [get]
 func (c *AuthController) StartGoogleOAuthFlow(ctx *gin.Context) {
 	conf := oauth2.NewGoogleOauthConf()
 
@@ -59,7 +59,7 @@ func (c *AuthController) StartGoogleOAuthFlow(ctx *gin.Context) {
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /auth/google/callback [get]
+// @Router /v1/auth/google/callback [get]
 func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 
 	stateToken := ctx.Query("state")
@@ -102,7 +102,7 @@ func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /login [post]
+// @Router /v1/login [post]
 func (c *AuthController) Login(ctx *gin.Context) {
 	var user user.Login
 	err := ctx.BindJSON(&user)
