@@ -3,7 +3,9 @@ package router
 import (
 	"os"
 	"strings"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	"github.com/oprimogus/cardapiogo/internal/api/middleware"
@@ -25,7 +27,14 @@ func Initialize(factory factory.RepositoryFactory) {
 
 	router := gin.New()
 	setGinMode()
-	router.Use(middleware.CorsMiddleware())
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // Permitir todas as origens
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	router.Use(middleware.LoggerMiddleware(logger.GetLoggerDefault("GIN")))
 
 	metrics := middleware.NewPrometheusMetrics()
