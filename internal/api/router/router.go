@@ -28,7 +28,7 @@ func Initialize(factory factory.RepositoryFactory) {
 	router := gin.New()
 	setGinMode()
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"}, // Permitir todas as origens
+		AllowOrigins:     []string{os.Getenv("WEB_URL")},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"},
 		ExposeHeaders:    []string{"Content-Length"},

@@ -2,6 +2,8 @@ package controller
 
 import (
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -111,14 +113,28 @@ func (c *AuthController) Login(ctx *gin.Context) {
 	jwt, err := auth.Login(ctx, c.UserService, &user)
 	validateErrorResponse(ctx, err)
 
+	var secure, httpOnly = false, false
+	var sameSite http.SameSite = http.SameSiteDefaultMode
+	environment := os.Getenv("API_ENVIRONMENT")
+    if strings.ToLower(environment) == "local" {
+        secure = false
+		httpOnly = false
+        sameSite = http.SameSiteNoneMode
+    }
+	if strings.ToLower(environment) == ("prod") || strings.ToLower(environment) == ("staging") {
+        secure = true
+		httpOnly = true
+        sameSite = http.SameSiteStrictMode
+    }
+
 	httpOnlyCookie := http.Cookie{
 		Name:     "token",
 		Value:    jwt,
 		Expires:  time.Now().Add(time.Hour * time.Duration(auth.TimeExpireInHour)),
-		HttpOnly: false,
-		Secure:   true,
+		HttpOnly: httpOnly,
+		Secure:   secure,
 		Path:     "/",
-		SameSite: http.SameSiteStrictMode,
+		SameSite: sameSite,
 	}
 
 	http.SetCookie(ctx.Writer, &httpOnlyCookie)
