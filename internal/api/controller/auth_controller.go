@@ -2,9 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"os"
-	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -80,17 +77,7 @@ func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 	jwt, err := auth.LoginWithOauth(ctx, c.UserService, userData)
 	validateErrorResponse(ctx, err)
 
-	httpOnlyCookie := http.Cookie{
-		Name:     "token",
-		Value:    jwt,
-		Expires:  time.Now().Add(time.Hour * time.Duration(auth.TimeExpireInHour)),
-		HttpOnly: false,
-		Secure:   true,
-		Path:     "/",
-		SameSite: http.SameSiteStrictMode,
-	}
-	http.SetCookie(ctx.Writer, &httpOnlyCookie)
-	ctx.Redirect(http.StatusMovedPermanently, "https://weather-app-angular-jeby7qw78-oprimogus.vercel.app/weather")
+	ctx.JSON(http.StatusOK, gin.H{"token": jwt, "redirect": "https://weather-app-angular-jeby7qw78-oprimogus.vercel.app/weather"})
 }
 
 // Login godoc
@@ -111,32 +98,9 @@ func (c *AuthController) Login(ctx *gin.Context) {
 	validateErrorResponse(ctx, err)
 
 	jwt, err := auth.Login(ctx, c.UserService, &user)
-	validateErrorResponse(ctx, err)
-
-	var secure, httpOnly = false, false
-	var sameSite http.SameSite = http.SameSiteDefaultMode
-	environment := os.Getenv("API_ENVIRONMENT")
-    if strings.ToLower(environment) == "local" {
-        secure = false
-		httpOnly = false
-        sameSite = http.SameSiteNoneMode
-    }
-	if strings.ToLower(environment) == ("prod") || strings.ToLower(environment) == ("staging") {
-        secure = true
-		httpOnly = true
-        sameSite = http.SameSiteStrictMode
-    }
-
-	httpOnlyCookie := http.Cookie{
-		Name:     "token",
-		Value:    jwt,
-		Expires:  time.Now().Add(time.Hour * time.Duration(auth.TimeExpireInHour)),
-		HttpOnly: httpOnly,
-		Secure:   secure,
-		Path:     "/",
-		SameSite: sameSite,
+	if err != nil {
+		validateErrorResponse(ctx, err)
+		return
 	}
-
-	http.SetCookie(ctx.Writer, &httpOnlyCookie)
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, gin.H{"token": jwt})
 }
