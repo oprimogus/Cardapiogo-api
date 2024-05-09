@@ -1,3 +1,4 @@
-DROP TABLE IF EXISTS "users", "profile", "address", "owner", "employee", "employee_restaurant", "restaurant", "restaurant_cousine_type", "cousine_type", "order", "order_item", "item", "payment_method", "businessHour", "restaurant_payment_method", "profile_restaurant" CASCADE;
 
-DROP TYPE IF EXISTS "user_role", "account_provider", "cousine_types", "order_status", "weekday";
+DROP TABLE IF EXISTS "users", "profile", "address", "store", "restaurant_type", "store_restaurant_type", "store_type", "store_payment_method", "payment_method", "employee", "owner", "order", "order_item", "item", "businessHours" CASCADE;
+
+DROP TYPE IF EXISTS "user_role", "account_provider", "cousine_type", "shop_type", "payment_form", "order_status", "weekday";
