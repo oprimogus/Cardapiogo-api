@@ -12,7 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 
-	"github.com/oprimogus/cardapiogo/pkg/log"
+	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
 var (
@@ -67,7 +67,14 @@ func (d PostgresDatabase) createStringConn() string {
 	dbUsername := os.Getenv("DB_USERNAME")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
+	return fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable search_path=public",
+		dbHost,
+		dbPort,
+		dbUsername,
+		dbPassword,
+		dbName,
+	)
 }
 
 func (d PostgresDatabase) getPgxConnection(connStr string) (*pgxpool.Pool, error) {
@@ -96,18 +103,21 @@ func (d PostgresDatabase) migrate() error {
 		return fmt.Errorf("database: could not create migration driver: %w", err)
 	}
 
-	log.Infof("Executing migrations on path: %s", sourceURL)
-	m, err := migrate.NewWithDatabaseInstance(
-		"file://"+sourceURL,
-		dbName, driver,
-	)
-	if m != nil {
-		err = m.Up()
-		if err != nil && err != migrate.ErrNoChange {
-			return fmt.Errorf("database: error when executing database migration: %w", err)
-		}
+	migrator, err := migrate.NewWithDatabaseInstance("file://"+sourceURL, dbName, driver)
+	if err != nil {
+		return fmt.Errorf("database: Could not create migrator: %w", err)
 	}
-	log.Info("Finish migrations!")
+
+	err = migrator.Up()
+	if err != nil && err != migrate.ErrNoChange {
+		return fmt.Errorf("database: Could not migrations: %w", err)
+	}
+
+	if err == migrate.ErrNoChange {
+		log.Info("No migrations to run.")
+	} else {
+		log.Info("Migrations applied successfully.")
+	}
 	return nil
 }
 
