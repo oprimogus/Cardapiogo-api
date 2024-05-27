@@ -14,10 +14,10 @@ import (
 type AccountProvider string
 
 const (
-	AccountProviderGoogle AccountProvider = "Google"
-	AccountProviderApple  AccountProvider = "Apple"
-	AccountProviderMeta   AccountProvider = "Meta"
-	AccountProviderLocal  AccountProvider = "Local"
+	AccountProviderGOOGLE     AccountProvider = "GOOGLE"
+	AccountProviderAPPLE      AccountProvider = "APPLE"
+	AccountProviderMETA       AccountProvider = "META"
+	AccountProviderCARDAPIOGO AccountProvider = "CARDAPIOGO"
 )
 
 func (e *AccountProvider) Scan(src interface{}) error {
@@ -55,63 +55,61 @@ func (ns NullAccountProvider) Value() (driver.Value, error) {
 	return string(ns.AccountProvider), nil
 }
 
-type CousineTypes string
+type CousineType string
 
 const (
-	CousineTypesITALIANA   CousineTypes = "ITALIANA"
-	CousineTypesFRANCESA   CousineTypes = "FRANCESA"
-	CousineTypesJAPONESA   CousineTypes = "JAPONESA"
-	CousineTypesPORTUGUESA CousineTypes = "PORTUGUESA"
-	CousineTypesMEXICANA   CousineTypes = "MEXICANA"
-	CousineTypesARABE      CousineTypes = "ARABE"
-	CousineTypesBRASILEIRA CousineTypes = "BRASILEIRA"
-	CousineTypesTAILANDESA CousineTypes = "TAILANDESA"
-	CousineTypesDOCES      CousineTypes = "DOCES"
-	CousineTypesSALGADOS   CousineTypes = "SALGADOS"
+	CousineTypeITALIAN   CousineType = "ITALIAN"
+	CousineTypeJAPANESE  CousineType = "JAPANESE"
+	CousineTypeMEXICAN   CousineType = "MEXICAN"
+	CousineTypeARABIC    CousineType = "ARABIC"
+	CousineTypeBRAZILIAN CousineType = "BRAZILIAN"
+	CousineTypeTHAI      CousineType = "THAI"
+	CousineTypeAMERICAN  CousineType = "AMERICAN"
 )
 
-func (e *CousineTypes) Scan(src interface{}) error {
+func (e *CousineType) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = CousineTypes(s)
+		*e = CousineType(s)
 	case string:
-		*e = CousineTypes(s)
+		*e = CousineType(s)
 	default:
-		return fmt.Errorf("unsupported scan type for CousineTypes: %T", src)
+		return fmt.Errorf("unsupported scan type for CousineType: %T", src)
 	}
 	return nil
 }
 
-type NullCousineTypes struct {
-	CousineTypes CousineTypes `json:"cousine_types"`
-	Valid        bool         `json:"valid"` // Valid is true if CousineTypes is not NULL
+type NullCousineType struct {
+	CousineType CousineType `json:"cousine_type"`
+	Valid       bool        `json:"valid"` // Valid is true if CousineType is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullCousineTypes) Scan(value interface{}) error {
+func (ns *NullCousineType) Scan(value interface{}) error {
 	if value == nil {
-		ns.CousineTypes, ns.Valid = "", false
+		ns.CousineType, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.CousineTypes.Scan(value)
+	return ns.CousineType.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullCousineTypes) Value() (driver.Value, error) {
+func (ns NullCousineType) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.CousineTypes), nil
+	return string(ns.CousineType), nil
 }
 
 type OrderStatus string
 
 const (
-	OrderStatusCREATED  OrderStatus = "CREATED"
-	OrderStatusPROGRESS OrderStatus = "PROGRESS"
-	OrderStatusFINISHED OrderStatus = "FINISHED"
-	OrderStatusCANCELED OrderStatus = "CANCELED"
+	OrderStatusCREATED    OrderStatus = "CREATED"
+	OrderStatusACCEPTED   OrderStatus = "ACCEPTED"
+	OrderStatusINPROGRESS OrderStatus = "IN_PROGRESS"
+	OrderStatusFINISHED   OrderStatus = "FINISHED"
+	OrderStatusCANCELED   OrderStatus = "CANCELED"
 )
 
 func (e *OrderStatus) Scan(src interface{}) error {
@@ -149,14 +147,104 @@ func (ns NullOrderStatus) Value() (driver.Value, error) {
 	return string(ns.OrderStatus), nil
 }
 
+type PaymentForm string
+
+const (
+	PaymentFormCREDITCARD PaymentForm = "CREDIT_CARD"
+	PaymentFormDEBITCARD  PaymentForm = "DEBIT_CARD"
+	PaymentFormPIX        PaymentForm = "PIX"
+	PaymentFormCASH       PaymentForm = "CASH"
+)
+
+func (e *PaymentForm) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = PaymentForm(s)
+	case string:
+		*e = PaymentForm(s)
+	default:
+		return fmt.Errorf("unsupported scan type for PaymentForm: %T", src)
+	}
+	return nil
+}
+
+type NullPaymentForm struct {
+	PaymentForm PaymentForm `json:"payment_form"`
+	Valid       bool        `json:"valid"` // Valid is true if PaymentForm is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPaymentForm) Scan(value interface{}) error {
+	if value == nil {
+		ns.PaymentForm, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.PaymentForm.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPaymentForm) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.PaymentForm), nil
+}
+
+type ShopType string
+
+const (
+	ShopTypeRESTAURANT  ShopType = "RESTAURANT"
+	ShopTypePHARMACY    ShopType = "PHARMACY"
+	ShopTypeTOBBACO     ShopType = "TOBBACO"
+	ShopTypeMARKET      ShopType = "MARKET"
+	ShopTypeCONVENIENCE ShopType = "CONVENIENCE"
+	ShopTypePUB         ShopType = "PUB"
+)
+
+func (e *ShopType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ShopType(s)
+	case string:
+		*e = ShopType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ShopType: %T", src)
+	}
+	return nil
+}
+
+type NullShopType struct {
+	ShopType ShopType `json:"shop_type"`
+	Valid    bool     `json:"valid"` // Valid is true if ShopType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullShopType) Scan(value interface{}) error {
+	if value == nil {
+		ns.ShopType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ShopType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullShopType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ShopType), nil
+}
+
 type UserRole string
 
 const (
-	UserRoleConsumer    UserRole = "Consumer"
-	UserRoleOwner       UserRole = "Owner"
-	UserRoleEmployee    UserRole = "Employee"
-	UserRoleDeliveryMan UserRole = "DeliveryMan"
-	UserRoleAdmin       UserRole = "Admin"
+	UserRoleCUSTOMER    UserRole = "CUSTOMER"
+	UserRoleOWNER       UserRole = "OWNER"
+	UserRoleEMPLOYEE    UserRole = "EMPLOYEE"
+	UserRoleDELIVERYMAN UserRole = "DELIVERY_MAN"
+	UserRoleADMIN       UserRole = "ADMIN"
 )
 
 func (e *UserRole) Scan(src interface{}) error {
@@ -197,13 +285,13 @@ func (ns NullUserRole) Value() (driver.Value, error) {
 type Weekday string
 
 const (
-	WeekdayMONDAY    Weekday = "MONDAY"
-	WeekdayTUESDAY   Weekday = "TUESDAY"
-	WeekdayWEDNESDAY Weekday = "WEDNESDAY"
-	WeekdayTHURSDAY  Weekday = "THURSDAY"
-	WeekdayFRIDAY    Weekday = "FRIDAY"
-	WeekdaySATURDAY  Weekday = "SATURDAY"
-	WeekdaySUNDAY    Weekday = "SUNDAY"
+	Weekday0 Weekday = "0"
+	Weekday1 Weekday = "1"
+	Weekday2 Weekday = "2"
+	Weekday3 Weekday = "3"
+	Weekday4 Weekday = "4"
+	Weekday5 Weekday = "5"
+	Weekday6 Weekday = "6"
 )
 
 func (e *Weekday) Scan(src interface{}) error {
@@ -242,131 +330,129 @@ func (ns NullWeekday) Value() (driver.Value, error) {
 }
 
 type Address struct {
-	ID         int32              `db:"id" json:"id"`
-	ProfileID  pgtype.Int4        `db:"profile_id" json:"profile_id"`
-	Street     string             `db:"street" json:"street"`
-	Number     string             `db:"number" json:"number"`
-	Complement string             `db:"complement" json:"complement"`
-	District   string             `db:"district" json:"district"`
-	Cep        string             `db:"cep" json:"cep"`
-	City       string             `db:"city" json:"city"`
-	State      string             `db:"state" json:"state"`
-	CreatedAt  pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt  pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+	ID         int32            `db:"id" json:"id"`
+	ProfileID  int32            `db:"profile_id" json:"profile_id"`
+	Street     string           `db:"street" json:"street"`
+	Number     string           `db:"number" json:"number"`
+	Complement pgtype.Text      `db:"complement" json:"complement"`
+	District   string           `db:"district" json:"district"`
+	Cep        string           `db:"cep" json:"cep"`
+	City       string           `db:"city" json:"city"`
+	State      string           `db:"state" json:"state"`
+	CreatedAt  pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt  pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+	DeletedAt  pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 }
 
-type BusinessHour struct {
-	RestaurantID int32       `db:"restaurant_id" json:"restaurant_id"`
-	Weekday      Weekday     `db:"weekday" json:"weekday"`
-	OpeningTime  pgtype.Time `db:"opening_time" json:"opening_time"`
-	ClosingTime  pgtype.Time `db:"closing_time" json:"closing_time"`
-}
-
-type CousineType struct {
-	ID   int32        `db:"id" json:"id"`
-	Name CousineTypes `db:"name" json:"name"`
+type BusinessHours struct {
+	StoreID     pgtype.Int4 `db:"store_id" json:"store_id"`
+	Weekday     Weekday     `db:"weekday" json:"weekday"`
+	OpeningTime pgtype.Text `db:"opening_time" json:"opening_time"`
+	ClosingTime pgtype.Text `db:"closing_time" json:"closing_time"`
 }
 
 type Employee struct {
-	ID        int32              `db:"id" json:"id"`
-	UsersID   pgtype.UUID        `db:"users_id" json:"users_id"`
-	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	DeletedAt pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
-}
-
-type EmployeeRestaurant struct {
-	EmployeeID   int32 `db:"employee_id" json:"employee_id"`
-	RestaurantID int32 `db:"restaurant_id" json:"restaurant_id"`
+	ID        int32            `db:"id" json:"id"`
+	ProfileID pgtype.Int4      `db:"profile_id" json:"profile_id"`
+	StoreID   pgtype.Int4      `db:"store_id" json:"store_id"`
+	CreatedAt pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+	DeletedAt pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 }
 
 type Item struct {
-	ID           int32              `db:"id" json:"id"`
-	RestaurantID int32              `db:"restaurant_id" json:"restaurant_id"`
-	Name         string             `db:"name" json:"name"`
-	Description  string             `db:"description" json:"description"`
-	Img          string             `db:"img" json:"img"`
-	Value        pgtype.Numeric     `db:"value" json:"value"`
-	Score        pgtype.Numeric     `db:"score" json:"score"`
-	CreatedAt    pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt    pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
-	DeletedAt    pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
+	ID           int32            `db:"id" json:"id"`
+	RestaurantID pgtype.Int4      `db:"restaurant_id" json:"restaurant_id"`
+	Name         pgtype.Text      `db:"name" json:"name"`
+	Description  pgtype.Text      `db:"description" json:"description"`
+	Img          pgtype.Text      `db:"img" json:"img"`
+	Amount       pgtype.Int4      `db:"amount" json:"amount"`
+	Score        pgtype.Int4      `db:"score" json:"score"`
+	CreatedAt    pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt    pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+	DeletedAt    pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 }
 
 type Order struct {
-	ID            int32              `db:"id" json:"id"`
-	ProfileID     int32              `db:"profile_id" json:"profile_id"`
-	ShippingValue pgtype.Numeric     `db:"shipping_value" json:"shipping_value"`
-	TotalValue    pgtype.Numeric     `db:"total_value" json:"total_value"`
-	Status        OrderStatus        `db:"status" json:"status"`
-	CreatedAt     pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt     pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
-	DeletedAt     pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
+	ID            int32            `db:"id" json:"id"`
+	ProfileID     pgtype.Int4      `db:"profile_id" json:"profile_id"`
+	ShippingValue pgtype.Int4      `db:"shipping_value" json:"shipping_value"`
+	Amount        pgtype.Int4      `db:"amount" json:"amount"`
+	Status        OrderStatus      `db:"status" json:"status"`
+	Details       pgtype.Text      `db:"details" json:"details"`
+	CreatedAt     pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt     pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+	DeletedAt     pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 }
 
 type OrderItem struct {
-	OrderID int32 `db:"order_id" json:"order_id"`
-	ItemID  int32 `db:"item_id" json:"item_id"`
+	OrderID pgtype.Int4 `db:"order_id" json:"order_id"`
+	ItemID  pgtype.Int4 `db:"item_id" json:"item_id"`
 }
 
 type Owner struct {
-	ID           int32              `db:"id" json:"id"`
-	UsersID      pgtype.UUID        `db:"users_id" json:"users_id"`
-	RestaurantID pgtype.Int4        `db:"restaurant_id" json:"restaurant_id"`
-	CreatedAt    pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	DeletedAt    pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
+	ID        int32            `db:"id" json:"id"`
+	ProfileID pgtype.Int4      `db:"profile_id" json:"profile_id"`
+	StoreID   pgtype.Int4      `db:"store_id" json:"store_id"`
+	CreatedAt pgtype.Timestamp `db:"created_at" json:"created_at"`
+	DeletedAt pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 }
 
 type PaymentMethod struct {
-	ID          int32  `db:"id" json:"id"`
-	Name        string `db:"name" json:"name"`
-	Description string `db:"description" json:"description"`
-	IsOnline    bool   `db:"isOnline" json:"is_online"`
+	ID   int32       `db:"id" json:"id"`
+	Type PaymentForm `db:"type" json:"type"`
 }
 
 type Profile struct {
-	ID        int32              `db:"id" json:"id"`
-	Name      string             `db:"name" json:"name"`
-	LastName  string             `db:"last_name" json:"last_name"`
-	Cpf       string             `db:"cpf" json:"cpf"`
-	Phone     string             `db:"phone" json:"phone"`
-	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+	ID        int32            `db:"id" json:"id"`
+	Name      string           `db:"name" json:"name"`
+	LastName  string           `db:"last_name" json:"last_name"`
+	Cpf       string           `db:"cpf" json:"cpf"`
+	Phone     string           `db:"phone" json:"phone"`
+	CreatedAt pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+	DeletedAt pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 }
 
-type ProfileRestaurant struct {
-	ProfileID    int32 `db:"profile_id" json:"profile_id"`
-	RestaurantID int32 `db:"restaurant_id" json:"restaurant_id"`
+type Store struct {
+	ID         int32            `db:"id" json:"id"`
+	Name       string           `db:"name" json:"name"`
+	CpfCnpj    string           `db:"cpf_cnpj" json:"cpf_cnpj"`
+	Phone      string           `db:"phone" json:"phone"`
+	Score      int32            `db:"score" json:"score"`
+	Type       ShopType         `db:"type" json:"type"`
+	Latitude   string           `db:"latitude" json:"latitude"`
+	Longitude  string           `db:"longitude" json:"longitude"`
+	Street     string           `db:"street" json:"street"`
+	Number     string           `db:"number" json:"number"`
+	Complement pgtype.Text      `db:"complement" json:"complement"`
+	District   string           `db:"district" json:"district"`
+	ZipCode    string           `db:"zip_code" json:"zip_code"`
+	City       string           `db:"city" json:"city"`
+	State      string           `db:"state" json:"state"`
+	CreatedAt  pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt  pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+	DeletedAt  pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 }
 
-type Restaurant struct {
-	ID        int32              `db:"id" json:"id"`
-	Name      string             `db:"name" json:"name"`
-	Cnpj      string             `db:"cnpj" json:"cnpj"`
-	Phone     string             `db:"phone" json:"phone"`
-	Score     pgtype.Numeric     `db:"score" json:"score"`
-	AddressID int32              `db:"address_id" json:"address_id"`
-	CreatedAt pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
-	DeletedAt pgtype.Timestamptz `db:"deleted_at" json:"deleted_at"`
+type StorePaymentMethod struct {
+	StoreID       pgtype.Int4 `db:"store_id" json:"store_id"`
+	PaymentFormID pgtype.Int4 `db:"payment_form_id" json:"payment_form_id"`
 }
 
-type RestaurantCousineType struct {
-	RestaurantID  int32 `db:"restaurant_id" json:"restaurant_id"`
-	CousineTypeID int32 `db:"cousine_type_id" json:"cousine_type_id"`
-}
-
-type RestaurantPaymentMethod struct {
-	PaymentMethodID int32 `db:"payment_method_id" json:"payment_method_id"`
-	RestaurantID    int32 `db:"restaurant_id" json:"restaurant_id"`
+type StoreRestaurantType struct {
+	StoreID        pgtype.Int4 `db:"store_id" json:"store_id"`
+	RestaurantType CousineType `db:"restaurant_type" json:"restaurant_type"`
 }
 
 type Users struct {
-	ID              pgtype.UUID        `db:"id" json:"id"`
-	ProfileID       pgtype.Int4        `db:"profile_id" json:"profile_id"`
-	Email           string             `db:"email" json:"email"`
-	Password        pgtype.Text        `db:"password" json:"password"`
-	Role            UserRole           `db:"role" json:"role"`
-	AccountProvider AccountProvider    `db:"account_provider" json:"account_provider"`
-	CreatedAt       pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt       pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+	ID              pgtype.UUID      `db:"id" json:"id"`
+	ProfileID       pgtype.Int4      `db:"profile_id" json:"profile_id"`
+	Email           string           `db:"email" json:"email"`
+	Password        pgtype.Text      `db:"password" json:"password"`
+	Role            UserRole         `db:"role" json:"role"`
+	AccountProvider AccountProvider  `db:"account_provider" json:"account_provider"`
+	CreatedAt       pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt       pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+	DeletedAt       pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 }

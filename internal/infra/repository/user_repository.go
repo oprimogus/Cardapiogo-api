@@ -53,7 +53,7 @@ func (u *UserRepositoryDatabase) GetUserByID(ctx context.Context, id string) (us
 		return user.User{}, errors.NewDatabaseError(err)
 	}
 
-	return u.fromSqlcUserToUserModel(getUser)
+	return u.fromSqlcUserToUserModel(u.fromGetUserByIDRowToSqlcUser(getUser))
 }
 
 func (u *UserRepositoryDatabase) GetUserByEmail(ctx context.Context, email string) (user.User, error) {
@@ -65,7 +65,7 @@ func (u *UserRepositoryDatabase) GetUserByEmail(ctx context.Context, email strin
 		return user.User{}, errors.NewDatabaseError(err)
 	}
 
-	return u.fromSqlcUserToUserModel(getUser)
+	return u.fromSqlcUserToUserModel(u.fromGetUserByEmailRowToSqlcUser(getUser))
 }
 
 func (u *UserRepositoryDatabase) GetUsersList(ctx context.Context, items int, page int) ([]*user.User, error) {
@@ -191,7 +191,7 @@ func (u *UserRepositoryDatabase) fromSqlcUserToUserModel(su sqlc.Users) (user.Us
 		return user.User{}, err
 	}
 
-	createdAtPtr, err := converters.ConvertTimestamptzToTime(su.CreatedAt)
+	createdAtPtr, err := converters.ConvertTimestamptToTime(su.CreatedAt)
 	if err != nil {
 		return user.User{}, err
 	}
@@ -200,7 +200,7 @@ func (u *UserRepositoryDatabase) fromSqlcUserToUserModel(su sqlc.Users) (user.Us
 		createdAtValue = *createdAtPtr
 	}
 
-	updatedAtPtr, err := converters.ConvertTimestamptzToTime(su.UpdatedAt)
+	updatedAtPtr, err := converters.ConvertTimestamptToTime(su.UpdatedAt)
 	if err != nil {
 		return user.User{}, err
 	}
@@ -229,6 +229,32 @@ func (u *UserRepositoryDatabase) fromGetUserRowToSqlcUser(su sqlc.GetUserRow) sq
 		ProfileID:       su.ProfileID,
 		Email:           su.Email,
 		Password:        pgtype.Text{Valid: false, String: ""},
+		Role:            su.Role,
+		AccountProvider: su.AccountProvider,
+		CreatedAt:       su.CreatedAt,
+		UpdatedAt:       su.UpdatedAt,
+	}
+}
+
+func (u *UserRepositoryDatabase) fromGetUserByEmailRowToSqlcUser(su sqlc.GetUserByEmailRow) sqlc.Users {
+	return sqlc.Users{
+		ID:              su.ID,
+		ProfileID:       su.ProfileID,
+		Email:           su.Email,
+		Password:        pgtype.Text{Valid: false, String: su.Password.String},
+		Role:            su.Role,
+		AccountProvider: su.AccountProvider,
+		CreatedAt:       su.CreatedAt,
+		UpdatedAt:       su.UpdatedAt,
+	}
+}
+
+func (u *UserRepositoryDatabase) fromGetUserByIDRowToSqlcUser(su sqlc.GetUserByIdRow) sqlc.Users {
+	return sqlc.Users{
+		ID:              su.ID,
+		ProfileID:       su.ProfileID,
+		Email:           su.Email,
+		Password:        pgtype.Text{Valid: false, String: su.Password.String},
 		Role:            su.Role,
 		AccountProvider: su.AccountProvider,
 		CreatedAt:       su.CreatedAt,

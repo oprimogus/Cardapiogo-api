@@ -4,7 +4,7 @@ package errors
 type ErrorResponse struct {
 	Status       int         `json:"-"`
 	ErrorMessage string      `json:"error"`
-	Details      interface{} `json:"details,omitempty"`
+	Details      interface{} `json:"details"`
 }
 
 func New(status int, message string, details ...interface{}) *ErrorResponse {

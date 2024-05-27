@@ -72,8 +72,8 @@ func (p *ProfileRepositoryDatabase) GetProfileByID(ctx context.Context, profileI
 		LastName:  userProfile.LastName,
 		Cpf:       userProfile.Cpf,
 		Phone:     userProfile.Phone,
-		CreatedAt: pgtype.Timestamptz{},
-		UpdatedAt: pgtype.Timestamptz{},
+		CreatedAt: pgtype.Timestamp{},
+		UpdatedAt: pgtype.Timestamp{},
 	}), nil
 }
 
@@ -92,8 +92,8 @@ func (p *ProfileRepositoryDatabase) GetProfileByUserID(ctx context.Context, user
 		LastName:  userProfile.LastName,
 		Cpf:       userProfile.Cpf,
 		Phone:     userProfile.Phone,
-		CreatedAt: pgtype.Timestamptz{},
-		UpdatedAt: pgtype.Timestamptz{},
+		CreatedAt: pgtype.Timestamp{},
+		UpdatedAt: pgtype.Timestamp{},
 	}), nil
 }
 

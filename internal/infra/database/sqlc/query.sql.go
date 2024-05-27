@@ -11,6 +11,21 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const addOwner = `-- name: AddOwner :exec
+INSERT INTO owner (profile_id, store_id, created_at)
+VALUES ($1, $2, NOW())
+`
+
+type AddOwnerParams struct {
+	ProfileID pgtype.Int4 `db:"profile_id" json:"profile_id"`
+	StoreID   pgtype.Int4 `db:"store_id" json:"store_id"`
+}
+
+func (q *Queries) AddOwner(ctx context.Context, arg AddOwnerParams) error {
+	_, err := q.db.Exec(ctx, addOwner, arg.ProfileID, arg.StoreID)
+	return err
+}
+
 const createProfileAndReturnID = `-- name: CreateProfileAndReturnID :one
 INSERT INTO profile (name, last_name, cpf, phone, created_at, updated_at)
 VALUES ($1, $2, $3, $4, NOW(), NOW())
@@ -30,6 +45,50 @@ func (q *Queries) CreateProfileAndReturnID(ctx context.Context, arg CreateProfil
 		arg.LastName,
 		arg.Cpf,
 		arg.Phone,
+	)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const createStore = `-- name: CreateStore :one
+INSERT INTO store (name, cpf_cnpj, phone, type, latitude, longitude, street, number, complement, district, zip_code, city, state, created_at, updated_at) 
+VALUES
+($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
+RETURNING id
+`
+
+type CreateStoreParams struct {
+	Name       string      `db:"name" json:"name"`
+	CpfCnpj    string      `db:"cpf_cnpj" json:"cpf_cnpj"`
+	Phone      string      `db:"phone" json:"phone"`
+	Type       ShopType    `db:"type" json:"type"`
+	Latitude   string      `db:"latitude" json:"latitude"`
+	Longitude  string      `db:"longitude" json:"longitude"`
+	Street     string      `db:"street" json:"street"`
+	Number     string      `db:"number" json:"number"`
+	Complement pgtype.Text `db:"complement" json:"complement"`
+	District   string      `db:"district" json:"district"`
+	ZipCode    string      `db:"zip_code" json:"zip_code"`
+	City       string      `db:"city" json:"city"`
+	State      string      `db:"state" json:"state"`
+}
+
+func (q *Queries) CreateStore(ctx context.Context, arg CreateStoreParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createStore,
+		arg.Name,
+		arg.CpfCnpj,
+		arg.Phone,
+		arg.Type,
+		arg.Latitude,
+		arg.Longitude,
+		arg.Street,
+		arg.Number,
+		arg.Complement,
+		arg.District,
+		arg.ZipCode,
+		arg.City,
+		arg.State,
 	)
 	var id int32
 	err := row.Scan(&id)
@@ -128,6 +187,64 @@ func (q *Queries) GetProfileByUserID(ctx context.Context, id pgtype.UUID) (GetPr
 	return i, err
 }
 
+const getStoresListByFilter = `-- name: GetStoresListByFilter :many
+SELECT s.id, s.name, s.score, s.district
+FROM store s
+INNER JOIN store_restaurant_type srt on srt.store_id = s.id
+WHERE
+    ($3 is NULL or s.name like '%' || $3 || '%')
+    AND ($4 is NULL OR s.type = $4)
+    AND ($5 is NULL OR srt.restaurant_type = ANY($5::string[]))
+ORDER BY s.score
+LIMIT $1 OFFSET $2
+`
+
+type GetStoresListByFilterParams struct {
+	Limit   int32       `db:"limit" json:"limit"`
+	Offset  int32       `db:"offset" json:"offset"`
+	Column3 interface{} `db:"column_3" json:"column_3"`
+	Column4 interface{} `db:"column_4" json:"column_4"`
+	Column5 interface{} `db:"column_5" json:"column_5"`
+}
+
+type GetStoresListByFilterRow struct {
+	ID       int32  `db:"id" json:"id"`
+	Name     string `db:"name" json:"name"`
+	Score    int32  `db:"score" json:"score"`
+	District string `db:"district" json:"district"`
+}
+
+func (q *Queries) GetStoresListByFilter(ctx context.Context, arg GetStoresListByFilterParams) ([]GetStoresListByFilterRow, error) {
+	rows, err := q.db.Query(ctx, getStoresListByFilter,
+		arg.Limit,
+		arg.Offset,
+		arg.Column3,
+		arg.Column4,
+		arg.Column5,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetStoresListByFilterRow
+	for rows.Next() {
+		var i GetStoresListByFilterRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Score,
+			&i.District,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUser = `-- name: GetUser :many
 SELECT id, profile_id, email, role, account_provider, created_at, updated_at FROM users
 ORDER BY created_at desc
@@ -140,13 +257,13 @@ type GetUserParams struct {
 }
 
 type GetUserRow struct {
-	ID              pgtype.UUID        `db:"id" json:"id"`
-	ProfileID       pgtype.Int4        `db:"profile_id" json:"profile_id"`
-	Email           string             `db:"email" json:"email"`
-	Role            UserRole           `db:"role" json:"role"`
-	AccountProvider AccountProvider    `db:"account_provider" json:"account_provider"`
-	CreatedAt       pgtype.Timestamptz `db:"created_at" json:"created_at"`
-	UpdatedAt       pgtype.Timestamptz `db:"updated_at" json:"updated_at"`
+	ID              pgtype.UUID      `db:"id" json:"id"`
+	ProfileID       pgtype.Int4      `db:"profile_id" json:"profile_id"`
+	Email           string           `db:"email" json:"email"`
+	Role            UserRole         `db:"role" json:"role"`
+	AccountProvider AccountProvider  `db:"account_provider" json:"account_provider"`
+	CreatedAt       pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt       pgtype.Timestamp `db:"updated_at" json:"updated_at"`
 }
 
 func (q *Queries) GetUser(ctx context.Context, arg GetUserParams) ([]GetUserRow, error) {
@@ -183,9 +300,20 @@ WHERE email = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (Users, error) {
+type GetUserByEmailRow struct {
+	ID              pgtype.UUID      `db:"id" json:"id"`
+	ProfileID       pgtype.Int4      `db:"profile_id" json:"profile_id"`
+	Email           string           `db:"email" json:"email"`
+	Password        pgtype.Text      `db:"password" json:"password"`
+	Role            UserRole         `db:"role" json:"role"`
+	AccountProvider AccountProvider  `db:"account_provider" json:"account_provider"`
+	CreatedAt       pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt       pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
 	row := q.db.QueryRow(ctx, getUserByEmail, email)
-	var i Users
+	var i GetUserByEmailRow
 	err := row.Scan(
 		&i.ID,
 		&i.ProfileID,
@@ -205,9 +333,20 @@ WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (Users, error) {
+type GetUserByIdRow struct {
+	ID              pgtype.UUID      `db:"id" json:"id"`
+	ProfileID       pgtype.Int4      `db:"profile_id" json:"profile_id"`
+	Email           string           `db:"email" json:"email"`
+	Password        pgtype.Text      `db:"password" json:"password"`
+	Role            UserRole         `db:"role" json:"role"`
+	AccountProvider AccountProvider  `db:"account_provider" json:"account_provider"`
+	CreatedAt       pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt       pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+}
+
+func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (GetUserByIdRow, error) {
 	row := q.db.QueryRow(ctx, getUserById, id)
-	var i Users
+	var i GetUserByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.ProfileID,
