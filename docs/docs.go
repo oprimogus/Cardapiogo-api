@@ -24,7 +24,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/auth/google": {
+        "/api/v1/auth/google": {
             "get": {
                 "description": "Inicia fluxo de OAuth2",
                 "consumes": [
@@ -62,7 +62,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/auth/google/callback": {
+        "/api/v1/auth/google/callback": {
             "get": {
                 "description": "Callback de login via OAuth2",
                 "consumes": [
@@ -100,7 +100,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/login": {
+        "/api/v1/login": {
             "post": {
                 "description": "Login de usuário com email e senha",
                 "consumes": [
@@ -551,6 +551,7 @@ const docTemplate = `{
         "profile.CreateProfileParams": {
             "type": "object",
             "required": [
+                "cpf",
                 "last_name",
                 "name",
                 "phone"

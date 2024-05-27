@@ -18,7 +18,10 @@ type AuthController struct {
 	Validator   *validatorutils.Validator
 }
 
-func NewAuthController(repository user.Repository, validator *validatorutils.Validator) *AuthController {
+func NewAuthController(
+	repository user.Repository,
+	validator *validatorutils.Validator,
+) *AuthController {
 	return &AuthController{
 		UserService: user.NewService(repository),
 		Validator:   validator,
@@ -35,7 +38,7 @@ func NewAuthController(repository user.Repository, validator *validatorutils.Val
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /v1/auth/google [get]
+// @Router /api/v1/auth/google [get]
 func (c *AuthController) StartGoogleOAuthFlow(ctx *gin.Context) {
 	conf := oauth2.NewGoogleOauthConf()
 
@@ -45,7 +48,6 @@ func (c *AuthController) StartGoogleOAuthFlow(ctx *gin.Context) {
 	url := conf.AuthCodeURL(jwt)
 
 	ctx.Redirect(http.StatusTemporaryRedirect, url)
-
 }
 
 // SignUpLoginGoogleOauthCallback godoc
@@ -58,9 +60,8 @@ func (c *AuthController) StartGoogleOAuthFlow(ctx *gin.Context) {
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /v1/auth/google/callback [get]
+// @Router /api/v1/auth/google/callback [get]
 func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
-
 	stateToken := ctx.Query("state")
 	valid, err := auth.ValidateStateToken(stateToken)
 	if err != nil || !valid {
@@ -77,7 +78,13 @@ func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 	jwt, err := auth.LoginWithOauth(ctx, c.UserService, userData)
 	validateErrorResponse(ctx, err)
 
-	ctx.JSON(http.StatusOK, gin.H{"token": jwt, "redirect": "https://weather-app-angular-jeby7qw78-oprimogus.vercel.app/weather"})
+	ctx.JSON(
+		http.StatusOK,
+		gin.H{
+			"token":    jwt,
+			"redirect": "https://weather-app-angular-jeby7qw78-oprimogus.vercel.app/weather",
+		},
+	)
 }
 
 // Login godoc
@@ -91,7 +98,7 @@ func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /v1/login [post]
+// @Router /api/v1/login [post]
 func (c *AuthController) Login(ctx *gin.Context) {
 	var user user.Login
 	err := ctx.BindJSON(&user)

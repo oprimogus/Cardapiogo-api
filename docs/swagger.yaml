@@ -19,6 +19,7 @@ definitions:
         maxLength: 11
         type: string
     required:
+    - cpf
     - last_name
     - name
     - phone
@@ -161,7 +162,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
 paths:
-  /v1/auth/google:
+  /api/v1/auth/google:
     get:
       consumes:
       - application/json
@@ -186,7 +187,7 @@ paths:
       summary: Inicia fluxo de OAuth2
       tags:
       - Auth
-  /v1/auth/google/callback:
+  /api/v1/auth/google/callback:
     get:
       consumes:
       - application/json
@@ -211,7 +212,7 @@ paths:
       summary: Callback de login via OAuth2
       tags:
       - Auth
-  /v1/login:
+  /api/v1/login:
     post:
       consumes:
       - application/json

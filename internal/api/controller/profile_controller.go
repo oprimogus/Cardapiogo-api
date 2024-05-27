@@ -16,8 +16,15 @@ type ProfileController struct {
 	validator *validatorutils.Validator
 }
 
-func NewProfileController(repository profile.Repository, userRepository user.Repository, validator *validatorutils.Validator) *ProfileController {
-	return &ProfileController{service: profile.NewService(repository, userRepository), validator: validator}
+func NewProfileController(
+	repository profile.Repository,
+	userRepository user.Repository,
+	validator *validatorutils.Validator,
+) *ProfileController {
+	return &ProfileController{
+		service:   profile.NewService(repository, userRepository),
+		validator: validator,
+	}
 }
 
 // CreateProfileHandler godoc
@@ -31,7 +38,7 @@ func NewProfileController(repository profile.Repository, userRepository user.Rep
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /v1/profile [post]
+// @Router /api/v1/profile [post]
 func (c *ProfileController) CreateProfileHandler(ctx *gin.Context) {
 	var createProfileParams profile.CreateProfileParams
 	err := ctx.BindJSON(&createProfileParams)
@@ -62,7 +69,7 @@ func (c *ProfileController) CreateProfileHandler(ctx *gin.Context) {
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /v1/profile [get]
+// @Router /api/v1/profile [get]
 func (c *ProfileController) GetProfileByUserIDHandler(ctx *gin.Context) {
 	userID := ctx.GetString("userID")
 
@@ -82,9 +89,8 @@ func (c *ProfileController) GetProfileByUserIDHandler(ctx *gin.Context) {
 // @Failure 400  {object} errors.ErrorResponse
 // @Failure 500  {object} errors.ErrorResponse
 // @Failure 502  {object} errors.ErrorResponse
-// @Router /v1/profile [put]
+// @Router /api/v1/profile [put]
 func (c *ProfileController) UpdateProfileHandler(ctx *gin.Context) {
-
 	var updateProfileParams profile.UpdateProfileParams
 	err := ctx.BindJSON(&updateProfileParams)
 	if err != nil {
