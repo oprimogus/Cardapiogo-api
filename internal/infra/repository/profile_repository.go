@@ -17,17 +17,23 @@ type ProfileRepositoryDatabase struct {
 	q  sqlc.Querier
 }
 
-func NewProfileRepositoryDatabase(db *postgres.PostgresDatabase, querier sqlc.Querier) profile.Repository {
+func NewProfileRepositoryDatabase(
+	db *postgres.PostgresDatabase,
+	querier sqlc.Querier,
+) profile.Repository {
 	return &ProfileRepositoryDatabase{db: db, q: querier}
 }
 
-func (p *ProfileRepositoryDatabase) CreateProfile(ctx context.Context, userID string, params profile.CreateProfileParams) error {
+func (p *ProfileRepositoryDatabase) CreateProfile(
+	ctx context.Context,
+	userID string,
+	params profile.CreateProfileParams,
+) error {
 	tx, err := p.db.GetDB().Begin(ctx)
 	if err != nil {
 		return errors.NewDatabaseError(err)
 	}
 	defer tx.Rollback(ctx)
-
 	sqlcParams := sqlc.CreateProfileAndReturnIDParams{
 		Name:     params.Name,
 		LastName: params.LastName,
@@ -61,7 +67,10 @@ func (p *ProfileRepositoryDatabase) CreateProfile(ctx context.Context, userID st
 	return nil
 }
 
-func (p *ProfileRepositoryDatabase) GetProfileByID(ctx context.Context, profileId int) (profile.Profile, error) {
+func (p *ProfileRepositoryDatabase) GetProfileByID(
+	ctx context.Context,
+	profileId int,
+) (profile.Profile, error) {
 	userProfile, err := p.q.GetProfileByID(ctx, int32(profileId))
 	if err != nil {
 		return profile.Profile{}, errors.NewDatabaseError(err)
@@ -77,7 +86,10 @@ func (p *ProfileRepositoryDatabase) GetProfileByID(ctx context.Context, profileI
 	}), nil
 }
 
-func (p *ProfileRepositoryDatabase) GetProfileByUserID(ctx context.Context, userID string) (profile.Profile, error) {
+func (p *ProfileRepositoryDatabase) GetProfileByUserID(
+	ctx context.Context,
+	userID string,
+) (profile.Profile, error) {
 	uuid, err := converters.ConvertStringToUUID(userID)
 	if err != nil {
 		return profile.Profile{}, err
@@ -97,7 +109,11 @@ func (p *ProfileRepositoryDatabase) GetProfileByUserID(ctx context.Context, user
 	}), nil
 }
 
-func (p *ProfileRepositoryDatabase) UpdateProfile(ctx context.Context, userID string, params profile.UpdateProfileParams) error {
+func (p *ProfileRepositoryDatabase) UpdateProfile(
+	ctx context.Context,
+	userID string,
+	params profile.UpdateProfileParams,
+) error {
 	uuid, err := converters.ConvertStringToUUID(userID)
 	if err != nil {
 		return err
@@ -115,7 +131,9 @@ func (p *ProfileRepositoryDatabase) UpdateProfile(ctx context.Context, userID st
 	return nil
 }
 
-func (p *ProfileRepositoryDatabase) fromSqlcProfileToDomainProfile(userProfile sqlc.Profile) profile.Profile {
+func (p *ProfileRepositoryDatabase) fromSqlcProfileToDomainProfile(
+	userProfile sqlc.Profile,
+) profile.Profile {
 	return profile.Profile{
 		ID:        int(userProfile.ID),
 		Name:      userProfile.Name,
