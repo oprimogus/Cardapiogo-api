@@ -29,9 +29,18 @@ type Validator struct {
 
 func NewValidator(locale string) (*Validator, error) {
 	v := validator.New(validator.WithRequiredStructEnabled())
-	v.RegisterValidation("role", isValidUserRole)
-	v.RegisterValidation("account_provider", isValidAccountProvider)
-	v.RegisterValidation("cpf", IsValidCpf)
+	err := v.RegisterValidation("role", isValidUserRole)
+	if err != nil {
+		panic(fmt.Sprintf("Could not create validator for type role: %v", err))
+	}
+	err = v.RegisterValidation("account_provider", isValidAccountProvider)
+	if err != nil {
+		panic(fmt.Sprintf("Could not create validator for type account_provider: %v", err))
+	}
+	err = v.RegisterValidation("cpf", IsValidCpf)
+	if err != nil {
+		panic(fmt.Sprintf("Could not create validator for type cpf: %v", err))
+	}
 
 	enLocale := en.New()
 	ptLocale := pt.New()
@@ -43,9 +52,15 @@ func NewValidator(locale string) (*Validator, error) {
 	}
 	switch locale {
 	case "en":
-		en_translations.RegisterDefaultTranslations(v, translator)
+		err = en_translations.RegisterDefaultTranslations(v, translator)
+		if err != nil {
+			panic(fmt.Sprintf("Could not register locale %v translation: %v", locale, err))
+		}
 	case "pt":
-		pt_translations.RegisterDefaultTranslations(v, translator)
+		err = pt_translations.RegisterDefaultTranslations(v, translator)
+		if err != nil {
+			panic(fmt.Sprintf("Could not register locale %v translation: %v", locale, err))
+		}
 	default:
 		return nil, fmt.Errorf("unsupported locale: %s", locale)
 	}
@@ -61,7 +76,6 @@ func (v *Validator) Validate(i interface{}) *errors.ErrorResponse {
 	out := make(map[string]string)
 
 	err := v.Validator.Struct(i)
-
 	if err != nil {
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
@@ -87,9 +101,9 @@ func (v *Validator) Validate(i interface{}) *errors.ErrorResponse {
 
 func errorPersonalized(locale string, tag string) string {
 	if locale == "pt" {
-		return "Valor inválido para o campo."
+		return fmt.Sprintf("Valor inválido para o campo %v.", tag)
 	}
-	return "Invalid value for field"
+	return fmt.Sprintf("Invalid value for field %v", tag)
 }
 
 func isValidUserRole(fl validator.FieldLevel) bool {
@@ -154,4 +168,37 @@ func calculateDigitCpf(cpf string, weight int) int {
 		return 0
 	}
 	return 11 - rest
+}
+
+func calculateDigitCnpj(cnpj string, factor int) int {
+	sum := 0
+	weights := []int{6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
+
+	for i := 0; i < factor-1; i++ {
+		num, _ := strconv.Atoi(string(cnpj[i]))
+		sum += num * weights[i+12-factor]
+	}
+	rest := sum % 11
+	if rest < 2 {
+		return 0
+	}
+	return 11 - rest
+}
+
+func IsValidCnpj(fl validator.FieldLevel) bool {
+	cnpj := fl.Field().String()
+
+	if len(cnpj) != 14 {
+		return false
+	}
+	if isAllEqual(cnpj) {
+		return false
+	}
+	d1 := calculateDigitCnpj(cnpj, 13)
+	d2 := calculateDigitCnpj(cnpj, 14)
+	return strconv.Itoa(d1) == cnpj[12:13] && strconv.Itoa(d2) == cnpj[13:14]
+}
+
+func IsValidCpfOrCnpj(fl validator.FieldLevel) bool {
+	return IsValidCpf(fl) || IsValidCnpj(fl)
 }
