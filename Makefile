@@ -10,19 +10,13 @@ lint:
 install:
 	go mod tidy
 
-docker-up:
-	docker compose -f deployments/docker-compose.yaml up --build -d
+up:
+	docker compose -f deployments/docker-compose.yaml up -d
 
-docker-down:
+down:
 	docker compose -f deployments/docker-compose.yaml down
 
-dev-docker-up:
-	docker compose -f deployments/docker-compose-development.yaml up -d
-
-dev-docker-down:
-	docker compose -f deployments/docker-compose-development.yaml down
-
-mock-database:
+mock-db:
 	go run scripts/populate_local_db.go
 
 mock:
@@ -31,12 +25,17 @@ mock:
 
 sqlc:
 	sqlc generate -f configs/sqlc.yaml
+	
 
 docs:
 	swag init -g cmd/main.go
 
 test:
 	go test ./... -v -cover
+
+dev:
+	make docs
+	air 
 
 run:
 	make docs
