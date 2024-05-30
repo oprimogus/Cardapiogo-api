@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
@@ -94,25 +95,21 @@ func (d PostgresDatabase) getSQLDBConnection(connStr string) (*sql.DB, error) {
 }
 
 func (d PostgresDatabase) migrate() error {
-	sourceURL := "internal/infra/database/migrations"
+	sourceURL := "file://internal/infra/database/migrations"
 	dbName := os.Getenv("DB_NAME")
 	log.Info("starting migration execution")
-
 	driver, err := postgres.WithInstance(d.sqlDB, &postgres.Config{})
 	if err != nil {
 		return fmt.Errorf("database: could not create migration driver: %w", err)
 	}
-
-	migrator, err := migrate.NewWithDatabaseInstance("file://"+sourceURL, dbName, driver)
-	if err != nil {
+	migrator, err := migrate.NewWithDatabaseInstance(sourceURL, dbName, driver)
+	if err != nil && err != migrate.ErrNoChange {
 		return fmt.Errorf("database: Could not create migrator: %w", err)
 	}
-
 	err = migrator.Up()
 	if err != nil && err != migrate.ErrNoChange {
-		return fmt.Errorf("database: Could not migrations: %w", err)
+		return fmt.Errorf("database: Could not apply migrations: %w", err)
 	}
-
 	if err == migrate.ErrNoChange {
 		log.Info("No migrations to run.")
 	} else {
