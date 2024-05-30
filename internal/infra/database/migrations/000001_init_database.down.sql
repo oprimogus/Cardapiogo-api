@@ -1,1 +1,1 @@
-DROP SCHEMA "cardapiogo" CASCADE;
+DROP EXTENSION IF EXISTS "uuid-ossp";

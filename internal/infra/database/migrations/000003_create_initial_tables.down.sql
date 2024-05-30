@@ -1,25 +1,25 @@
-DROP TABLE "cardapiogo"."businessHours";
+DROP TABLE "businessHours";
 
-DROP TABLE "cardapiogo"."order_item";
+DROP TABLE "order_item";
 
-DROP TABLE "cardapiogo"."item";
+DROP TABLE "item";
 
-DROP TABLE "cardapiogo"."order";
+DROP TABLE "order";
 
-DROP TABLE "cardapiogo"."owner";
+DROP TABLE "owner";
 
-DROP TABLE "cardapiogo"."employee";
+DROP TABLE "employee";
 
-DROP TABLE "cardapiogo"."store_payment_method";
+DROP TABLE "store_payment_method";
 
-DROP TABLE "cardapiogo"."store_type";
+DROP TABLE "store_type";
 
-DROP TABLE "cardapiogo"."store_restaurant_type";
+DROP TABLE "store_restaurant_type";
 
-DROP TABLE "cardapiogo"."store";
+DROP TABLE "store";
 
-DROP TABLE "cardapiogo"."address";
+DROP TABLE "address";
 
-DROP TABLE "cardapiogo"."users";
+DROP TABLE "users";
 
-DROP TABLE "cardapiogo"."profile";
+DROP TABLE "profile";

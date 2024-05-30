@@ -1,4 +1,4 @@
-INSERT INTO "cardapiogo"."users" ("profile_id", "email", "password", "role", "account_provider", "created_at", "updated_at")
+INSERT INTO "users" ("profile_id", "email", "password", "role", "account_provider", "created_at", "updated_at")
 VALUES
 (1, 'carl.johnson@example.com', '$2a$14$QH8.9CMBXx3T8pOQVhNsM.Fz2yU1/tNTsQ3Iq1htWX/XqsLSGayQq', 'ADMIN', 'GOOGLE', NOW(), NOW()),
 (2, 'tommy.vercetti@example.com', '$2a$14$QH8.9CMBXx3T8pOQVhNsM.Fz2yU1/tNTsQ3Iq1htWX/XqsLSGayQq', 'ADMIN', 'GOOGLE', NOW(), NOW()),

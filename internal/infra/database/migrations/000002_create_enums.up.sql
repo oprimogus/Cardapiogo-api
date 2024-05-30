@@ -1,4 +1,4 @@
-CREATE TYPE "cardapiogo"."user_role" AS ENUM (
+CREATE TYPE "user_role" AS ENUM (
   'CUSTOMER',
   'OWNER',
   'EMPLOYEE',
@@ -6,7 +6,14 @@ CREATE TYPE "cardapiogo"."user_role" AS ENUM (
   'ADMIN'
 );
 
-CREATE TYPE "cardapiogo"."cousine_type" AS ENUM (
+CREATE TYPE "account_provider" AS ENUM (
+  'GOOGLE',
+  'APPLE',
+  'META',
+  'CARDAPIOGO'
+);
+
+CREATE TYPE "cousine_type" AS ENUM (
   'ITALIAN',
   'JAPANESE',
   'MEXICAN',
@@ -16,7 +23,7 @@ CREATE TYPE "cardapiogo"."cousine_type" AS ENUM (
   'AMERICAN'
 );
 
-CREATE TYPE "cardapiogo"."shop_type" AS ENUM (
+CREATE TYPE "shop_type" AS ENUM (
   'RESTAURANT',
   'PHARMACY',
   'TOBBACO',
@@ -25,14 +32,14 @@ CREATE TYPE "cardapiogo"."shop_type" AS ENUM (
   'PUB'
 );
 
-CREATE TYPE "cardapiogo"."payment_form" AS ENUM (
+CREATE TYPE "payment_form" AS ENUM (
   'CREDIT_CARD',
   'DEBIT_CARD',
   'PIX',
   'CASH'
 );
 
-CREATE TYPE "cardapiogo"."order_status" AS ENUM (
+CREATE TYPE "order_status" AS ENUM (
   'CREATED',
   'ACCEPTED',
   'IN_PROGRESS',
@@ -40,7 +47,7 @@ CREATE TYPE "cardapiogo"."order_status" AS ENUM (
   'CANCELED'
 );
 
-CREATE TYPE "cardapiogo"."weekday" AS ENUM (
+CREATE TYPE "weekday" AS ENUM (
   'MONDAY',
   'TUESDAY',
   'WEDNESDAY',
@@ -48,11 +55,4 @@ CREATE TYPE "cardapiogo"."weekday" AS ENUM (
   'FRIDAY',
   'SATURDAY',
   'SUNDAY'
-);
-
-CREATE TYPE "cardapiogo"."account_provider" AS ENUM (
-  'GOOGLE',
-  'APPLE',
-  'META',
-  'CARDAPIOGO'
 );

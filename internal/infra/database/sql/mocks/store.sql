@@ -1,4 +1,4 @@
-INSERT INTO "cardapiogo"."store" ("name", "active", "cpf_cnpj", "phone", "score", "address_id", "created_at", "updated_at", "deleted_at")
+INSERT INTO "store" ("name", "active", "cpf_cnpj", "phone", "score", "address_id", "created_at", "updated_at", "deleted_at")
 VALUES
   ('The Clucking Bell', true, '68552141000107', '13997590576', 475, 1, NOW(), NOW(), NULL),
   ('Up-n-Atom Burger', true,'05710281000108', '13997590575', 498, 2, NOW(), NOW(), NULL),

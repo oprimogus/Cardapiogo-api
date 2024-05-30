@@ -1,4 +1,4 @@
-INSERT INTO "cardapiogo".store_payment_method (id, payment_form)
+INSERT INTO store_payment_method (id, payment_form)
 VALUES
     (1, 'CREDIT_CARD'),
     (1, 'DEBIT_CARD'),

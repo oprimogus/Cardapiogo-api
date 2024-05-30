@@ -1,4 +1,4 @@
-INSERT INTO "cardapiogo"."profile" ("name", "last_name", "cpf", "phone", "created_at", "updated_at", "deleted_at")
+INSERT INTO "profile" ("name", "last_name", "cpf", "phone", "created_at", "updated_at", "deleted_at")
 VALUES
 ('Carl', 'Johnson', '11111111111', '5551234567', NOW(), NOW(), NULL),
 ('Tommy', 'Vercetti', '22222222222', '5552345678', NOW(), NOW(), NULL),

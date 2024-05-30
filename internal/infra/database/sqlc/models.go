@@ -285,13 +285,13 @@ func (ns NullUserRole) Value() (driver.Value, error) {
 type Weekday string
 
 const (
-	Weekday0 Weekday = "0"
-	Weekday1 Weekday = "1"
-	Weekday2 Weekday = "2"
-	Weekday3 Weekday = "3"
-	Weekday4 Weekday = "4"
-	Weekday5 Weekday = "5"
-	Weekday6 Weekday = "6"
+	WeekdayMONDAY    Weekday = "MONDAY"
+	WeekdayTUESDAY   Weekday = "TUESDAY"
+	WeekdayWEDNESDAY Weekday = "WEDNESDAY"
+	WeekdayTHURSDAY  Weekday = "THURSDAY"
+	WeekdayFRIDAY    Weekday = "FRIDAY"
+	WeekdaySATURDAY  Weekday = "SATURDAY"
+	WeekdaySUNDAY    Weekday = "SUNDAY"
 )
 
 func (e *Weekday) Scan(src interface{}) error {
@@ -331,14 +331,16 @@ func (ns NullWeekday) Value() (driver.Value, error) {
 
 type Address struct {
 	ID         int32            `db:"id" json:"id"`
-	ProfileID  int32            `db:"profile_id" json:"profile_id"`
+	ProfileID  pgtype.Int4      `db:"profile_id" json:"profile_id"`
 	Street     string           `db:"street" json:"street"`
 	Number     string           `db:"number" json:"number"`
 	Complement pgtype.Text      `db:"complement" json:"complement"`
 	District   string           `db:"district" json:"district"`
-	Cep        string           `db:"cep" json:"cep"`
+	ZipCode    string           `db:"zip_code" json:"zip_code"`
 	City       string           `db:"city" json:"city"`
 	State      string           `db:"state" json:"state"`
+	Latitude   pgtype.Text      `db:"latitude" json:"latitude"`
+	Longitude  pgtype.Text      `db:"longitude" json:"longitude"`
 	CreatedAt  pgtype.Timestamp `db:"created_at" json:"created_at"`
 	UpdatedAt  pgtype.Timestamp `db:"updated_at" json:"updated_at"`
 	DeletedAt  pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
@@ -346,7 +348,7 @@ type Address struct {
 
 type BusinessHours struct {
 	StoreID     pgtype.Int4 `db:"store_id" json:"store_id"`
-	Weekday     Weekday     `db:"weekday" json:"weekday"`
+	Weekday     NullWeekday `db:"weekday" json:"weekday"`
 	OpeningTime pgtype.Text `db:"opening_time" json:"opening_time"`
 	ClosingTime pgtype.Text `db:"closing_time" json:"closing_time"`
 }
@@ -378,7 +380,7 @@ type Order struct {
 	ProfileID     pgtype.Int4      `db:"profile_id" json:"profile_id"`
 	ShippingValue pgtype.Int4      `db:"shipping_value" json:"shipping_value"`
 	Amount        pgtype.Int4      `db:"amount" json:"amount"`
-	Status        OrderStatus      `db:"status" json:"status"`
+	Status        NullOrderStatus  `db:"status" json:"status"`
 	Details       pgtype.Text      `db:"details" json:"details"`
 	CreatedAt     pgtype.Timestamp `db:"created_at" json:"created_at"`
 	UpdatedAt     pgtype.Timestamp `db:"updated_at" json:"updated_at"`
@@ -391,16 +393,11 @@ type OrderItem struct {
 }
 
 type Owner struct {
-	ID        int32            `db:"id" json:"id"`
 	ProfileID pgtype.Int4      `db:"profile_id" json:"profile_id"`
 	StoreID   pgtype.Int4      `db:"store_id" json:"store_id"`
 	CreatedAt pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt pgtype.Timestamp `db:"updated_at" json:"updated_at"`
 	DeletedAt pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
-}
-
-type PaymentMethod struct {
-	ID   int32       `db:"id" json:"id"`
-	Type PaymentForm `db:"type" json:"type"`
 }
 
 type Profile struct {
@@ -415,34 +412,31 @@ type Profile struct {
 }
 
 type Store struct {
-	ID         int32            `db:"id" json:"id"`
-	Name       string           `db:"name" json:"name"`
-	CpfCnpj    string           `db:"cpf_cnpj" json:"cpf_cnpj"`
-	Phone      string           `db:"phone" json:"phone"`
-	Score      int32            `db:"score" json:"score"`
-	Type       ShopType         `db:"type" json:"type"`
-	Latitude   string           `db:"latitude" json:"latitude"`
-	Longitude  string           `db:"longitude" json:"longitude"`
-	Street     string           `db:"street" json:"street"`
-	Number     string           `db:"number" json:"number"`
-	Complement pgtype.Text      `db:"complement" json:"complement"`
-	District   string           `db:"district" json:"district"`
-	ZipCode    string           `db:"zip_code" json:"zip_code"`
-	City       string           `db:"city" json:"city"`
-	State      string           `db:"state" json:"state"`
-	CreatedAt  pgtype.Timestamp `db:"created_at" json:"created_at"`
-	UpdatedAt  pgtype.Timestamp `db:"updated_at" json:"updated_at"`
-	DeletedAt  pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
+	ID        int32            `db:"id" json:"id"`
+	Name      string           `db:"name" json:"name"`
+	Active    bool             `db:"active" json:"active"`
+	CpfCnpj   string           `db:"cpf_cnpj" json:"cpf_cnpj"`
+	Phone     string           `db:"phone" json:"phone"`
+	Score     int32            `db:"score" json:"score"`
+	AddressID pgtype.Int4      `db:"address_id" json:"address_id"`
+	CreatedAt pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+	DeletedAt pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 }
 
 type StorePaymentMethod struct {
-	StoreID       pgtype.Int4 `db:"store_id" json:"store_id"`
-	PaymentFormID pgtype.Int4 `db:"payment_form_id" json:"payment_form_id"`
+	ID          pgtype.Int4     `db:"id" json:"id"`
+	PaymentForm NullPaymentForm `db:"payment_form" json:"payment_form"`
 }
 
 type StoreRestaurantType struct {
-	StoreID        pgtype.Int4 `db:"store_id" json:"store_id"`
-	RestaurantType CousineType `db:"restaurant_type" json:"restaurant_type"`
+	ID             pgtype.Int4     `db:"id" json:"id"`
+	RestaurantType NullCousineType `db:"restaurant_type" json:"restaurant_type"`
+}
+
+type StoreType struct {
+	ID   pgtype.Int4  `db:"id" json:"id"`
+	Type NullShopType `db:"type" json:"type"`
 }
 
 type Users struct {

@@ -11,18 +11,71 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const addOwner = `-- name: AddOwner :exec
-INSERT INTO owner (profile_id, store_id, created_at)
-VALUES ($1, $2, NOW())
+const createAddressOfProfile = `-- name: CreateAddressOfProfile :exec
+INSERT INTO address (profile_id, street, number, complement, district, zip_code, city, state, latitude, longitude, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
+RETURNING ID
 `
 
-type AddOwnerParams struct {
-	ProfileID pgtype.Int4 `db:"profile_id" json:"profile_id"`
-	StoreID   pgtype.Int4 `db:"store_id" json:"store_id"`
+type CreateAddressOfProfileParams struct {
+	ProfileID  pgtype.Int4 `db:"profile_id" json:"profile_id"`
+	Street     string      `db:"street" json:"street"`
+	Number     string      `db:"number" json:"number"`
+	Complement pgtype.Text `db:"complement" json:"complement"`
+	District   string      `db:"district" json:"district"`
+	ZipCode    string      `db:"zip_code" json:"zip_code"`
+	City       string      `db:"city" json:"city"`
+	State      string      `db:"state" json:"state"`
+	Latitude   pgtype.Text `db:"latitude" json:"latitude"`
+	Longitude  pgtype.Text `db:"longitude" json:"longitude"`
 }
 
-func (q *Queries) AddOwner(ctx context.Context, arg AddOwnerParams) error {
-	_, err := q.db.Exec(ctx, addOwner, arg.ProfileID, arg.StoreID)
+func (q *Queries) CreateAddressOfProfile(ctx context.Context, arg CreateAddressOfProfileParams) error {
+	_, err := q.db.Exec(ctx, createAddressOfProfile,
+		arg.ProfileID,
+		arg.Street,
+		arg.Number,
+		arg.Complement,
+		arg.District,
+		arg.ZipCode,
+		arg.City,
+		arg.State,
+		arg.Latitude,
+		arg.Longitude,
+	)
+	return err
+}
+
+const createAddressOfStore = `-- name: CreateAddressOfStore :exec
+INSERT INTO address (street, number, complement, district, zip_code, city, state, latitude, longitude, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+RETURNING ID
+`
+
+type CreateAddressOfStoreParams struct {
+	Street     string      `db:"street" json:"street"`
+	Number     string      `db:"number" json:"number"`
+	Complement pgtype.Text `db:"complement" json:"complement"`
+	District   string      `db:"district" json:"district"`
+	ZipCode    string      `db:"zip_code" json:"zip_code"`
+	City       string      `db:"city" json:"city"`
+	State      string      `db:"state" json:"state"`
+	Latitude   pgtype.Text `db:"latitude" json:"latitude"`
+	Longitude  pgtype.Text `db:"longitude" json:"longitude"`
+}
+
+func (q *Queries) CreateAddressOfStore(ctx context.Context, arg CreateAddressOfStoreParams) error {
+	_, err := q.db.Exec(ctx, createAddressOfStore,
+		arg.Street,
+		arg.Number,
+		arg.Complement,
+		arg.District,
+		arg.ZipCode,
+		arg.City,
+		arg.State,
+		arg.Latitude,
+		arg.Longitude,
+	)
 	return err
 }
 
@@ -45,50 +98,6 @@ func (q *Queries) CreateProfileAndReturnID(ctx context.Context, arg CreateProfil
 		arg.LastName,
 		arg.Cpf,
 		arg.Phone,
-	)
-	var id int32
-	err := row.Scan(&id)
-	return id, err
-}
-
-const createStore = `-- name: CreateStore :one
-INSERT INTO store (name, cpf_cnpj, phone, type, latitude, longitude, street, number, complement, district, zip_code, city, state, created_at, updated_at) 
-VALUES
-($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
-RETURNING id
-`
-
-type CreateStoreParams struct {
-	Name       string      `db:"name" json:"name"`
-	CpfCnpj    string      `db:"cpf_cnpj" json:"cpf_cnpj"`
-	Phone      string      `db:"phone" json:"phone"`
-	Type       ShopType    `db:"type" json:"type"`
-	Latitude   string      `db:"latitude" json:"latitude"`
-	Longitude  string      `db:"longitude" json:"longitude"`
-	Street     string      `db:"street" json:"street"`
-	Number     string      `db:"number" json:"number"`
-	Complement pgtype.Text `db:"complement" json:"complement"`
-	District   string      `db:"district" json:"district"`
-	ZipCode    string      `db:"zip_code" json:"zip_code"`
-	City       string      `db:"city" json:"city"`
-	State      string      `db:"state" json:"state"`
-}
-
-func (q *Queries) CreateStore(ctx context.Context, arg CreateStoreParams) (int32, error) {
-	row := q.db.QueryRow(ctx, createStore,
-		arg.Name,
-		arg.CpfCnpj,
-		arg.Phone,
-		arg.Type,
-		arg.Latitude,
-		arg.Longitude,
-		arg.Street,
-		arg.Number,
-		arg.Complement,
-		arg.District,
-		arg.ZipCode,
-		arg.City,
-		arg.State,
 	)
 	var id int32
 	err := row.Scan(&id)
@@ -162,7 +171,7 @@ func (q *Queries) GetProfileByID(ctx context.Context, id int32) (GetProfileByIDR
 
 const getProfileByUserID = `-- name: GetProfileByUserID :one
 SELECT id, name, last_name, cpf, phone FROM profile p
-inner join (SELECT profile_id from users where users.id = $1) u on p.id = u.profile_id
+inner join (SELECT profile_id from users u where u.id = $1) u on p.id = u.profile_id
 LIMIT 1
 `
 
@@ -185,64 +194,6 @@ func (q *Queries) GetProfileByUserID(ctx context.Context, id pgtype.UUID) (GetPr
 		&i.Phone,
 	)
 	return i, err
-}
-
-const getStoresListByFilter = `-- name: GetStoresListByFilter :many
-SELECT s.id, s.name, s.score, s.district
-FROM store s
-INNER JOIN store_restaurant_type srt on srt.store_id = s.id
-WHERE
-    ($3 is NULL or s.name like '%' || $3 || '%')
-    AND ($4 is NULL OR s.type = $4)
-    AND ($5 is NULL OR srt.restaurant_type = ANY($5::string[]))
-ORDER BY s.score
-LIMIT $1 OFFSET $2
-`
-
-type GetStoresListByFilterParams struct {
-	Limit   int32       `db:"limit" json:"limit"`
-	Offset  int32       `db:"offset" json:"offset"`
-	Column3 interface{} `db:"column_3" json:"column_3"`
-	Column4 interface{} `db:"column_4" json:"column_4"`
-	Column5 interface{} `db:"column_5" json:"column_5"`
-}
-
-type GetStoresListByFilterRow struct {
-	ID       int32  `db:"id" json:"id"`
-	Name     string `db:"name" json:"name"`
-	Score    int32  `db:"score" json:"score"`
-	District string `db:"district" json:"district"`
-}
-
-func (q *Queries) GetStoresListByFilter(ctx context.Context, arg GetStoresListByFilterParams) ([]GetStoresListByFilterRow, error) {
-	rows, err := q.db.Query(ctx, getStoresListByFilter,
-		arg.Limit,
-		arg.Offset,
-		arg.Column3,
-		arg.Column4,
-		arg.Column5,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetStoresListByFilterRow
-	for rows.Next() {
-		var i GetStoresListByFilterRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Score,
-			&i.District,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }
 
 const getUser = `-- name: GetUser :many
@@ -360,6 +311,24 @@ func (q *Queries) GetUserById(ctx context.Context, id pgtype.UUID) (GetUserByIdR
 	return i, err
 }
 
+const linkAddressInStore = `-- name: LinkAddressInStore :exec
+UPDATE store 
+SET 
+    address_id = $1,
+    updated_at = NOW()
+WHERE id = $2
+`
+
+type LinkAddressInStoreParams struct {
+	AddressID pgtype.Int4 `db:"address_id" json:"address_id"`
+	ID        int32       `db:"id" json:"id"`
+}
+
+func (q *Queries) LinkAddressInStore(ctx context.Context, arg LinkAddressInStoreParams) error {
+	_, err := q.db.Exec(ctx, linkAddressInStore, arg.AddressID, arg.ID)
+	return err
+}
+
 const updateProfile = `-- name: UpdateProfile :exec
 UPDATE profile
 SET 
@@ -369,8 +338,8 @@ SET
     updated_at = NOW()
 WHERE id = (
     SELECT profile_id
-    FROM users
-    WHERE users.id = $1
+    FROM users u
+    WHERE u.id = $1
 )
 `
 

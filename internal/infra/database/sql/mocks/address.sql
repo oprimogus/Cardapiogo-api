@@ -1,4 +1,4 @@
-INSERT INTO "cardapiogo"."address" ("street", "number", "complement", "district", "zip_code", "city", "state", "latitude", "longitude", "created_at", "updated_at", "deleted_at")
+INSERT INTO "address" ("street", "number", "complement", "district", "zip_code", "city", "state", "latitude", "longitude", "created_at", "updated_at", "deleted_at")
 VALUES
   ('Main Street', '1', NULL, 'Vinewood', '54321', 'Los Santos', 'San Andreas', '12.345', '67.890', NOW(), NOW(), NULL),
   ('Pyrite Avenue', '42', NULL, 'Pillbox Hill', '67890', 'Los Santos', 'San Andreas', '34.567', '89.012', NOW(), NOW(), NULL),
