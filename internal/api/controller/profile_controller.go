@@ -28,17 +28,18 @@ func NewProfileController(
 }
 
 // CreateProfileHandler godoc
-// @Summary Cria um perfil e atribui a um usuário
-// @Description Cria um perfil e atribui a um usuário
-// @Tags Profile
-// @Accept  json
-// @Produce  json
-// @Param   request body profile.CreateProfileParams true "CreateProfileParams"
-// @Success 201
-// @Failure 400  {object} errors.ErrorResponse
-// @Failure 500  {object} errors.ErrorResponse
-// @Failure 502  {object} errors.ErrorResponse
-// @Router /api/v1/profile [post]
+//
+//	@Summary		Create a profile and assign it to a user
+//	@Description	Create a new user profile with the provided parameters and assign it to the authenticated user.
+//	@Tags			Profile
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body	profile.CreateProfileParams	true	"CreateProfileParams"
+//	@Success		201
+//	@Failure		400	{object}	errors.ErrorResponse
+//	@Failure		500	{object}	errors.ErrorResponse
+//	@Failure		502	{object}	errors.ErrorResponse
+//	@Router			/v1/profile [post]
 func (c *ProfileController) CreateProfileHandler(ctx *gin.Context) {
 	var createProfileParams profile.CreateProfileParams
 	err := ctx.BindJSON(&createProfileParams)
@@ -50,26 +51,29 @@ func (c *ProfileController) CreateProfileHandler(ctx *gin.Context) {
 	validationErr := c.validator.Validate(createProfileParams)
 	if validationErr != nil {
 		ctx.JSON(http.StatusBadRequest, validationErr)
+		return
 	}
 
 	userID := ctx.GetString("userID")
 
 	err = c.service.CreateProfile(ctx, userID, createProfileParams)
 	validateErrorResponse(ctx, err)
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusCreated)
 }
 
 // GetProfileByUserIDHandler godoc
-// @Summary Retorna o perfil do usuário
-// @Description Retorna o perfil do usuário
-// @Tags Profile
-// @Accept  json
-// @Produce  json
-// @Success 200  {object} profile.Profile
-// @Failure 400  {object} errors.ErrorResponse
-// @Failure 500  {object} errors.ErrorResponse
-// @Failure 502  {object} errors.ErrorResponse
-// @Router /api/v1/profile [get]
+//
+//	 @Security ApiKeyAuth
+//		@Summary		Get user profile
+//		@Description	Retrieve the profile of the authenticated user based on the user ID.
+//		@Tags			Profile
+//		@Accept			json
+//		@Produce		json
+//		@Success		200	{object}	profile.Profile
+//		@Failure		400	{object}	errors.ErrorResponse
+//		@Failure		500	{object}	errors.ErrorResponse
+//		@Failure		502	{object}	errors.ErrorResponse
+//		@Router			/v1/profile [get]
 func (c *ProfileController) GetProfileByUserIDHandler(ctx *gin.Context) {
 	userID := ctx.GetString("userID")
 
@@ -79,17 +83,18 @@ func (c *ProfileController) GetProfileByUserIDHandler(ctx *gin.Context) {
 }
 
 // UpdateProfileHandler godoc
-// @Summary Atualiza os dados do perfil do usuário
-// @Description Atualiza os dados do perfil do usuário
-// @Tags Profile
-// @Accept  json
-// @Produce  json
-// @Param   request body profile.UpdateProfileParams true "UpdateProfileParams"
-// @Success 200
-// @Failure 400  {object} errors.ErrorResponse
-// @Failure 500  {object} errors.ErrorResponse
-// @Failure 502  {object} errors.ErrorResponse
-// @Router /api/v1/profile [put]
+//
+//	@Summary		Update user profile
+//	@Description	Update the profile data of the authenticated user with the provided parameters.
+//	@Tags			Profile
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body	profile.UpdateProfileParams	true	"UpdateProfileParams"
+//	@Success		200
+//	@Failure		400	{object}	errors.ErrorResponse
+//	@Failure		500	{object}	errors.ErrorResponse
+//	@Failure		502	{object}	errors.ErrorResponse
+//	@Router			/v1/profile [put]
 func (c *ProfileController) UpdateProfileHandler(ctx *gin.Context) {
 	var updateProfileParams profile.UpdateProfileParams
 	err := ctx.BindJSON(&updateProfileParams)

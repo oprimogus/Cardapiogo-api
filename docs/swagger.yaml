@@ -1,3 +1,6 @@
+basePath: /api
+consumes:
+- application/json
 definitions:
   errors.ErrorResponse:
     properties:
@@ -149,24 +152,21 @@ definitions:
       updated_at:
         type: string
     type: object
-externalDocs:
-  description: OpenAPI
-  url: https://swagger.io/resources/open-api/
+host: localhost:8080
 info:
   contact:
     email: gustavo081900@gmail.com
-    name: Gustavo Ferreira
-    url: http://www.swagger.io/support
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
+    name: Gustavo Ferreira de Jesus
+  description: Documentação da API de delivery Cardapiogo.
+  title: Cardapiogo API
+  version: "1.0"
 paths:
-  /api/v1/auth/google:
+  /v1/auth/google:
     get:
       consumes:
       - application/json
-      description: Inicia fluxo de OAuth2
+      description: Start OAuth2 authentication with Google. The flow continues in
+        the callback route.
       produces:
       - application/json
       responses:
@@ -184,14 +184,14 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: Inicia fluxo de OAuth2
+      summary: Start OAuth2 authentication
       tags:
-      - Auth
-  /api/v1/auth/google/callback:
+      - Authentication
+  /v1/auth/google/callback:
     get:
       consumes:
       - application/json
-      description: Callback de login via OAuth2
+      description: Handle OAuth2 login callback and issue a JWT on successful authentication.
       produces:
       - application/json
       responses:
@@ -209,16 +209,17 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: Callback de login via OAuth2
+      summary: OAuth2 login callback
       tags:
-      - Auth
-  /api/v1/login:
+      - Authentication
+  /v1/login:
     post:
       consumes:
       - application/json
-      description: Login de usuário com email e senha
+      description: Authenticate a user using email and password and issue a JWT on
+        successful login.
       parameters:
-      - description: Login
+      - description: Login credentials
         in: body
         name: request
         required: true
@@ -241,14 +242,15 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: Login de usuário com email e senha
+      summary: User login with email and password
       tags:
-      - Auth
+      - Authentication
   /v1/profile:
     get:
       consumes:
       - application/json
-      description: Retorna o perfil do usuário
+      description: Retrieve the profile of the authenticated user based on the user
+        ID.
       produces:
       - application/json
       responses:
@@ -268,13 +270,16 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: Retorna o perfil do usuário
+      security:
+      - ApiKeyAuth: []
+      summary: Get user profile
       tags:
       - Profile
     post:
       consumes:
       - application/json
-      description: Cria um perfil e atribui a um usuário
+      description: Create a new user profile with the provided parameters and assign
+        it to the authenticated user.
       parameters:
       - description: CreateProfileParams
         in: body
@@ -299,13 +304,14 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: Cria um perfil e atribui a um usuário
+      summary: Create a profile and assign it to a user
       tags:
       - Profile
     put:
       consumes:
       - application/json
-      description: Atualiza os dados do perfil do usuário
+      description: Update the profile data of the authenticated user with the provided
+        parameters.
       parameters:
       - description: UpdateProfileParams
         in: body
@@ -330,21 +336,21 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: Atualiza os dados do perfil do usuário
+      summary: Update user profile
       tags:
       - Profile
   /v1/user:
     get:
       consumes:
       - application/json
-      description: Retorna uma lista de usuários com paginação
+      description: Retrieve a paginated list of users.
       parameters:
-      - description: Número de itens por página
+      - description: Number of items per page
         in: query
         name: items
         required: true
         type: number
-      - description: Página
+      - description: Page number
         in: query
         name: page
         required: true
@@ -370,13 +376,13 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: Retorna uma lista de usuários
+      summary: Get a list of users
       tags:
       - User
     post:
       consumes:
       - application/json
-      description: Cria um novo usuário através de login email/senha
+      description: Create a new user using email and password for authentication.
       parameters:
       - description: CreateUserParams
         in: body
@@ -401,13 +407,13 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: Adiciona um novo usuário
+      summary: Add a new user
       tags:
       - User
     put:
       consumes:
       - application/json
-      description: Atualiza os dados do usuário
+      description: Update the details of the authenticated user.
       parameters:
       - description: UpdateUserParams
         in: body
@@ -432,16 +438,16 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: Atualiza os dados do usuário
+      summary: Update user details
       tags:
       - User
   /v1/user/{id}:
     get:
       consumes:
       - application/json
-      description: Retorna um usuário através do ID
+      description: Retrieve a user's details using their unique ID.
       parameters:
-      - description: ID do usuário (UUID)
+      - description: User ID (UUID)
         in: path
         name: id
         required: true
@@ -465,14 +471,14 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: Retorna um usuário
+      summary: Get user by ID
       tags:
       - User
   /v1/user/change-password:
     put:
       consumes:
       - application/json
-      description: Atualiza a senha do usuário
+      description: Update the password of the authenticated user.
       parameters:
       - description: UpdateUserPasswordParams
         in: body
@@ -497,12 +503,14 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: Atualiza a senha do usuário
+      summary: Update user password
       tags:
       - User
+produces:
+- application/json
 securityDefinitions:
-  JWT Token:
-    in: 'header Cookie: token=$VALUE'
+  Bearer Token:
+    in: header
     name: Authorization
     type: apiKey
 swagger: "2.0"

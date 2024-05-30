@@ -29,16 +29,17 @@ func NewAuthController(
 }
 
 // StartGoogleOAuthFlow godoc
-// @Summary Inicia fluxo de OAuth2
-// @Description Inicia fluxo de OAuth2
-// @Tags Auth
-// @Accept  json
-// @Produce  json
-// @Success 307
-// @Failure 400  {object} errors.ErrorResponse
-// @Failure 500  {object} errors.ErrorResponse
-// @Failure 502  {object} errors.ErrorResponse
-// @Router /api/v1/auth/google [get]
+//
+//	@Summary		Start OAuth2 authentication
+//	@Description	Start OAuth2 authentication with Google. The flow continues in the callback route.
+//	@Tags			Authentication
+//	@Accept			json
+//	@Produce		json
+//	@Success		307
+//	@Failure		400	{object}	errors.ErrorResponse
+//	@Failure		500	{object}	errors.ErrorResponse
+//	@Failure		502	{object}	errors.ErrorResponse
+//	@Router			/v1/auth/google [get]
 func (c *AuthController) StartGoogleOAuthFlow(ctx *gin.Context) {
 	conf := oauth2.NewGoogleOauthConf()
 
@@ -51,16 +52,17 @@ func (c *AuthController) StartGoogleOAuthFlow(ctx *gin.Context) {
 }
 
 // SignUpLoginGoogleOauthCallback godoc
-// @Summary Callback de login via OAuth2
-// @Description Callback de login via OAuth2
-// @Tags Auth
-// @Accept  json
-// @Produce  json
-// @Success 307
-// @Failure 400  {object} errors.ErrorResponse
-// @Failure 500  {object} errors.ErrorResponse
-// @Failure 502  {object} errors.ErrorResponse
-// @Router /api/v1/auth/google/callback [get]
+//
+//	@Summary		OAuth2 login callback
+//	@Description	Handle OAuth2 login callback and issue a JWT on successful authentication.
+//	@Tags			Authentication
+//	@Accept			json
+//	@Produce		json
+//	@Success		307
+//	@Failure		400	{object}	errors.ErrorResponse
+//	@Failure		500	{object}	errors.ErrorResponse
+//	@Failure		502	{object}	errors.ErrorResponse
+//	@Router			/v1/auth/google/callback [get]
 func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 	stateToken := ctx.Query("state")
 	valid, err := auth.ValidateStateToken(stateToken)
@@ -88,17 +90,18 @@ func (c *AuthController) SignUpLoginGoogleOauthCallback(ctx *gin.Context) {
 }
 
 // Login godoc
-// @Summary Login de usuário com email e senha
-// @Description Login de usuário com email e senha
-// @Tags Auth
-// @Accept  json
-// @Produce  json
-// @Param   request body user.Login true "Login"
-// @Success 200
-// @Failure 400  {object} errors.ErrorResponse
-// @Failure 500  {object} errors.ErrorResponse
-// @Failure 502  {object} errors.ErrorResponse
-// @Router /api/v1/login [post]
+//
+//	@Summary		User login with email and password
+//	@Description	Authenticate a user using email and password and issue a JWT on successful login.
+//	@Tags			Authentication
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body	user.Login	true	"Login credentials"
+//	@Success		200
+//	@Failure		400	{object}	errors.ErrorResponse
+//	@Failure		500	{object}	errors.ErrorResponse
+//	@Failure		502	{object}	errors.ErrorResponse
+//	@Router			/v1/login [post]
 func (c *AuthController) Login(ctx *gin.Context) {
 	var user user.Login
 	err := ctx.BindJSON(&user)

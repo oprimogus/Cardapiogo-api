@@ -5,28 +5,28 @@ import "github.com/swaggo/swag"
 
 const docTemplate = `{
     "schemes": {{ marshal .Schemes }},
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
     "swagger": "2.0",
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
         "contact": {
-            "name": "Gustavo Ferreira",
-            "url": "http://www.swagger.io/support",
+            "name": "Gustavo Ferreira de Jesus",
             "email": "gustavo081900@gmail.com"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/auth/google": {
+        "/v1/auth/google": {
             "get": {
-                "description": "Inicia fluxo de OAuth2",
+                "description": "Start OAuth2 authentication with Google. The flow continues in the callback route.",
                 "consumes": [
                     "application/json"
                 ],
@@ -34,9 +34,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "Authentication"
                 ],
-                "summary": "Inicia fluxo de OAuth2",
+                "summary": "Start OAuth2 authentication",
                 "responses": {
                     "307": {
                         "description": "Temporary Redirect"
@@ -62,9 +62,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/auth/google/callback": {
+        "/v1/auth/google/callback": {
             "get": {
-                "description": "Callback de login via OAuth2",
+                "description": "Handle OAuth2 login callback and issue a JWT on successful authentication.",
                 "consumes": [
                     "application/json"
                 ],
@@ -72,9 +72,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "Authentication"
                 ],
-                "summary": "Callback de login via OAuth2",
+                "summary": "OAuth2 login callback",
                 "responses": {
                     "307": {
                         "description": "Temporary Redirect"
@@ -100,9 +100,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/login": {
+        "/v1/login": {
             "post": {
-                "description": "Login de usuário com email e senha",
+                "description": "Authenticate a user using email and password and issue a JWT on successful login.",
                 "consumes": [
                     "application/json"
                 ],
@@ -110,12 +110,12 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "Authentication"
                 ],
-                "summary": "Login de usuário com email e senha",
+                "summary": "User login with email and password",
                 "parameters": [
                     {
-                        "description": "Login",
+                        "description": "Login credentials",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -151,7 +151,12 @@ const docTemplate = `{
         },
         "/v1/profile": {
             "get": {
-                "description": "Retorna o perfil do usuário",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve the profile of the authenticated user based on the user ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -161,7 +166,7 @@ const docTemplate = `{
                 "tags": [
                     "Profile"
                 ],
-                "summary": "Retorna o perfil do usuário",
+                "summary": "Get user profile",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -190,7 +195,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Atualiza os dados do perfil do usuário",
+                "description": "Update the profile data of the authenticated user with the provided parameters.",
                 "consumes": [
                     "application/json"
                 ],
@@ -200,7 +205,7 @@ const docTemplate = `{
                 "tags": [
                     "Profile"
                 ],
-                "summary": "Atualiza os dados do perfil do usuário",
+                "summary": "Update user profile",
                 "parameters": [
                     {
                         "description": "UpdateProfileParams",
@@ -237,7 +242,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Cria um perfil e atribui a um usuário",
+                "description": "Create a new user profile with the provided parameters and assign it to the authenticated user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -247,7 +252,7 @@ const docTemplate = `{
                 "tags": [
                     "Profile"
                 ],
-                "summary": "Cria um perfil e atribui a um usuário",
+                "summary": "Create a profile and assign it to a user",
                 "parameters": [
                     {
                         "description": "CreateProfileParams",
@@ -286,7 +291,7 @@ const docTemplate = `{
         },
         "/v1/user": {
             "get": {
-                "description": "Retorna uma lista de usuários com paginação",
+                "description": "Retrieve a paginated list of users.",
                 "consumes": [
                     "application/json"
                 ],
@@ -296,18 +301,18 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Retorna uma lista de usuários",
+                "summary": "Get a list of users",
                 "parameters": [
                     {
                         "type": "number",
-                        "description": "Número de itens por página",
+                        "description": "Number of items per page",
                         "name": "items",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "number",
-                        "description": "Página",
+                        "description": "Page number",
                         "name": "page",
                         "in": "query",
                         "required": true
@@ -344,7 +349,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Atualiza os dados do usuário",
+                "description": "Update the details of the authenticated user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -354,7 +359,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Atualiza os dados do usuário",
+                "summary": "Update user details",
                 "parameters": [
                     {
                         "description": "UpdateUserParams",
@@ -391,7 +396,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Cria um novo usuário através de login email/senha",
+                "description": "Create a new user using email and password for authentication.",
                 "consumes": [
                     "application/json"
                 ],
@@ -401,7 +406,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Adiciona um novo usuário",
+                "summary": "Add a new user",
                 "parameters": [
                     {
                         "description": "CreateUserParams",
@@ -440,7 +445,7 @@ const docTemplate = `{
         },
         "/v1/user/change-password": {
             "put": {
-                "description": "Atualiza a senha do usuário",
+                "description": "Update the password of the authenticated user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -450,7 +455,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Atualiza a senha do usuário",
+                "summary": "Update user password",
                 "parameters": [
                     {
                         "description": "UpdateUserPasswordParams",
@@ -489,7 +494,7 @@ const docTemplate = `{
         },
         "/v1/user/{id}": {
             "get": {
-                "description": "Retorna um usuário através do ID",
+                "description": "Retrieve a user's details using their unique ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -499,11 +504,11 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Retorna um usuário",
+                "summary": "Get user by ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do usuário (UUID)",
+                        "description": "User ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -753,26 +758,22 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
-        "JWT Token": {
+        "Bearer Token": {
             "type": "apiKey",
             "name": "Authorization",
-            "in": "header Cookie: token=$VALUE"
+            "in": "header"
         }
-    },
-    "externalDocs": {
-        "description": "OpenAPI",
-        "url": "https://swagger.io/resources/open-api/"
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/api",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Cardapiogo API",
+	Description:      "Documentação da API de delivery Cardapiogo.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
