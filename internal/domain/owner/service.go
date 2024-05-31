@@ -23,6 +23,5 @@ func (s *Service) RemoveOwnerOfStore(ctx context.Context, userID string, storeID
 }
 
 func (s *Service) IsOwner(ctx context.Context, userID string, storeID string) (bool, error) {
-	value, err := s.repository.IsOwner(ctx, userID, storeID)
-	return value, err
+	return s.repository.IsOwner(ctx, userID, storeID)
 }
