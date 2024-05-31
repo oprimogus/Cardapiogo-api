@@ -108,7 +108,7 @@ func (s *Service) DeleteStore(ctx context.Context, ID string, userID string) err
 		return err
 	}
 	if !existStore {
-		return errors.NotFound(ExistRegisteredStore)
+		return errors.NotFound(NotRegisteredStore)
 	}
 	isOwner, err := s.ownerService.IsOwner(ctx, userID, ID)
 	if err != nil {

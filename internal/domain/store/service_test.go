@@ -243,3 +243,150 @@ func (s *ServiceSuite) TestUpdateStore() {
 		assert.Equal(s.T(), v.want, err, v.name)
 	}
 }
+
+func (s *ServiceSuite) TestUpdateStoreCpfCnpj() {
+	type UpdateStoresData struct {
+		name                  string
+		input                 store.UpdateStoreCpfCnpjParams
+		mockGetStoreByIDError error
+		mockIsOwnerValue      bool
+		mockIsOwnerError      error
+		mockIsOwnerTimes      int
+		mockUpdateStore       error
+		mockUpdateStoreTimes  int
+		want                  error
+	}
+
+	data := []UpdateStoresData{
+		{
+			name: "Doesn't exist store yet",
+			input: store.UpdateStoreCpfCnpjParams{
+				ExternalID: "",
+				CpfCnpj:    "",
+			},
+			mockGetStoreByIDError: fmt.Errorf(errors.NOT_FOUND_RECORD),
+			mockIsOwnerValue:      false,
+			mockIsOwnerError:      nil,
+			mockIsOwnerTimes:      0,
+			mockUpdateStore:       nil,
+			mockUpdateStoreTimes:  0,
+			want:                  errors.NotFound(store.NotRegisteredStore),
+		},
+		{
+			name: "Store exist and is owner doing request",
+			input: store.UpdateStoreCpfCnpjParams{
+				ExternalID: "",
+				CpfCnpj:    "",
+			},
+			mockGetStoreByIDError: nil,
+			mockIsOwnerValue:      true,
+			mockIsOwnerError:      nil,
+			mockIsOwnerTimes:      1,
+			mockUpdateStore:       nil,
+			mockUpdateStoreTimes:  1,
+			want:                  nil,
+		},
+		{
+			name: "Store exist and not is owner doing request",
+			input: store.UpdateStoreCpfCnpjParams{
+				ExternalID: "",
+				CpfCnpj:    "",
+			},
+			mockGetStoreByIDError: nil,
+			mockIsOwnerValue:      false,
+			mockIsOwnerError:      nil,
+			mockIsOwnerTimes:      1,
+			mockUpdateStore:       nil,
+			mockUpdateStoreTimes:  0,
+			want:                  errors.Forbidden(store.IsNotOwner),
+		},
+	}
+
+	for _, v := range data {
+		s.repository.EXPECT().
+			GetStoreByID(gomock.Any(), "").
+			Return(store.StoreDetail{}, v.mockGetStoreByIDError)
+
+		s.ownerRepository.EXPECT().
+			IsOwner(gomock.Any(), "", gomock.Any()).
+			Return(v.mockIsOwnerValue, v.mockIsOwnerError).Times(v.mockIsOwnerTimes)
+
+		s.repository.EXPECT().
+			UpdateStoreCpfCnpj(gomock.Any(), gomock.Any()).
+			Return(v.mockUpdateStore).Times(v.mockUpdateStoreTimes)
+
+		err := s.Service.UpdateStoreCpfCnpj(context.Background(), v.input, "")
+		assert.Equal(s.T(), v.want, err, v.name)
+	}
+}
+
+func (s *ServiceSuite) TestDeleteStore() {
+	type DeleteStoresData struct {
+		name                  string
+		ID                    string
+		userID                string
+		mockGetStoreByIDError error
+		mockIsOwnerValue      bool
+		mockIsOwnerError      error
+		mockIsOwnerTimes      int
+		mockDeleteStore       error
+		mockDeleteStoreTimes  int
+		want                  error
+	}
+
+	data := []DeleteStoresData{
+		{
+			name:                  "Doesn't exist store yet",
+			ID:                    "",
+			userID:                "",
+			mockGetStoreByIDError: fmt.Errorf(errors.NOT_FOUND_RECORD),
+			mockIsOwnerValue:      false,
+			mockIsOwnerError:      nil,
+			mockIsOwnerTimes:      0,
+			mockDeleteStore:       nil,
+			mockDeleteStoreTimes:  0,
+			want:                  errors.NotFound(store.NotRegisteredStore),
+		},
+		{
+			name:                  "Store exist and is owner doing request",
+			ID:                    "",
+			userID:                "",
+			mockGetStoreByIDError: nil,
+			mockIsOwnerValue:      true,
+			mockIsOwnerError:      nil,
+			mockIsOwnerTimes:      1,
+			mockDeleteStore:       nil,
+			mockDeleteStoreTimes:  1,
+			want:                  nil,
+		},
+		{
+			name:                  "Store exist and not is owner doing request",
+			ID:                    "",
+			userID:                "",
+			mockGetStoreByIDError: nil,
+			mockIsOwnerValue:      false,
+			mockIsOwnerError:      nil,
+			mockIsOwnerTimes:      1,
+			mockDeleteStore:       nil,
+			mockDeleteStoreTimes:  0,
+			want:                  errors.Forbidden(store.IsNotOwner),
+		},
+	}
+
+	for _, v := range data {
+		s.repository.EXPECT().
+			GetStoreByID(gomock.Any(), "").
+			Return(store.StoreDetail{}, v.mockGetStoreByIDError)
+
+		s.ownerRepository.EXPECT().
+			IsOwner(gomock.Any(), "", gomock.Any()).
+			Return(v.mockIsOwnerValue, v.mockIsOwnerError).Times(v.mockIsOwnerTimes)
+
+		s.repository.EXPECT().
+			DeleteStore(gomock.Any(), gomock.Any()).
+			Return(v.mockDeleteStore).Times(v.mockDeleteStoreTimes)
+
+		err := s.Service.DeleteStore(context.Background(), "", "")
+		assert.Equal(s.T(), v.want, err, v.name)
+	}
+}
