@@ -41,7 +41,7 @@ Documentação disponível [aqui](https://github.com/uber-go/mock)
 mockgen -source=internal/domain/profile/repository.go -destination=internal/infra/mocks/mock_profile.go
 ```
 
-### 7. Air Live reload
+### 7. Air hot reload
 
 Documentação disponível [aqui](https://github.com/cosmtrek/air)
 

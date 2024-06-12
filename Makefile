@@ -2,7 +2,7 @@ include .env
 export
 
 
-.PHONY: fmt lint install docker-up docker-down dev-docker-up dev-docker-down mock-database sqlc docs test run
+.PHONY: fmt lint install up down stop mock-database sqlc docs test run
 
 lint:
 	@gofmt -s -w .
@@ -16,12 +16,15 @@ up:
 down:
 	docker compose -f deployments/docker-compose.yaml down
 
+stop:
+	docker compose -f deployments/docker-compose.yaml stop
+
 mock-db:
 	go run scripts/populate_local_db.go
 
 mock:
-	@read -p "Enter mock interface path: " name; \
-		mockgen -source=internal/domain/$$name/repository.go -destination=internal/infra/mocks/$$name/mock_$$name.go 
+	@read -p "Enter entity domain: " name; \
+		mockgen -source=internal/domain/repository/$${name}_repository.go -destination=internal/application/$${name}/mocks/mock_$${name}_repository.go -package mock_$${name}_repository
 
 sqlc:
 	sqlc generate -f configs/sqlc.yaml
@@ -43,14 +46,14 @@ run:
 
 migration:
 	@read -p "Enter migration name: " name; \
-		migrate create -ext sql -dir internal/infra/database/migrations -seq $$name
+		migrate create -ext sql -dir internal/infrastructure/database/migrations -seq $$name
 
 migration-up: 
-	migrate -path internal/infra/database/migrations -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable&search_path=public" -verbose up
+	migrate -path internal/infrastructure/database/migrations -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable&search_path=public" -verbose up
 
 migration-down: 
-	migrate -path internal/infra/database/migrations -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable&search_path=public" -verbose down
+	migrate -path internal/infrastructure/database/migrations -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable&search_path=public" -verbose down
 
 migration-fix: 
 	@read -p "Enter migration version: " version; \
-	migrate -path internal/infra/database/migrations -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable&search_path=public" force $$version
+	migrate -path internal/infrastructure/database/migrations -database "postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable&search_path=public" force $$version
