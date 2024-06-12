@@ -18,83 +18,7 @@
     "host": "localhost:8080",
     "basePath": "/api",
     "paths": {
-        "/v1/auth/google": {
-            "get": {
-                "description": "Start OAuth2 authentication with Google. The flow continues in the callback route.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Start OAuth2 authentication",
-                "responses": {
-                    "307": {
-                        "description": "Temporary Redirect"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/auth/google/callback": {
-            "get": {
-                "description": "Handle OAuth2 login callback and issue a JWT on successful authentication.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "OAuth2 login callback",
-                "responses": {
-                    "307": {
-                        "description": "Temporary Redirect"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/login": {
+        "/v1/auth/login2": {
             "post": {
                 "description": "Authenticate a user using email and password and issue a JWT on successful login.",
                 "consumes": [
@@ -121,6 +45,82 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/oauth": {
+            "get": {
+                "description": "Start OAuth2 authentication with Keycloak. The flow continues in the callback route.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Start OAuth2 authentication",
+                "responses": {
+                    "302": {
+                        "description": "Found"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/oauth/callback": {
+            "get": {
+                "description": "Handle OAuth2 login callback and issue a JWT on successful authentication.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "OAuth2 login callback",
+                "responses": {
+                    "307": {
+                        "description": "Temporary Redirect"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -313,15 +313,6 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/user.User"
-                            }
-                        }
-                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -509,12 +500,6 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/user.User"
-                        }
-                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -720,32 +705,6 @@
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.User": {
-            "type": "object",
-            "properties": {
-                "account_provider": {
-                    "$ref": "#/definitions/types.AccountProvider"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "profile_id": {
-                    "type": "integer"
-                },
-                "role": {
-                    "$ref": "#/definitions/types.Role"
-                },
-                "updated_at": {
                     "type": "string"
                 }
             }

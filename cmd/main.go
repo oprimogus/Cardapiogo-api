@@ -3,9 +3,9 @@ package main
 import (
 	"github.com/subosito/gotenv"
 
-	"github.com/oprimogus/cardapiogo/internal/api/router"
-	"github.com/oprimogus/cardapiogo/internal/infra/database/postgres"
-	"github.com/oprimogus/cardapiogo/internal/infra/factory"
+	"github.com/oprimogus/cardapiogo/internal/infrastructure/api/router"
+	"github.com/oprimogus/cardapiogo/internal/infrastructure/database/postgres"
+	"github.com/oprimogus/cardapiogo/internal/infrastructure/persistence"
 )
 
 // @title Cardapiogo API
@@ -31,6 +31,6 @@ func main() {
 	defer db.Close()
 
 	// routes
-	factoryRepository := factory.NewDataBaseRepositoryFactory(db)
+	factoryRepository := persistence.NewDataBaseRepositoryFactory(db)
 	router.Initialize(factoryRepository)
 }

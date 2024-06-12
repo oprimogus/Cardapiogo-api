@@ -135,23 +135,6 @@ definitions:
     - new_password
     - password
     type: object
-  user.User:
-    properties:
-      account_provider:
-        $ref: '#/definitions/types.AccountProvider'
-      created_at:
-        type: string
-      email:
-        type: string
-      id:
-        type: string
-      profile_id:
-        type: integer
-      role:
-        $ref: '#/definitions/types.Role'
-      updated_at:
-        type: string
-    type: object
 host: localhost:8080
 info:
   contact:
@@ -161,58 +144,7 @@ info:
   title: Cardapiogo API
   version: "1.0"
 paths:
-  /v1/auth/google:
-    get:
-      consumes:
-      - application/json
-      description: Start OAuth2 authentication with Google. The flow continues in
-        the callback route.
-      produces:
-      - application/json
-      responses:
-        "307":
-          description: Temporary Redirect
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: Start OAuth2 authentication
-      tags:
-      - Authentication
-  /v1/auth/google/callback:
-    get:
-      consumes:
-      - application/json
-      description: Handle OAuth2 login callback and issue a JWT on successful authentication.
-      produces:
-      - application/json
-      responses:
-        "307":
-          description: Temporary Redirect
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: OAuth2 login callback
-      tags:
-      - Authentication
-  /v1/login:
+  /v1/auth/login2:
     post:
       consumes:
       - application/json
@@ -243,6 +175,57 @@ paths:
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
       summary: User login with email and password
+      tags:
+      - Authentication
+  /v1/auth/oauth:
+    get:
+      consumes:
+      - application/json
+      description: Start OAuth2 authentication with Keycloak. The flow continues in
+        the callback route.
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Found
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      summary: Start OAuth2 authentication
+      tags:
+      - Authentication
+  /v1/auth/oauth/callback:
+    get:
+      consumes:
+      - application/json
+      description: Handle OAuth2 login callback and issue a JWT on successful authentication.
+      produces:
+      - application/json
+      responses:
+        "307":
+          description: Temporary Redirect
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      summary: OAuth2 login callback
       tags:
       - Authentication
   /v1/profile:
@@ -358,12 +341,6 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/user.User'
-            type: array
         "400":
           description: Bad Request
           schema:
@@ -455,10 +432,6 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/user.User'
         "400":
           description: Bad Request
           schema:
