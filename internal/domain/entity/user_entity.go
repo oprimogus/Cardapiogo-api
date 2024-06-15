@@ -7,11 +7,11 @@ import (
 type UserRole string
 
 const (
-	UserRoleConsumer    UserRole = "CONSUMER"
-	UserRoleOwner       UserRole = "OWNER"
-	UserRoleEmployee    UserRole = "EMPLOYEE"
-	UserRoleDeliveryMan UserRole = "DELIVERY_MAN"
-	UserRoleAdmin       UserRole = "ADMIN"
+	UserRoleConsumer    UserRole = "Consumer"
+	UserRoleOwner       UserRole = "Owner"
+	UserRoleEmployee    UserRole = "Employee"
+	UserRoleDeliveryMan UserRole = "Delivery_Man"
+	UserRoleAdmin       UserRole = "Admin"
 )
 
 type User struct {
@@ -20,7 +20,7 @@ type User struct {
 	Profile    Profile
 	Email      string
 	Password   string
-	Role       UserRole
+	Roles      []UserRole
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  time.Time

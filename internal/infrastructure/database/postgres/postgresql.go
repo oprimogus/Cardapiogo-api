@@ -18,7 +18,7 @@ import (
 
 var (
 	instance *PostgresDatabase
-	log      = logger.GetLoggerDefault("Postgres")
+	log      = logger.NewLogger("Postgres")
 )
 
 // PostgresDatabase struct

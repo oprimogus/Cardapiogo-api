@@ -5,21 +5,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/api/controller"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/infrastructure/api/validator"
 )
 
-func AuthRoutes(router *gin.Engine, validator *validatorutils.Validator) {
-
-	authController := controller.NewAuthController(validator)
+func AuthRoutes(router *gin.Engine, validator *validatorutils.Validator, factory repository.Factory) {
+	authController := controller.NewAuthController(validator, factory)
 
 	basePath := os.Getenv("API_BASE_PATH")
 
 	v1 := router.Group(basePath + "/v1")
 	{
-		v1.POST("/auth/login", authController.SignUp)
-		v1.GET("/auth/oauth", authController.SignInOrSignUpKeycloakOauth)
-		v1.GET("/auth/oauth/callback", authController.SignInOrSignUpKeycloakOauthCallback)
+		v1.POST("/auth/login", authController.SignIn)
 	}
-
 }

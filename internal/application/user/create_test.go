@@ -40,8 +40,10 @@ func (s *CreateSuite) TestExecute() {
 		Email:    "johndoe@example.com",
 		Password: "teste123",
 		Profile:  user.CreateProfileParams{Name: "John", LastName: "Doe", Document: "50338097949", Phone: "13981142501"},
-		Role:     string(entity.UserRoleConsumer),
+		Roles:    []string{string(entity.UserRoleConsumer)},
 	}
+
+	roles := user.Roles(input.Roles)
 
 	tests := []struct {
 		name                 string
@@ -74,7 +76,7 @@ func (s *CreateSuite) TestExecute() {
 					Phone:    input.Profile.Phone,
 				},
 				Email:     input.Email,
-				Role:      entity.UserRoleConsumer,
+				Roles:     roles,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				DeletedAt: time.Now(),
@@ -97,7 +99,7 @@ func (s *CreateSuite) TestExecute() {
 					Phone:    input.Profile.Phone,
 				},
 				Email:     "johndoe2@example.com",
-				Role:      entity.UserRoleConsumer,
+				Roles:     roles,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				DeletedAt: time.Now(),
@@ -120,7 +122,7 @@ func (s *CreateSuite) TestExecute() {
 					Phone:    input.Profile.Phone,
 				},
 				Email:     "johndoe2@example.com",
-				Role:      entity.UserRoleConsumer,
+				Roles:     roles,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				DeletedAt: time.Now(),

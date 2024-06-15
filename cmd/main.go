@@ -8,20 +8,20 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/persistence"
 )
 
-// @title Cardapiogo API
-// @version 1.0
-// @description Documentação da API de delivery Cardapiogo.
-// @contact.name Gustavo Ferreira de Jesus
-// @contact.email gustavo081900@gmail.com
+//	@title			Cardapiogo API
+//	@version		1.0
+//	@description	Documentação da API de delivery Cardapiogo.
+//	@contact.name	Gustavo Ferreira de Jesus
+//	@contact.email	gustavo081900@gmail.com
 
-// @host localhost:8080
-// @BasePath /api
-// @accept json
-// @produce json
+//	@host		localhost:8080
+//	@BasePath	/api
+//	@accept		json
+//	@produce	json
 
-// @securityDefinitions.apikey Bearer Token
-// @in header
-// @name Authorization
+//	@securityDefinitions.apikey	Bearer Token
+//	@in							header
+//	@name						Authorization
 func main() {
 	// env
 	_ = gotenv.Load()

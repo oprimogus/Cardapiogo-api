@@ -9,29 +9,25 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	"github.com/oprimogus/cardapiogo/docs"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
 )
 
 func SwaggerRoutes(router *gin.Engine) {
-
 	basePath := os.Getenv("API_BASE_PATH")
 	v1 := router.Group(basePath)
 
 	// SWAGGER
-	v1.StaticFile("/docs/swagger.json", "./docs/swagger.json")
-	v1.GET("/v1/reference/*any", ginSwagger.WrapHandler(swaggerFiles.Handler,
-		ginSwagger.URL("/api/docs/swagger.json")))
+	docs.SwaggerInfo.BasePath = basePath
+	v1.GET("/v1/reference/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	v1.GET("/v2/reference", func(c *gin.Context) {
 		htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
-			Theme:   scalar.ThemeKepler,
-			Layout:  scalar.LayoutModern,
 			SpecURL: "./docs/swagger.json",
 			CustomOptions: scalar.CustomOptions{
 				PageTitle: "Cardapiogo",
 			},
-			DarkMode:       true,
-			Authentication: "Bearer",
+			DarkMode: true,
 		})
 		if err != nil {
 			c.JSON(500, errors.InternalServerError(err.Error()))
@@ -39,5 +35,4 @@ func SwaggerRoutes(router *gin.Engine) {
 		}
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(htmlContent))
 	})
-
 }

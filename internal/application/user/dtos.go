@@ -2,6 +2,14 @@ package user
 
 import "github.com/oprimogus/cardapiogo/internal/domain/entity"
 
+func Roles(rolesJson []string) []entity.UserRole {
+	roles := make([]entity.UserRole, len(rolesJson))
+	for i, v := range rolesJson {
+		roles[i] = entity.UserRole(v)
+	}
+	return roles
+}
+
 type CreateProfileParams struct {
 	Name     string `db:"name" json:"name" validate:"required"`
 	LastName string `db:"last_name" json:"last_name" validate:"required"`
@@ -22,27 +30,16 @@ type CreateParams struct {
 	Email    string `db:"email" json:"email" validate:"required,email"`
 	Password string `db:"password" json:"password" validate:"required"`
 	Profile  CreateProfileParams
-	Role     string `db:"role" json:"role" validate:"required,role"`
+	Roles    []string `db:"role" json:"role" validate:"required,role"`
 }
 
 func (d CreateParams) ToEntity() entity.User {
+	roles := Roles(d.Roles)
 	return entity.User{
 		Profile:  d.Profile.ToEntity(),
 		Email:    d.Email,
 		Password: d.Password,
-		Role:     entity.UserRole(d.Role),
-	}
-}
-
-type UpdateParams struct {
-	Profile UpdateProfileParams
-	Role    string `db:"role" json:"role" validate:"required,role"`
-}
-
-func (d UpdateParams) ToEntity() entity.User {
-	return entity.User{
-		Profile: d.Profile.toEntity(),
-		Role:    entity.UserRole(d.Role),
+		Roles:    roles,
 	}
 }
 
@@ -52,11 +49,13 @@ type UpdateProfileParams struct {
 	Phone    string `db:"phone" json:"phone" validate:"required, phone"`
 }
 
-func (d UpdateProfileParams) toEntity() entity.Profile {
-	return entity.Profile{
-		Name:     d.Name,
-		LastName: d.LastName,
-		Phone:    d.Phone,
+func (d UpdateProfileParams) ToEntity() entity.User {
+	return entity.User{
+		Profile: entity.Profile{
+			Name:     d.Name,
+			LastName: d.LastName,
+			Phone:    d.Phone,
+		},
 	}
 }
 

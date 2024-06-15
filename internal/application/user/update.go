@@ -8,7 +8,7 @@ import (
 )
 
 type Update interface {
-	Execute(ctx context.Context, input UpdateParams) error
+	Execute(ctx context.Context, input UpdateProfileParams) error
 }
 
 type update struct {
@@ -21,7 +21,7 @@ func NewUpdate(repository repository.UserRepository) Update {
 	}
 }
 
-func (u update) Execute(ctx context.Context, input UpdateParams) error {
+func (u update) Execute(ctx context.Context, input UpdateProfileParams) error {
 	userID := ctx.Value("userID").(string)
 	if userID == "" {
 		return errors.New("Invalid user.")

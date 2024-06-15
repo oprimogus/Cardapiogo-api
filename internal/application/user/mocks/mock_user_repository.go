@@ -98,6 +98,20 @@ func (mr *MockUserRepositoryMockRecorder) FindByID(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockUserRepository)(nil).FindByID), ctx, id)
 }
 
+// ResetPasswordByEmail mocks base method.
+func (m *MockUserRepository) ResetPasswordByEmail(ctx context.Context, id string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetPasswordByEmail", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ResetPasswordByEmail indicates an expected call of ResetPasswordByEmail.
+func (mr *MockUserRepositoryMockRecorder) ResetPasswordByEmail(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetPasswordByEmail", reflect.TypeOf((*MockUserRepository)(nil).ResetPasswordByEmail), ctx, id)
+}
+
 // Update mocks base method.
 func (m *MockUserRepository) Update(ctx context.Context, user entity.User) error {
 	m.ctrl.T.Helper()
@@ -110,18 +124,4 @@ func (m *MockUserRepository) Update(ctx context.Context, user entity.User) error
 func (mr *MockUserRepositoryMockRecorder) Update(ctx, user any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUserRepository)(nil).Update), ctx, user)
-}
-
-// UpdatePassword mocks base method.
-func (m *MockUserRepository) UpdatePassword(ctx context.Context, oldPassword, newPassword string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdatePassword", ctx, oldPassword, newPassword)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdatePassword indicates an expected call of UpdatePassword.
-func (mr *MockUserRepositoryMockRecorder) UpdatePassword(ctx, oldPassword, newPassword any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*MockUserRepository)(nil).UpdatePassword), ctx, oldPassword, newPassword)
 }

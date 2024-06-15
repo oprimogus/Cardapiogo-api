@@ -22,7 +22,7 @@ func Initialize(factory repository.Factory) {
 		panic(err)
 	}
 
-	logger := logger.GetLoggerDefault("GIN Router")
+	logger := logger.NewLogger("Gin Router")
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"*"},
@@ -45,7 +45,7 @@ func Initialize(factory repository.Factory) {
 
 	routes.DefaultRoutes(router, factory, metrics.Registry)
 	routes.SwaggerRoutes(router)
-	routes.AuthRoutes(router, validator)
+	routes.AuthRoutes(router, validator, factory)
 
 	router.Use(gin.Recovery())
 

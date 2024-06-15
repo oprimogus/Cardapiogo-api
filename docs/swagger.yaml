@@ -2,138 +2,42 @@ basePath: /api
 consumes:
 - application/json
 definitions:
+  authentication.SignInParams:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  entity.JWT:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      id_token:
+        type: string
+      not-before-policy:
+        type: integer
+      refresh_expires_in:
+        type: integer
+      refresh_token:
+        type: string
+      scope:
+        type: string
+      session_state:
+        type: string
+      token_type:
+        type: string
+    type: object
   errors.ErrorResponse:
     properties:
       details: {}
       error:
         type: string
-    type: object
-  profile.CreateProfileParams:
-    properties:
-      cpf:
-        type: string
-      last_name:
-        maxLength: 40
-        type: string
-      name:
-        maxLength: 25
-        type: string
-      phone:
-        maxLength: 11
-        type: string
-    required:
-    - cpf
-    - last_name
-    - name
-    - phone
-    type: object
-  profile.Profile:
-    properties:
-      cpf:
-        type: string
-      last_name:
-        type: string
-      name:
-        type: string
-      phone:
-        type: string
-    type: object
-  profile.UpdateProfileParams:
-    properties:
-      last_name:
-        maxLength: 40
-        type: string
-      name:
-        maxLength: 25
-        type: string
-      phone:
-        maxLength: 11
-        type: string
-    required:
-    - last_name
-    - name
-    - phone
-    type: object
-  types.AccountProvider:
-    enum:
-    - Google
-    - Apple
-    - Meta
-    - Local
-    type: string
-    x-enum-varnames:
-    - AccountProviderGoogle
-    - AccountProviderApple
-    - AccountProviderMeta
-    - AccountProviderLocal
-  types.Role:
-    enum:
-    - Consumer
-    - Owner
-    - Employee
-    - DeliveryMan
-    - Admin
-    type: string
-    x-enum-varnames:
-    - UserRoleConsumer
-    - UserRoleOwner
-    - UserRoleEmployee
-    - UserRoleDeliveryMan
-    - UserRoleAdmin
-  user.CreateUserParams:
-    properties:
-      account_provider:
-        $ref: '#/definitions/types.AccountProvider'
-      email:
-        type: string
-      password:
-        type: string
-      role:
-        $ref: '#/definitions/types.Role'
-    required:
-    - account_provider
-    - email
-    - password
-    - role
-    type: object
-  user.Login:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    required:
-    - email
-    - password
-    type: object
-  user.UpdateUserParams:
-    properties:
-      email:
-        type: string
-      id:
-        type: string
-      password:
-        type: string
-      role:
-        $ref: '#/definitions/types.Role'
-    required:
-    - email
-    - id
-    - password
-    - role
-    type: object
-  user.UpdateUserPasswordParams:
-    properties:
-      id:
-        type: string
-      new_password:
-        type: string
-      password:
-        type: string
-    required:
-    - id
-    - new_password
-    - password
     type: object
 host: localhost:8080
 info:
@@ -144,24 +48,25 @@ info:
   title: Cardapiogo API
   version: "1.0"
 paths:
-  /v1/auth/login2:
+  /v1/auth/login:
     post:
       consumes:
       - application/json
       description: Authenticate a user using email and password and issue a JWT on
         successful login.
       parameters:
-      - description: Login credentials
+      - description: SignInParams
         in: body
         name: request
-        required: true
         schema:
-          $ref: '#/definitions/user.Login'
+          $ref: '#/definitions/authentication.SignInParams'
       produces:
       - application/json
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/entity.JWT'
         "400":
           description: Bad Request
           schema:
@@ -174,311 +79,9 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
-      summary: User login with email and password
+      summary: Sign-In with email and password
       tags:
       - Authentication
-  /v1/auth/oauth:
-    get:
-      consumes:
-      - application/json
-      description: Start OAuth2 authentication with Keycloak. The flow continues in
-        the callback route.
-      produces:
-      - application/json
-      responses:
-        "302":
-          description: Found
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: Start OAuth2 authentication
-      tags:
-      - Authentication
-  /v1/auth/oauth/callback:
-    get:
-      consumes:
-      - application/json
-      description: Handle OAuth2 login callback and issue a JWT on successful authentication.
-      produces:
-      - application/json
-      responses:
-        "307":
-          description: Temporary Redirect
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: OAuth2 login callback
-      tags:
-      - Authentication
-  /v1/profile:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve the profile of the authenticated user based on the user
-        ID.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/profile.Profile'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Get user profile
-      tags:
-      - Profile
-    post:
-      consumes:
-      - application/json
-      description: Create a new user profile with the provided parameters and assign
-        it to the authenticated user.
-      parameters:
-      - description: CreateProfileParams
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/profile.CreateProfileParams'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: Create a profile and assign it to a user
-      tags:
-      - Profile
-    put:
-      consumes:
-      - application/json
-      description: Update the profile data of the authenticated user with the provided
-        parameters.
-      parameters:
-      - description: UpdateProfileParams
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/profile.UpdateProfileParams'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: Update user profile
-      tags:
-      - Profile
-  /v1/user:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a paginated list of users.
-      parameters:
-      - description: Number of items per page
-        in: query
-        name: items
-        required: true
-        type: number
-      - description: Page number
-        in: query
-        name: page
-        required: true
-        type: number
-      produces:
-      - application/json
-      responses:
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: Get a list of users
-      tags:
-      - User
-    post:
-      consumes:
-      - application/json
-      description: Create a new user using email and password for authentication.
-      parameters:
-      - description: CreateUserParams
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/user.CreateUserParams'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: Add a new user
-      tags:
-      - User
-    put:
-      consumes:
-      - application/json
-      description: Update the details of the authenticated user.
-      parameters:
-      - description: UpdateUserParams
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/user.UpdateUserParams'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: Update user details
-      tags:
-      - User
-  /v1/user/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a user's details using their unique ID.
-      parameters:
-      - description: User ID (UUID)
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: Get user by ID
-      tags:
-      - User
-  /v1/user/change-password:
-    put:
-      consumes:
-      - application/json
-      description: Update the password of the authenticated user.
-      parameters:
-      - description: UpdateUserPasswordParams
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/user.UpdateUserPasswordParams'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/errors.ErrorResponse'
-      summary: Update user password
-      tags:
-      - User
 produces:
 - application/json
 securityDefinitions:
