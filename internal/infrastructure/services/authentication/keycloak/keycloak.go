@@ -9,7 +9,20 @@ import (
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
-var log = logger.NewLogger("Keycloak")
+var (
+	log          = logger.NewLogger("Keycloak")
+	keycloakURL  string
+	realm        string
+	clientID     string
+	clientSecret string
+)
+
+func init() {
+	keycloakURL = os.Getenv("KEYCLOAK_BASE_URL")
+	realm = os.Getenv("KEYCLOAK_REALM")
+	clientID = os.Getenv("KEYCLOAK_CLIENT_ID")
+	clientSecret = os.Getenv("KEYCLOAK_CLIENT_SECRET")
+}
 
 type KeycloakService struct {
 	client       *gocloak.GoCloak
@@ -20,10 +33,6 @@ type KeycloakService struct {
 }
 
 func NewKeycloakService(ctx context.Context) (*KeycloakService, error) {
-	keycloakURL := os.Getenv("KEYCLOAK_BASE_URL")
-	realm := os.Getenv("KEYCLOAK_REALM")
-	clientID := os.Getenv("KEYCLOAK_CLIENT_ID")
-	clientSecret := os.Getenv("KEYCLOAK_CLIENT_SECRET")
 	client := gocloak.NewClient(keycloakURL)
 	token, err := client.LoginClient(ctx, clientID, clientSecret, realm)
 	if err != nil {
@@ -112,7 +121,12 @@ func (k *KeycloakService) FindByID(ctx context.Context, id string) (entity.User,
 
 func (k *KeycloakService) FindByEmail(ctx context.Context, email string) (entity.User, error) {
 	maxUsers := 1
-	user, err := k.client.GetUsers(ctx, k.token.AccessToken, k.realm, gocloak.GetUsersParams{Email: &email, Max: &maxUsers})
+	user, err := k.client.GetUsers(
+		ctx,
+		k.token.AccessToken,
+		k.realm,
+		gocloak.GetUsersParams{Email: &email, Max: &maxUsers},
+	)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -141,11 +155,16 @@ func (k *KeycloakService) Delete(ctx context.Context, id string) error {
 func (k *KeycloakService) ResetPasswordByEmail(ctx context.Context, id string) error {
 	lifespan := 30 * 60
 	actions := []string{"UPDATE_PASSWORD"}
-	return k.client.ExecuteActionsEmail(ctx, k.token.AccessToken, k.realm, gocloak.ExecuteActionsEmail{
-		Lifespan: &lifespan,
-		ClientID: &k.clientID,
-		Actions:  &actions,
-	})
+	return k.client.ExecuteActionsEmail(
+		ctx,
+		k.token.AccessToken,
+		k.realm,
+		gocloak.ExecuteActionsEmail{
+			Lifespan: &lifespan,
+			ClientID: &k.clientID,
+			Actions:  &actions,
+		},
+	)
 }
 
 func (k *KeycloakService) SignIn(ctx context.Context, email, password string) (entity.JWT, error) {

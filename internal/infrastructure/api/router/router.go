@@ -24,6 +24,7 @@ func Initialize(factory repository.Factory) {
 
 	logger := logger.NewLogger("Gin Router")
 	router := gin.New()
+	router.Use(gin.Recovery())
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -46,8 +47,6 @@ func Initialize(factory repository.Factory) {
 	routes.DefaultRoutes(router, factory, metrics.Registry)
 	routes.SwaggerRoutes(router)
 	routes.AuthRoutes(router, validator, factory)
-
-	router.Use(gin.Recovery())
 
 	port := os.Getenv("API_PORT")
 	if port == "" {

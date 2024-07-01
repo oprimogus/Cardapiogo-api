@@ -1,6 +1,6 @@
 module github.com/oprimogus/cardapiogo
 
-go 1.22.0
+go 1.22.3
 
 require (
 	github.com/MarceloPetrucio/go-scalar-api-reference v0.0.0-20240521013641-ce5d2efe0e06
