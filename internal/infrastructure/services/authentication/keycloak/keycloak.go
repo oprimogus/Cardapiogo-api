@@ -2,6 +2,8 @@ package keycloak
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"os"
 
 	"github.com/Nerzal/gocloak/v13"
@@ -103,7 +105,7 @@ func (k *KeycloakService) Create(ctx context.Context, user entity.User) error {
 
 	keycloakUser := entityUserToKeycloakUser(user, enabled, emailVerified)
 
-	id, err := k.client.CreateUser(ctx, k.token.AccessToken, k.realm, *keycloakUser)
+	id, err := k.client.CreateUser(ctx, k.token.AccessToken, realm, *keycloakUser)
 	log.Infof("User created: %s", id)
 	if err != nil {
 		return err
@@ -112,7 +114,7 @@ func (k *KeycloakService) Create(ctx context.Context, user entity.User) error {
 }
 
 func (k *KeycloakService) FindByID(ctx context.Context, id string) (entity.User, error) {
-	user, err := k.client.GetUserByID(ctx, k.token.AccessToken, k.realm, id)
+	user, err := k.client.GetUserByID(ctx, k.token.AccessToken, realm, id)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -124,7 +126,7 @@ func (k *KeycloakService) FindByEmail(ctx context.Context, email string) (entity
 	user, err := k.client.GetUsers(
 		ctx,
 		k.token.AccessToken,
-		k.realm,
+		realm,
 		gocloak.GetUsersParams{Email: &email, Max: &maxUsers},
 	)
 	if err != nil {
@@ -134,7 +136,7 @@ func (k *KeycloakService) FindByEmail(ctx context.Context, email string) (entity
 }
 
 func (k *KeycloakService) Update(ctx context.Context, user entity.User) error {
-	actualUser, err := k.client.GetUserByID(ctx, k.token.AccessToken, k.realm, user.ExternalId)
+	actualUser, err := k.client.GetUserByID(ctx, k.token.AccessToken, realm, user.ExternalId)
 	if err != nil {
 		return err
 	}
@@ -145,7 +147,7 @@ func (k *KeycloakService) Update(ctx context.Context, user entity.User) error {
 			phoneValues[0] = user.Profile.Phone
 		}
 	}
-	return k.client.UpdateUser(ctx, k.token.AccessToken, k.realm, *actualUser)
+	return k.client.UpdateUser(ctx, k.token.AccessToken, realm, *actualUser)
 }
 
 func (k *KeycloakService) Delete(ctx context.Context, id string) error {
@@ -168,7 +170,7 @@ func (k *KeycloakService) ResetPasswordByEmail(ctx context.Context, id string) e
 }
 
 func (k *KeycloakService) SignIn(ctx context.Context, email, password string) (entity.JWT, error) {
-	jwt, err := k.client.Login(ctx, k.clientID, k.clientSecret, k.realm, email, password)
+	jwt, err := k.client.Login(ctx, clientID, clientSecret, realm, email, password)
 	if err != nil {
 		return entity.JWT{}, err
 	}
@@ -183,4 +185,15 @@ func (k *KeycloakService) SignIn(ctx context.Context, email, password string) (e
 		SessionState:     jwt.SessionState,
 		Scope:            jwt.Scope,
 	}, nil
+}
+
+func (k *KeycloakService) IsValidToken(ctx context.Context, token string) (bool, error) {
+	a, err := k.client.RetrospectToken(ctx, token, clientID, clientSecret, realm)
+	if err != nil {
+		return false, fmt.Errorf("Ocurred an error while validate your access token: %w", err)
+	}
+	if a == nil {
+		return false, errors.New("Ocurred an error while validate your access token")
+	}
+	return *a.Active, nil
 }

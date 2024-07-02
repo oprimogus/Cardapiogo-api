@@ -7,4 +7,5 @@ import (
 
 type AuthenticationRepository interface {
 	SignIn(ctx context.Context, email, password string) (entity.JWT, error)
+	IsValidToken(ctx context.Context, token string) (bool, error)
 }

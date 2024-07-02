@@ -1,18 +1,16 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 
+	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
 )
 
-func AuthenticationMiddleware() gin.HandlerFunc {
+func AuthenticationMiddleware(repository repository.AuthenticationRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
@@ -20,33 +18,24 @@ func AuthenticationMiddleware() gin.HandlerFunc {
 			return
 		}
 		token = strings.Replace(token, "Bearer ", "", -1)
-		validatedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("signature method not expected: %v", token.Header["alg"])
-			}
-			if err := token.Claims.Valid(); err != nil {
-				return nil, fmt.Errorf("invalid token: %v", err.Error())
-			}
-
-			return []byte(os.Getenv("JWT_SECRET")), nil
-		})
+		isValidToken, err := repository.IsValidToken(c, token)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, err.Error()))
 			return
 		}
 
-		if validatedToken == nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, "Invalid token."))
+		if !isValidToken {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Unauthorized("Invalid authentication"))
 			return
 		}
 
-		claims, ok := validatedToken.Claims.(jwt.MapClaims)
-		if !ok || !validatedToken.Valid {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, "Invalid token."))
-			return
-		}
-		c.Set("userRole", claims["role"].(string))
-		c.Set("userID", claims["sub"].(string))
+		// claims, ok := validatedToken.Claims.(jwt.MapClaims)
+		// if !ok || !validatedToken.Valid {
+		// c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, "Invalid token."))
+		// return
+		// }
+		// c.Set("userRole", claims["role"].(string))
+		// c.Set("userID", claims["sub"].(string))
 		c.Next()
 	}
 }

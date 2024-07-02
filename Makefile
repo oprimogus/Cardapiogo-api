@@ -29,9 +29,12 @@ mock:
 sqlc:
 	sqlc generate -f configs/sqlc.yaml
 	
+lint-docs:
+	swag fmt
 
 docs:
-	swag init -g cmd/main.go
+	make lint-docs
+	swag init -g cmd/main.go 
 
 test:
 	go test ./... -v -cover
