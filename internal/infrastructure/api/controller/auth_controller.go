@@ -8,7 +8,10 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/application/authentication"
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/infrastructure/api/validator"
+	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
+
+var log = logger.NewLogger("AuthController")
 
 // UserController struct
 type AuthController struct {
@@ -16,7 +19,10 @@ type AuthController struct {
 	signIn    authentication.SignIn
 }
 
-func NewAuthController(validator *validatorutils.Validator, factory repository.Factory) *AuthController {
+func NewAuthController(
+	validator *validatorutils.Validator,
+	factory repository.Factory,
+) *AuthController {
 	return &AuthController{
 		validator: validator,
 		signIn:    authentication.NewSignIn(factory.NewAuthenticationRepository()),
@@ -30,7 +36,7 @@ func NewAuthController(validator *validatorutils.Validator, factory repository.F
 //	@Tags			Authentication
 //	@Accept			json
 //	@Produce		json
-//	@Param			request	body		authentication.SignInParams	false "SignInParams"
+//	@Param			request	body		authentication.SignInParams	false	"SignInParams"
 //	@Success		200		{object}	entity.JWT
 //	@Failure		400		{object}	errors.ErrorResponse
 //	@Failure		500		{object}	errors.ErrorResponse
@@ -50,4 +56,23 @@ func (c *AuthController) SignIn(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, jwt)
+}
+
+// TestRoute godoc
+//
+//	@Summary		Route for test authentication middleware
+//	@Description	Route for test authentication middleware
+//	@Tags			Authentication
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	entity.JWT
+//	@Failure		400	{object}	errors.ErrorResponse
+//	@Failure		500	{object}	errors.ErrorResponse
+//	@Failure		502	{object}	errors.ErrorResponse
+//	@Security		Bearer Token
+//	@Router			/v1/auth/test/authentication [get]
+func (c *AuthController) ProtectedRoute(ctx *gin.Context) {
+	userID := ctx.GetString("userID")
+	log.Infof(userID)
+	ctx.JSON(http.StatusOK, gin.H{"message": "Alright, you access the protected endpoint!"})
 }

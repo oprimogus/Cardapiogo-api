@@ -82,6 +82,35 @@ paths:
       summary: Sign-In with email and password
       tags:
       - Authentication
+  /v1/auth/test/authentication:
+    get:
+      consumes:
+      - application/json
+      description: Route for test authentication middleware
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.JWT'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      security:
+      - Bearer Token: []
+      summary: Route for test authentication middleware
+      tags:
+      - Authentication
 produces:
 - application/json
 securityDefinitions:

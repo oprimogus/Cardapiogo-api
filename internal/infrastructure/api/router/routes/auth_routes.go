@@ -7,6 +7,7 @@ import (
 
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/api/controller"
+	"github.com/oprimogus/cardapiogo/internal/infrastructure/api/middleware"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/infrastructure/api/validator"
 )
 
@@ -18,5 +19,6 @@ func AuthRoutes(router *gin.Engine, validator *validatorutils.Validator, factory
 	v1 := router.Group(basePath + "/v1")
 	{
 		v1.POST("/auth/login", authController.SignIn)
+		v1.GET("/auth/test/authentication", middleware.AuthenticationMiddleware(factory.NewAuthenticationRepository()), authController.ProtectedRoute)
 	}
 }
