@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	ExistUserWithEmail    = "Exist user with this email."
-	ExistUserWithDocument = "Exist user with this document."
-	ExistUserWithPhone    = "Exist user with this phone."
+	ExistUserWithEmail    = "exist user with this email"
+	ExistUserWithDocument = "exist user with this document"
+	ExistUserWithPhone    = "exist user with this phone"
 )
 
 type Create interface {

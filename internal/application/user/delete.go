@@ -22,7 +22,7 @@ func NewDelete(repository repository.UserRepository) Delete {
 func (d delete) Execute(ctx context.Context) error {
 	userID := ctx.Value("userID").(string)
 	if userID == "" {
-		return errors.New("Invalid user.")
+		return errors.New("invalid user")
 	}
 	return d.userRepository.Delete(ctx, userID)
 }

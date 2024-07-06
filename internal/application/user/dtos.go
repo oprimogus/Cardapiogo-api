@@ -2,9 +2,9 @@ package user
 
 import "github.com/oprimogus/cardapiogo/internal/domain/entity"
 
-func Roles(rolesJson []string) []entity.UserRole {
-	roles := make([]entity.UserRole, len(rolesJson))
-	for i, v := range rolesJson {
+func Roles(rolesJSON []string) []entity.UserRole {
+	roles := make([]entity.UserRole, len(rolesJSON))
+	for i, v := range rolesJSON {
 		roles[i] = entity.UserRole(v)
 	}
 	return roles

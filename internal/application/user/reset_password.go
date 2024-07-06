@@ -24,7 +24,7 @@ func NewResetPassword(repository repository.UserRepository) ResetPassword {
 func (r resetPassword) Execute(ctx context.Context, id string) error {
 	userID := ctx.Value("userID").(string)
 	if userID == "" {
-		return errors.New("Invalid user.")
+		return errors.New("invalid user")
 	}
 	return r.userRepository.ResetPasswordByEmail(ctx, id)
 }

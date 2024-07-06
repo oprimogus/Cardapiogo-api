@@ -24,7 +24,7 @@ func NewUpdate(repository repository.UserRepository) Update {
 func (u update) Execute(ctx context.Context, input UpdateProfileParams) error {
 	userID := ctx.Value("userID").(string)
 	if userID == "" {
-		return errors.New("Invalid user.")
+		return errors.New("invalid user")
 	}
 	return u.userRepository.Update(ctx, input.ToEntity())
 }
