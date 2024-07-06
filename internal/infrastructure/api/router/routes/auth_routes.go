@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/oprimogus/cardapiogo/internal/domain/entity"
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/api/controller"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/api/middleware"
@@ -20,5 +21,6 @@ func AuthRoutes(router *gin.Engine, validator *validatorutils.Validator, factory
 	{
 		v1.POST("/auth/login", authController.SignIn)
 		v1.GET("/auth/test/authentication", middleware.AuthenticationMiddleware(factory.NewAuthenticationRepository()), authController.ProtectedRoute)
+		v1.GET("/auth/test/authorization", middleware.AuthenticationMiddleware(factory.NewAuthenticationRepository()), middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleConsumer}), authController.ProtectedRouteForRoles)
 	}
 }

@@ -198,7 +198,7 @@ func (k *KeycloakService) IsValidToken(ctx context.Context, token string) (bool,
 	return *a.Active, nil
 }
 
-func (k *KeycloakService) DecodeAccessToken(ctx context.Context, accessToken string) (map[string]string, error) {
+func (k *KeycloakService) DecodeAccessToken(ctx context.Context, accessToken string) (map[string]interface{}, error) {
 	token, mapClaims, err := k.client.DecodeAccessToken(ctx, accessToken, realm)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to decode access token: %w", err)
@@ -210,9 +210,9 @@ func (k *KeycloakService) DecodeAccessToken(ctx context.Context, accessToken str
 		return nil, fmt.Errorf("Unable to decode access token and get metadata")
 	}
 	// outputMap := make(map[string]string, len(*mapClaims))
-	for k, v := range *mapClaims {
-		// outputMap[k] = v
-		fmt.Println(k, ": ", v)
-	}
-	return map[string]string{"key": "value"}, nil
+	// for k, v := range *mapClaims {
+	// outputMap[k] = v
+	// fmt.Println(k, ": ", v)
+	// }
+	return *mapClaims, nil
 }

@@ -1,11 +1,14 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 
+	// "github.com/oprimogus/cardapiogo/internal/domain/entity"
+	"github.com/oprimogus/cardapiogo/internal/domain/entity"
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
 )
@@ -34,7 +37,31 @@ func AuthenticationMiddleware(repository repository.AuthenticationRepository) gi
 			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, err.Error()))
 			return
 		}
+
+		realmAccess, ok := claims["realm_access"].(map[string]interface{})
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, "Invalid token"))
+			return
+		}
+
+		roles, ok := realmAccess["roles"].([]interface{})
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, "Invalid token"))
+			return
+		}
+
+		userRoles := []entity.UserRole{}
+		for _, role := range roles {
+			if roleStr, ok := role.(string); ok {
+				if entity.IsValidUserRole(roleStr) {
+					userRoles = append(userRoles, entity.UserRole(roleStr))
+				}
+
+			}
+		}
+		fmt.Println(userRoles)
 		c.Set("userID", claims["sub"])
+		c.Set("userRoles", userRoles)
 		c.Next()
 	}
 }

@@ -7,12 +7,21 @@ import (
 type UserRole string
 
 const (
-	UserRoleConsumer    UserRole = "Consumer"
-	UserRoleOwner       UserRole = "Owner"
-	UserRoleEmployee    UserRole = "Employee"
-	UserRoleDeliveryMan UserRole = "Delivery_Man"
-	UserRoleAdmin       UserRole = "Admin"
+	UserRoleConsumer    UserRole = "consumer"
+	UserRoleOwner       UserRole = "owner"
+	UserRoleEmployee    UserRole = "employee"
+	UserRoleDeliveryMan UserRole = "delivery_man"
+	UserRoleAdmin       UserRole = "admin"
 )
+
+func IsValidUserRole(role string) bool {
+	switch UserRole(role) {
+	case UserRoleConsumer, UserRoleOwner, UserRoleEmployee, UserRoleDeliveryMan, UserRoleAdmin:
+		return true
+	default:
+		return false
+	}
+}
 
 type User struct {
 	ID         int

@@ -11,33 +11,35 @@ import (
 
 func AuthorizationMiddleware(allowedRoles []entity.UserRole) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userRoleInterface, exists := c.Get("userRole")
+		userRolesContext, exists := c.Get("userRoles")
 		if !exists {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Unauthorized(""))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Forbidden(""))
 			return
 		}
 
-		userRoleString, ok := userRoleInterface.(string)
+		userRoles, ok := userRolesContext.([]entity.UserRole)
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, errors.InternalServerError("Error in process userRole"))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, errors.Forbidden(""))
 			return
 		}
-
-		userRole := entity.UserRole(userRoleString)
+		if len(userRoles) == 0 {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Forbidden(""))
+			return
+		}
 
 		isAllowed := false
-		for _, role := range allowedRoles {
-			if role == userRole {
-				isAllowed = true
-				break
+		for _, userRole := range userRoles {
+			for _, allowedRole := range allowedRoles {
+				if userRole == allowedRole {
+					isAllowed = true
+				}
 			}
 		}
-
 		if !isAllowed {
-			c.AbortWithStatusJSON(http.StatusForbidden, errors.Forbidden(""))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Forbidden(""))
 			return
 		}
-
 		c.Next()
+
 	}
 }

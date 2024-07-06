@@ -19,9 +19,9 @@ import (
 //	@accept		json
 //	@produce	json
 
-//	@securityDefinitions.apikey	Bearer Token
-//	@in							header
-//	@name						Authorization
+// @securityDefinitions.apikey	Bearer Token
+// @in							header
+// @name						Authorization
 func main() {
 	// env
 	_ = gotenv.Load()
