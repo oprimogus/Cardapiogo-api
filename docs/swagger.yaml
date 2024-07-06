@@ -39,6 +39,39 @@ definitions:
       error:
         type: string
     type: object
+  user.CreateParams:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      profile:
+        $ref: '#/definitions/user.CreateProfileParams'
+      role:
+        items:
+          type: string
+        type: array
+    required:
+    - email
+    - password
+    - role
+    type: object
+  user.CreateProfileParams:
+    properties:
+      document:
+        type: string
+      last_name:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    required:
+    - document
+    - last_name
+    - name
+    - phone
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -48,7 +81,7 @@ info:
   title: Cardapiogo API
   version: "1.0"
 paths:
-  /v1/auth/login:
+  /v1/auth/sign-in:
     post:
       consumes:
       - application/json
@@ -80,6 +113,37 @@ paths:
           schema:
             $ref: '#/definitions/errors.ErrorResponse'
       summary: Sign-In with email and password
+      tags:
+      - Authentication
+  /v1/auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Sign-Up with local credentials and data
+      parameters:
+      - description: CreateUserParams
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/user.CreateParams'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/errors.ErrorResponse'
+      summary: Sign-Up with local credentials and data
       tags:
       - Authentication
   /v1/auth/test/authentication:

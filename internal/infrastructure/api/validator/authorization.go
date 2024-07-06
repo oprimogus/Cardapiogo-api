@@ -9,10 +9,10 @@ import (
 func IsSameUser(ctx *gin.Context, userID string) error {
 	extractID, exists := ctx.Get("userID")
 	if !exists {
-		return errors.Forbidden("The user ID must exist in the context.")
+		return xerrors.Forbidden("The user ID must exist in the context.")
 	}
 	if extractID != userID {
-		return errors.Forbidden("You are not the account owner.")
+		return xerrors.Forbidden("You are not the account owner.")
 	}
 	return nil
 }

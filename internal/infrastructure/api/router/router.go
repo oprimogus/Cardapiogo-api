@@ -47,7 +47,7 @@ func Initialize(factory repository.Factory) {
 	routes.DefaultRoutes(router, factory, metrics.Registry)
 	routes.SwaggerRoutes(router)
 	routes.AuthRoutes(router, validator, factory)
-
+	routes.UserRoutes(router, validator, factory)
 	port := os.Getenv("API_PORT")
 	if port == "" {
 		port = "8080"

@@ -6,12 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/oprimogus/cardapiogo/internal/application/user"
-	mock_user_repository "github.com/oprimogus/cardapiogo/internal/application/user/mocks"
-	"github.com/oprimogus/cardapiogo/internal/domain/entity"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
+
+	"github.com/oprimogus/cardapiogo/internal/application/user"
+	mock_user_repository "github.com/oprimogus/cardapiogo/internal/application/user/mocks"
+	"github.com/oprimogus/cardapiogo/internal/domain/entity"
 )
 
 type CreateSuite struct {
@@ -68,7 +69,7 @@ func (s *CreateSuite) TestExecute() {
 			input: input,
 			mockFindByEmailValue: entity.User{
 				ID:         3683,
-				ExternalId: "randowm_uuid",
+				ExternalID: "randowm_uuid",
 				Profile: entity.Profile{
 					Name:     input.Profile.Name,
 					LastName: input.Profile.LastName,
@@ -84,14 +85,14 @@ func (s *CreateSuite) TestExecute() {
 			mockFindByEmailError: nil,
 			mockCreateError:      nil,
 			mockCreateErrorTimes: 0,
-			expected:             errors.New(user.ExistUserWithEmail),
+			expected:             user.ErrExistUserWithEmail,
 		},
 		{
 			name:  "Exist user with this document",
 			input: input,
 			mockFindByEmailValue: entity.User{
 				ID:         3683,
-				ExternalId: "randowm_uuid",
+				ExternalID: "randowm_uuid",
 				Profile: entity.Profile{
 					Name:     input.Profile.Name,
 					LastName: input.Profile.LastName,
@@ -107,14 +108,14 @@ func (s *CreateSuite) TestExecute() {
 			mockFindByEmailError: nil,
 			mockCreateError:      nil,
 			mockCreateErrorTimes: 0,
-			expected:             errors.New(user.ExistUserWithDocument),
+			expected:             user.ErrExistUserWithDocument,
 		},
 		{
 			name:  "Exist user with this phone",
 			input: input,
 			mockFindByEmailValue: entity.User{
 				ID:         3683,
-				ExternalId: "randowm_uuid",
+				ExternalID: "randowm_uuid",
 				Profile: entity.Profile{
 					Name:     input.Profile.Name,
 					LastName: input.Profile.LastName,
@@ -130,7 +131,7 @@ func (s *CreateSuite) TestExecute() {
 			mockFindByEmailError: nil,
 			mockCreateError:      nil,
 			mockCreateErrorTimes: 0,
-			expected:             errors.New(user.ExistUserWithPhone),
+			expected:             user.ErrExistUserWithPhone,
 		},
 		{
 			name:                 "Fail on find user on repository",

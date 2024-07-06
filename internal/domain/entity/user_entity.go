@@ -25,7 +25,7 @@ func IsValidUserRole(role string) bool {
 
 type User struct {
 	ID         int
-	ExternalId string
+	ExternalID string
 	Profile    Profile
 	Email      string
 	Password   string

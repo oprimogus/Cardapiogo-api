@@ -1,4 +1,10 @@
-package errors
+package xerrors
+
+import (
+	"net/http"
+
+	"github.com/oprimogus/cardapiogo/internal/application/user"
+)
 
 // ErrorResponse is the response that represents an error.
 type ErrorResponse struct {
@@ -12,6 +18,26 @@ func New(status int, message string, details ...interface{}) *ErrorResponse {
 		Status:       status,
 		ErrorMessage: message,
 		Details:      details,
+	}
+}
+
+func Map(err error) *ErrorResponse {
+	if errResp, ok := err.(*ErrorResponse); ok {
+		return errResp
+	}
+	switch(err) {
+	case user.ErrExistUserWithDocument,
+		user.ErrExistUserWithEmail,
+		user.ErrExistUserWithPhone:
+		return &ErrorResponse{
+			Status: http.StatusConflict,
+			ErrorMessage: err.Error(),
+		}
+	default:
+		return &ErrorResponse{
+			Status: http.StatusInternalServerError,
+			ErrorMessage: err.Error(),
+		}
 	}
 }
 

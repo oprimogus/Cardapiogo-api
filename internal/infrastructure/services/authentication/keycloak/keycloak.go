@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/Nerzal/gocloak/v13"
+
 	"github.com/oprimogus/cardapiogo/internal/domain/entity"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
@@ -58,6 +59,7 @@ func entityUserToKeycloakUser(user entity.User, userEnabled, userEmailVerified b
 	return &gocloak.User{
 		FirstName:     &user.Profile.Name,
 		LastName:      &user.Profile.LastName,
+		Username:      &user.Email,
 		Enabled:       &userEnabled,
 		EmailVerified: &userEmailVerified,
 		Email:         &user.Email,
@@ -66,11 +68,6 @@ func entityUserToKeycloakUser(user entity.User, userEnabled, userEmailVerified b
 }
 
 func keycloakUserToEntityUser(user *gocloak.User) entity.User {
-	roles := make([]entity.UserRole, len(*user.RealmRoles))
-	for i, v := range *user.RealmRoles {
-		roles[i] = entity.UserRole(v)
-	}
-
 	var document, phone string
 	if user.Attributes != nil {
 		if docValues, ok := (*user.Attributes)["document"]; ok && len(docValues) > 0 {
@@ -82,7 +79,7 @@ func keycloakUserToEntityUser(user *gocloak.User) entity.User {
 	}
 
 	return entity.User{
-		ExternalId: *user.ID,
+		ExternalID: *user.ID,
 		Email:      *user.Email,
 		Profile: entity.Profile{
 			Name:     *user.FirstName,
@@ -90,14 +87,23 @@ func keycloakUserToEntityUser(user *gocloak.User) entity.User {
 			Document: document,
 			Phone:    phone,
 		},
-		Roles: roles,
 	}
 }
 
 func (k *KeycloakService) Create(ctx context.Context, user entity.User) error {
-	realmRoles := make([]string, len(user.Roles))
-	for i, v := range user.Roles {
-		realmRoles[i] = string(v)
+	realmRoles, err := k.client.GetRealmRoles(ctx, k.token.AccessToken, realm, gocloak.GetRoleParams{})
+	if err != nil {
+		return err
+	}
+
+	realmRolesUser := make([]gocloak.Role, len(user.Roles))
+
+	for _, realmRole:= range realmRoles {
+		for i, userRole := range user.Roles {
+			if *realmRole.Name == string(userRole) {
+				realmRolesUser[i] = *realmRole
+			}
+		}
 	}
 
 	enabled := false
@@ -109,6 +115,14 @@ func (k *KeycloakService) Create(ctx context.Context, user entity.User) error {
 	log.Infof("User created: %s", id)
 	if err != nil {
 		return err
+	}
+	errSetPassword := k.client.SetPassword(ctx, k.token.AccessToken, id, realm, user.Password, false)
+	if errSetPassword != nil {
+		return errSetPassword
+	}
+	errSetRoles := k.client.AddRealmRoleToUser(ctx, k.token.AccessToken, realm, id, realmRolesUser)
+	if errSetRoles != nil {
+		return errSetRoles
 	}
 	return nil
 }
@@ -132,11 +146,14 @@ func (k *KeycloakService) FindByEmail(ctx context.Context, email string) (entity
 	if err != nil {
 		return entity.User{}, err
 	}
+	if len(user) == 0 {
+		return entity.User{}, nil
+	}
 	return keycloakUserToEntityUser(user[0]), nil
 }
 
 func (k *KeycloakService) Update(ctx context.Context, user entity.User) error {
-	actualUser, err := k.client.GetUserByID(ctx, k.token.AccessToken, realm, user.ExternalId)
+	actualUser, err := k.client.GetUserByID(ctx, k.token.AccessToken, realm, user.ExternalID)
 	if err != nil {
 		return err
 	}

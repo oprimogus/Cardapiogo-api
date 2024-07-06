@@ -28,7 +28,7 @@ func SwaggerRoutes(router *gin.Engine) {
 			DarkMode: true,
 		})
 		if err != nil {
-			c.JSON(500, errors.InternalServerError(err.Error()))
+			c.JSON(500, xerrors.InternalServerError(err.Error()))
 			return
 		}
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(htmlContent))

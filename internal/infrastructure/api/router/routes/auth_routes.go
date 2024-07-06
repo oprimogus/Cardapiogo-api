@@ -19,7 +19,7 @@ func AuthRoutes(router *gin.Engine, validator *validatorutils.Validator, factory
 
 	v1 := router.Group(basePath + "/v1")
 	{
-		v1.POST("/auth/login", authController.SignIn)
+		v1.POST("/auth/sign-in", authController.SignIn)
 		v1.GET("/auth/test/authentication", middleware.AuthenticationMiddleware(factory.NewAuthenticationRepository()), authController.ProtectedRoute)
 		v1.GET("/auth/test/authorization", middleware.AuthenticationMiddleware(factory.NewAuthenticationRepository()), middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleConsumer}), authController.ProtectedRouteForRoles)
 	}

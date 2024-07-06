@@ -13,17 +13,17 @@ func AuthorizationMiddleware(allowedRoles []entity.UserRole) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userRolesContext, exists := c.Get("userRoles")
 		if !exists {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Forbidden(""))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Forbidden(""))
 			return
 		}
 
 		userRoles, ok := userRolesContext.([]entity.UserRole)
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, errors.Forbidden(""))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, xerrors.Forbidden(""))
 			return
 		}
 		if len(userRoles) == 0 {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Forbidden(""))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Forbidden(""))
 			return
 		}
 
@@ -36,7 +36,7 @@ func AuthorizationMiddleware(allowedRoles []entity.UserRole) gin.HandlerFunc {
 			}
 		}
 		if !isAllowed {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Forbidden(""))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Forbidden(""))
 			return
 		}
 		c.Next()

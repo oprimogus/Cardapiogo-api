@@ -7,11 +7,9 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
 
-const (
-	ExistUserWithEmail    = "exist user with this email"
-	ExistUserWithDocument = "exist user with this document"
-	ExistUserWithPhone    = "exist user with this phone"
-)
+var ErrExistUserWithEmail = errors.New("exist user with this email")
+var ErrExistUserWithDocument = errors.New("exist user with this document")
+var ErrExistUserWithPhone = errors.New("exist user with this phone")
 
 type Create interface {
 	Execute(ctx context.Context, input CreateParams) error
@@ -33,13 +31,13 @@ func (c create) Execute(ctx context.Context, input CreateParams) error {
 		return err
 	}
 	if existUser.Email == input.Email {
-		return errors.New(ExistUserWithEmail)
+		return ErrExistUserWithEmail
 	}
 	if existUser.Profile.Document == input.Profile.Document {
-		return errors.New(ExistUserWithDocument)
+		return ErrExistUserWithDocument
 	}
 	if existUser.Profile.Phone == input.Profile.Phone {
-		return errors.New(ExistUserWithPhone)
+		return ErrExistUserWithPhone
 	}
 	return c.userRepository.Create(ctx, input.ToEntity())
 }

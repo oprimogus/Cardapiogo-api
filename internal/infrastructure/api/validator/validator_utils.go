@@ -3,6 +3,7 @@ package validatorutils
 import (
 	"fmt"
 	"net/http"
+	"reflect"
 	"strconv"
 
 	"github.com/go-playground/locales/en"
@@ -69,7 +70,7 @@ func NewValidator(locale string) (*Validator, error) {
 	}, nil
 }
 
-func (v *Validator) Validate(i interface{}) *errors.ErrorResponse {
+func (v *Validator) Validate(i interface{}) *xerrors.ErrorResponse {
 	out := make(map[string]string)
 
 	err := v.Validator.Struct(i)
@@ -77,7 +78,7 @@ func (v *Validator) Validate(i interface{}) *errors.ErrorResponse {
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
 			out["error"] = "Unknown validation error"
-			return errors.New(http.StatusBadRequest, out["error"])
+			return xerrors.New(http.StatusBadRequest, out["error"])
 		}
 
 		for _, e := range errs {
@@ -91,7 +92,7 @@ func (v *Validator) Validate(i interface{}) *errors.ErrorResponse {
 	}
 
 	if len(out) > 0 {
-		return errors.InvalidInput(out)
+		return xerrors.InvalidInput(out)
 	}
 	return nil
 }
@@ -104,17 +105,19 @@ func errorPersonalized(locale string, tag string) string {
 }
 
 func isValidUserRole(fl validator.FieldLevel) bool {
-	role := fl.Field().String()
-	switch entity.UserRole(role) {
-	case entity.UserRoleAdmin,
-		entity.UserRoleConsumer,
-		entity.UserRoleDeliveryMan,
-		entity.UserRoleEmployee,
-		entity.UserRoleOwner:
-		return true
-	default:
-		return false
-	}
+	role := fl.Field()
+
+	if role.Kind() != reflect.Slice {
+        return false
+    }
+	for i := 0; i < role.Len(); i++ {
+        role := role.Index(i).String()
+        if !entity.IsValidUserRole(role) {
+            return false
+        }
+    }
+
+    return true
 }
 
 func IsValidCpf(fl validator.FieldLevel) bool {

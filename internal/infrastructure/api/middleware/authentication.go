@@ -17,36 +17,36 @@ func AuthenticationMiddleware(repository repository.AuthenticationRepository) gi
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Unauthorized(""))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Unauthorized(""))
 			return
 		}
 		token = strings.Replace(token, "Bearer ", "", -1)
 		isValidToken, err := repository.IsValidToken(c, token)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Unauthorized(err.Error()))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Unauthorized(err.Error()))
 			return
 		}
 
 		if !isValidToken {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.Unauthorized("Invalid access token"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Unauthorized("Invalid access token"))
 			return
 		}
 
 		claims, err := repository.DecodeAccessToken(c, token)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, err.Error()))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.New(http.StatusUnauthorized, err.Error()))
 			return
 		}
 
 		realmAccess, ok := claims["realm_access"].(map[string]interface{})
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, "Invalid token"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.New(http.StatusUnauthorized, "Invalid token"))
 			return
 		}
 
 		roles, ok := realmAccess["roles"].([]interface{})
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errors.New(http.StatusUnauthorized, "Invalid token"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.New(http.StatusUnauthorized, "Invalid token"))
 			return
 		}
 

@@ -13,8 +13,8 @@ func Roles(rolesJSON []string) []entity.UserRole {
 type CreateProfileParams struct {
 	Name     string `db:"name" json:"name" validate:"required"`
 	LastName string `db:"last_name" json:"last_name" validate:"required"`
-	Document string `db:"document" json:"document" validate:"required, cpf"`
-	Phone    string `db:"phone" json:"phone" validate:"required, phone"`
+	Document string `db:"document" json:"document" validate:"required,cpf"`
+	Phone    string `db:"phone" json:"phone" validate:"required"`
 }
 
 func (d CreateProfileParams) ToEntity() entity.Profile {
@@ -46,7 +46,7 @@ func (d CreateParams) ToEntity() entity.User {
 type UpdateProfileParams struct {
 	Name     string `db:"name" json:"name" validate:"required"`
 	LastName string `db:"last_name" json:"last_name" validate:"required"`
-	Phone    string `db:"phone" json:"phone" validate:"required, phone"`
+	Phone    string `db:"phone" json:"phone" validate:"required"`
 }
 
 func (d UpdateProfileParams) ToEntity() entity.User {

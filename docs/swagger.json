@@ -18,7 +18,7 @@
     "host": "localhost:8080",
     "basePath": "/api",
     "paths": {
-        "/v1/auth/login": {
+        "/v1/auth/sign-in": {
             "post": {
                 "description": "Authenticate a user using email and password and issue a JWT on successful login.",
                 "consumes": [
@@ -47,6 +47,54 @@
                         "schema": {
                             "$ref": "#/definitions/entity.JWT"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/sign-up": {
+            "post": {
+                "description": "Sign-Up with local credentials and data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Sign-Up with local credentials and data",
+                "parameters": [
+                    {
+                        "description": "CreateUserParams",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/user.CreateParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -215,6 +263,54 @@
             "properties": {
                 "details": {},
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.CreateParams": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "role"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "profile": {
+                    "$ref": "#/definitions/user.CreateProfileParams"
+                },
+                "role": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "user.CreateProfileParams": {
+            "type": "object",
+            "required": [
+                "document",
+                "last_name",
+                "name",
+                "phone"
+            ],
+            "properties": {
+                "document": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 }
             }
