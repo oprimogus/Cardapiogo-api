@@ -190,10 +190,10 @@ func (k *KeycloakService) SignIn(ctx context.Context, email, password string) (e
 func (k *KeycloakService) IsValidToken(ctx context.Context, token string) (bool, error) {
 	a, err := k.client.RetrospectToken(ctx, token, clientID, clientSecret, realm)
 	if err != nil {
-		return false, fmt.Errorf("Ocurred an error while validate your access token: %w", err)
+		return false, fmt.Errorf("ocurred an error while validate your access token: %w", err)
 	}
 	if a == nil {
-		return false, errors.New("Ocurred an error while validate your access token")
+		return false, errors.New("ocurred an error while validate your access token")
 	}
 	return *a.Active, nil
 }
@@ -201,13 +201,13 @@ func (k *KeycloakService) IsValidToken(ctx context.Context, token string) (bool,
 func (k *KeycloakService) DecodeAccessToken(ctx context.Context, accessToken string) (map[string]interface{}, error) {
 	token, mapClaims, err := k.client.DecodeAccessToken(ctx, accessToken, realm)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to decode access token: %w", err)
+		return nil, fmt.Errorf("unable to decode access token: %w", err)
 	}
 	if mapClaims == nil {
-		return nil, fmt.Errorf("Unable to decode access token and get claims")
+		return nil, fmt.Errorf("unable to decode access token and get claims")
 	}
 	if token == nil {
-		return nil, fmt.Errorf("Unable to decode access token and get metadata")
+		return nil, fmt.Errorf("unable to decode access token and get metadata")
 	}
 	// outputMap := make(map[string]string, len(*mapClaims))
 	// for k, v := range *mapClaims {
