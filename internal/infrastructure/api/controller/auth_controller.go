@@ -17,10 +17,10 @@ type AuthController struct {
 	signIn    authentication.SignIn
 }
 
-func NewAuthController(validator *validatorutils.Validator, factory repository.Factory) *AuthController {
+func NewAuthController(validator *validatorutils.Validator, authRepository repository.AuthenticationRepository) *AuthController {
 	return &AuthController{
 		validator: validator,
-		signIn:    authentication.NewSignIn(factory.NewAuthenticationRepository()),
+		signIn:    authentication.NewSignIn(authRepository),
 	}
 }
 

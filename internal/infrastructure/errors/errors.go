@@ -3,6 +3,8 @@ package xerrors
 import (
 	"net/http"
 
+	"github.com/Nerzal/gocloak/v13"
+
 	"github.com/oprimogus/cardapiogo/internal/application/user"
 )
 
@@ -25,17 +27,26 @@ func Map(err error) *ErrorResponse {
 	if errResp, ok := err.(*ErrorResponse); ok {
 		return errResp
 	}
-	switch(err) {
+	if errResp, ok := err.(*gocloak.APIError); ok {
+		return &ErrorResponse{
+			Status:       errResp.Code,
+			ErrorMessage: errResp.Message,
+			Details: errResp.Type,
+		}
+	}
+
+	switch err {
 	case user.ErrExistUserWithDocument,
 		user.ErrExistUserWithEmail,
 		user.ErrExistUserWithPhone:
 		return &ErrorResponse{
-			Status: http.StatusConflict,
+			Status:       http.StatusConflict,
 			ErrorMessage: err.Error(),
 		}
+
 	default:
 		return &ErrorResponse{
-			Status: http.StatusInternalServerError,
+			Status:       http.StatusInternalServerError,
 			ErrorMessage: err.Error(),
 		}
 	}

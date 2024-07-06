@@ -4,51 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/Nerzal/gocloak/v13"
 
 	"github.com/oprimogus/cardapiogo/internal/domain/entity"
-	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
-
-var (
-	log          = logger.NewLogger("Keycloak")
-	keycloakURL  string
-	realm        string
-	clientID     string
-	clientSecret string
-)
-
-func init() {
-	keycloakURL = os.Getenv("KEYCLOAK_BASE_URL")
-	realm = os.Getenv("KEYCLOAK_REALM")
-	clientID = os.Getenv("KEYCLOAK_CLIENT_ID")
-	clientSecret = os.Getenv("KEYCLOAK_CLIENT_SECRET")
-}
-
-type KeycloakService struct {
-	client       *gocloak.GoCloak
-	token        *gocloak.JWT
-	realm        string
-	clientID     string
-	clientSecret string
-}
-
-func NewKeycloakService(ctx context.Context) (*KeycloakService, error) {
-	client := gocloak.NewClient(keycloakURL)
-	token, err := client.LoginClient(ctx, clientID, clientSecret, realm)
-	if err != nil {
-		return nil, err
-	}
-	return &KeycloakService{
-		client:       client,
-		token:        token,
-		realm:        realm,
-		clientID:     clientID,
-		clientSecret: clientSecret,
-	}, nil
-}
 
 func entityUserToKeycloakUser(user entity.User, userEnabled, userEmailVerified bool) *gocloak.User {
 	realmRoles := make([]string, len(user.Roles))
@@ -64,6 +24,9 @@ func entityUserToKeycloakUser(user entity.User, userEnabled, userEmailVerified b
 		EmailVerified: &userEmailVerified,
 		Email:         &user.Email,
 		RealmRoles:    &realmRoles,
+		Attributes: &map[string][]string{
+			"document": {user.Profile.Document},
+		},
 	}
 }
 
@@ -98,7 +61,7 @@ func (k *KeycloakService) Create(ctx context.Context, user entity.User) error {
 
 	realmRolesUser := make([]gocloak.Role, len(user.Roles))
 
-	for _, realmRole:= range realmRoles {
+	for _, realmRole := range realmRoles {
 		for i, userRole := range user.Roles {
 			if *realmRole.Name == string(userRole) {
 				realmRolesUser[i] = *realmRole

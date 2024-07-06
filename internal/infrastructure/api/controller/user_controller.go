@@ -20,8 +20,7 @@ type UserController struct {
 	delete    user.Delete
 }
 
-func NewUserController(validator *validatorutils.Validator, factory repository.Factory) *UserController {
-	userRepository := factory.NewUserRepository()
+func NewUserController(validator *validatorutils.Validator, userRepository repository.UserRepository) *UserController {
 	return &UserController{
 		validator: validator,
 		create:    user.NewCreate(userRepository),

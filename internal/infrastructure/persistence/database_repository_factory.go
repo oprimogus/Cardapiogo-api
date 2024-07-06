@@ -9,6 +9,16 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/services/authentication/keycloak"
 )
 
+var keycloakService *keycloak.KeycloakService
+
+func init() {
+	keycloakInstance, err := keycloak.NewKeycloakService(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	keycloakService = keycloakInstance
+}
+
 type DatabaseRepositoryFactory struct {
 	db      *postgres.PostgresDatabase
 	querier *sqlc.Queries
@@ -19,17 +29,9 @@ func NewDataBaseRepositoryFactory(db *postgres.PostgresDatabase) repository.Fact
 }
 
 func (d *DatabaseRepositoryFactory) NewUserRepository() repository.UserRepository {
-	keycloakService, err := keycloak.NewKeycloakService(context.Background())
-	if err != nil {
-		panic(err)
-	}
 	return keycloakService
 }
 
 func (d *DatabaseRepositoryFactory) NewAuthenticationRepository() repository.AuthenticationRepository {
-	keycloakService, err := keycloak.NewKeycloakService(context.Background())
-	if err != nil {
-		panic(err)
-	}
 	return keycloakService
 }

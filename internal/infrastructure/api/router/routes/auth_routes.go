@@ -12,15 +12,15 @@ import (
 	validatorutils "github.com/oprimogus/cardapiogo/internal/infrastructure/api/validator"
 )
 
-func AuthRoutes(router *gin.Engine, validator *validatorutils.Validator, factory repository.Factory) {
-	authController := controller.NewAuthController(validator, factory)
+func AuthRoutes(router *gin.Engine, validator *validatorutils.Validator, authRepository repository.AuthenticationRepository) {
+	authController := controller.NewAuthController(validator, authRepository)
 
 	basePath := os.Getenv("API_BASE_PATH")
 
 	v1 := router.Group(basePath + "/v1")
 	{
 		v1.POST("/auth/sign-in", authController.SignIn)
-		v1.GET("/auth/test/authentication", middleware.AuthenticationMiddleware(factory.NewAuthenticationRepository()), authController.ProtectedRoute)
-		v1.GET("/auth/test/authorization", middleware.AuthenticationMiddleware(factory.NewAuthenticationRepository()), middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleConsumer}), authController.ProtectedRouteForRoles)
+		v1.GET("/auth/test/authentication", middleware.AuthenticationMiddleware(authRepository), authController.ProtectedRoute)
+		v1.GET("/auth/test/authorization", middleware.AuthenticationMiddleware(authRepository), middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleConsumer}), authController.ProtectedRouteForRoles)
 	}
 }

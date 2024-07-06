@@ -44,10 +44,13 @@ func Initialize(factory repository.Factory) {
 	metrics := middleware.NewPrometheusMetrics()
 	router.Use(middleware.PrometheusMiddleware(metrics))
 
-	routes.DefaultRoutes(router, factory, metrics.Registry)
+	authRepository := factory.NewAuthenticationRepository()
+	userRepository := factory.NewUserRepository()
+
+	routes.DefaultRoutes(router, metrics.Registry)
 	routes.SwaggerRoutes(router)
-	routes.AuthRoutes(router, validator, factory)
-	routes.UserRoutes(router, validator, factory)
+	routes.AuthRoutes(router, validator, authRepository)
+	routes.UserRoutes(router, validator, userRepository)
 	port := os.Getenv("API_PORT")
 	if port == "" {
 		port = "8080"
