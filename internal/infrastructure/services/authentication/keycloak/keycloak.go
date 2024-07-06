@@ -209,10 +209,6 @@ func (k *KeycloakService) DecodeAccessToken(ctx context.Context, accessToken str
 	if token == nil {
 		return nil, fmt.Errorf("unable to decode access token and get metadata")
 	}
-	// outputMap := make(map[string]string, len(*mapClaims))
-	// for k, v := range *mapClaims {
-	// outputMap[k] = v
-	// fmt.Println(k, ": ", v)
-	// }
+
 	return *mapClaims, nil
 }
