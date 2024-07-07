@@ -25,7 +25,7 @@ func UserRoutes(router *gin.Engine,
 		v1.POST("/auth/sign-up", userController.CreateUser)
 		v1.PUT("/user",
 			middleware.AuthenticationMiddleware(authRepository),
-			middleware.AuthorizationMiddleware([]entity.UserRole{}, true),
+			middleware.AuthorizationMiddleware([]entity.UserRole{}),
 			userController.UpdateUser)
 	}
 }

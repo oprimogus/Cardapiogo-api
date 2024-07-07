@@ -9,13 +9,8 @@ import (
 	xerrors "github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
 )
 
-func AuthorizationMiddleware(allowedRoles []entity.UserRole, isUser bool) gin.HandlerFunc {
+func AuthorizationMiddleware(allowedRoles []entity.UserRole) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !isUser {
-			c.AbortWithStatusJSON(http.StatusForbidden, xerrors.Forbidden("You aren't resource owner"))
-			return
-		}
-
 		userRolesContext, exists := c.Get("userRoles")
 		if !exists {
 			c.AbortWithStatusJSON(http.StatusForbidden, xerrors.Forbidden(""))

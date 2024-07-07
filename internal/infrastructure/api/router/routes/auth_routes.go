@@ -21,6 +21,6 @@ func AuthRoutes(router *gin.Engine, validator *validatorutils.Validator, authRep
 	{
 		v1.POST("/auth/sign-in", authController.SignIn)
 		v1.GET("/auth/test/authentication", middleware.AuthenticationMiddleware(authRepository), authController.ProtectedRoute)
-		v1.GET("/auth/test/authorization", middleware.AuthenticationMiddleware(authRepository), middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleConsumer}, false), authController.ProtectedRouteForRoles)
+		v1.GET("/auth/test/authorization", middleware.AuthenticationMiddleware(authRepository), middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleConsumer}), authController.ProtectedRouteForRoles)
 	}
 }
