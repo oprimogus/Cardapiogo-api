@@ -26,5 +26,7 @@ func (u update) Execute(ctx context.Context, input UpdateProfileParams) error {
 	if userID == "" {
 		return errors.New("invalid user")
 	}
-	return u.userRepository.Update(ctx, input.ToEntity())
+	user := input.ToEntity()
+	user.ID = userID
+	return u.userRepository.Update(ctx, user)
 }

@@ -1,6 +1,10 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/oprimogus/cardapiogo/internal/domain/object"
+)
 
 const defaultScoreStore = 500
 
@@ -31,15 +35,14 @@ type BusinessHours struct {
 }
 
 type Store struct {
-	ID             int
-	ExternalID     string
+	ID     string
 	BusinessID     string
 	OwnerID        string
 	Name           string
-	active         bool
+	Active         bool
 	Phone          string
 	score          int
-	Address        Address
+	Address        object.Address
 	StoreType      ShopType
 	BusinessHours  []BusinessHours
 	PaymentMethods []PaymentMethod
@@ -48,7 +51,7 @@ type Store struct {
 	DeletedAt      time.Time
 }
 
-func NewStore(ownerId, name, businessId, phone string, address Address, shopType ShopType) Store {
+func NewStore(ownerId, name, businessId, phone string, address object.Address, shopType ShopType) Store {
 	store := Store{
 		Name:           name,
 		BusinessID:     businessId,
@@ -60,12 +63,5 @@ func NewStore(ownerId, name, businessId, phone string, address Address, shopType
 		BusinessHours:  []BusinessHours{},
 		PaymentMethods: []PaymentMethod{},
 	}
-	store.hasPlanActive()
 	return store
-}
-
-// hasPlanActive Should verify if store owner has a plan active
-// TODO: Introduce logic here
-func (s *Store) hasPlanActive() {
-	s.active = false
 }

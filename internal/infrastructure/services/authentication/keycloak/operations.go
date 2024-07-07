@@ -41,8 +41,15 @@ func keycloakUserToEntityUser(user *gocloak.User) entity.User {
 		}
 	}
 
+	userRoles := make([]entity.UserRole, len(*user.RealmRoles))
+	for i, v := range *user.RealmRoles {
+		if entity.IsValidUserRole(v) {
+			userRoles[i] = entity.UserRole(v)
+		}
+	}
+
 	return entity.User{
-		ExternalID: *user.ID,
+		ID: *user.ID,
 		Email:      *user.Email,
 		Profile: entity.Profile{
 			Name:     *user.FirstName,
@@ -50,42 +57,22 @@ func keycloakUserToEntityUser(user *gocloak.User) entity.User {
 			Document: document,
 			Phone:    phone,
 		},
+		Roles: userRoles,
 	}
 }
 
 func (k *KeycloakService) Create(ctx context.Context, user entity.User) error {
-	realmRoles, err := k.client.GetRealmRoles(ctx, k.token.AccessToken, realm, gocloak.GetRoleParams{})
-	if err != nil {
-		return err
-	}
-
-	realmRolesUser := make([]gocloak.Role, len(user.Roles))
-
-	for _, realmRole := range realmRoles {
-		for i, userRole := range user.Roles {
-			if *realmRole.Name == string(userRole) {
-				realmRolesUser[i] = *realmRole
-			}
-		}
-	}
-
-	enabled := false
+	enabled := true
 	emailVerified := false
-
 	keycloakUser := entityUserToKeycloakUser(user, enabled, emailVerified)
 
 	id, err := k.client.CreateUser(ctx, k.token.AccessToken, realm, *keycloakUser)
-	log.Infof("User created: %s", id)
 	if err != nil {
 		return err
 	}
 	errSetPassword := k.client.SetPassword(ctx, k.token.AccessToken, id, realm, user.Password, false)
 	if errSetPassword != nil {
 		return errSetPassword
-	}
-	errSetRoles := k.client.AddRealmRoleToUser(ctx, k.token.AccessToken, realm, id, realmRolesUser)
-	if errSetRoles != nil {
-		return errSetRoles
 	}
 	return nil
 }
@@ -116,9 +103,9 @@ func (k *KeycloakService) FindByEmail(ctx context.Context, email string) (entity
 }
 
 func (k *KeycloakService) Update(ctx context.Context, user entity.User) error {
-	actualUser, err := k.client.GetUserByID(ctx, k.token.AccessToken, realm, user.ExternalID)
+	actualUser, err := k.client.GetUserByID(ctx, k.token.AccessToken, realm, user.ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("fail in found user: %w", err)
 	}
 	actualUser.FirstName = &user.Profile.Name
 	actualUser.LastName = &user.Profile.LastName
@@ -127,7 +114,11 @@ func (k *KeycloakService) Update(ctx context.Context, user entity.User) error {
 			phoneValues[0] = user.Profile.Phone
 		}
 	}
-	return k.client.UpdateUser(ctx, k.token.AccessToken, realm, *actualUser)
+	errUpdateUser := k.client.UpdateUser(ctx, k.token.AccessToken, realm, *actualUser) 
+	if errUpdateUser != nil {
+		return fmt.Errorf("fail in update user data: %w", errUpdateUser)
+	}
+	return nil
 }
 
 func (k *KeycloakService) Delete(ctx context.Context, id string) error {

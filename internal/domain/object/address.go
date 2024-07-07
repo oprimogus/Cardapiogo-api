@@ -1,4 +1,4 @@
-package entity
+package object
 
 type Address struct {
 	AddressLine1 string

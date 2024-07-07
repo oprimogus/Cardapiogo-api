@@ -6,14 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/oprimogus/cardapiogo/internal/domain/entity"
-	"github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
+	xerrors "github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
 )
 
-func AuthorizationMiddleware(allowedRoles []entity.UserRole) gin.HandlerFunc {
+func AuthorizationMiddleware(allowedRoles []entity.UserRole, isUser bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if !isUser {
+			c.AbortWithStatusJSON(http.StatusForbidden, xerrors.Forbidden("You aren't resource owner"))
+			return
+		}
+
 		userRolesContext, exists := c.Get("userRoles")
 		if !exists {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Forbidden(""))
+			c.AbortWithStatusJSON(http.StatusForbidden, xerrors.Forbidden(""))
 			return
 		}
 
@@ -35,7 +40,7 @@ func AuthorizationMiddleware(allowedRoles []entity.UserRole) gin.HandlerFunc {
 				}
 			}
 		}
-		if !isAllowed {
+		if !isAllowed && len(allowedRoles) != 0 {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Forbidden(""))
 			return
 		}

@@ -41,20 +41,15 @@ definitions:
         type: string
       profile:
         $ref: '#/definitions/user.CreateProfileParams'
-      role:
-        items:
-          type: string
-        type: array
     required:
     - email
     - password
-    - role
     type: object
   user.CreateProfileParams:
     properties:
       document:
         type: string
-      last_name:
+      lastName:
         type: string
       name:
         type: string
@@ -62,7 +57,20 @@ definitions:
         type: string
     required:
     - document
-    - last_name
+    - lastName
+    - name
+    - phone
+    type: object
+  user.UpdateProfileParams:
+    properties:
+      lastName:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    required:
+    - lastName
     - name
     - phone
     type: object
@@ -204,6 +212,37 @@ paths:
       summary: Route for test authorization middleware
       tags:
       - Authentication
+  /v1/user:
+    put:
+      consumes:
+      - application/json
+      description: Update user profile
+      parameters:
+      - description: UpdateProfileParams
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/user.UpdateProfileParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+      summary: Update user profile
+      tags:
+      - User
 produces:
 - application/json
 securityDefinitions:

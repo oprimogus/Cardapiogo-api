@@ -41,10 +41,7 @@ func (s *CreateSuite) TestExecute() {
 		Email:    "johndoe@example.com",
 		Password: "teste123",
 		Profile:  user.CreateProfileParams{Name: "John", LastName: "Doe", Document: "50338097949", Phone: "13981142501"},
-		Roles:    []string{string(entity.UserRoleConsumer)},
 	}
-
-	roles := user.Roles(input.Roles)
 
 	tests := []struct {
 		name                 string
@@ -68,8 +65,7 @@ func (s *CreateSuite) TestExecute() {
 			name:  "Exist user with this email",
 			input: input,
 			mockFindByEmailValue: entity.User{
-				ID:         3683,
-				ExternalID: "randowm_uuid",
+				ID: "randowm_uuid",
 				Profile: entity.Profile{
 					Name:     input.Profile.Name,
 					LastName: input.Profile.LastName,
@@ -77,7 +73,6 @@ func (s *CreateSuite) TestExecute() {
 					Phone:    input.Profile.Phone,
 				},
 				Email:     input.Email,
-				Roles:     roles,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				DeletedAt: time.Now(),
@@ -91,8 +86,7 @@ func (s *CreateSuite) TestExecute() {
 			name:  "Exist user with this document",
 			input: input,
 			mockFindByEmailValue: entity.User{
-				ID:         3683,
-				ExternalID: "randowm_uuid",
+				ID: "randowm_uuid",
 				Profile: entity.Profile{
 					Name:     input.Profile.Name,
 					LastName: input.Profile.LastName,
@@ -100,7 +94,6 @@ func (s *CreateSuite) TestExecute() {
 					Phone:    input.Profile.Phone,
 				},
 				Email:     "johndoe2@example.com",
-				Roles:     roles,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				DeletedAt: time.Now(),
@@ -114,8 +107,7 @@ func (s *CreateSuite) TestExecute() {
 			name:  "Exist user with this phone",
 			input: input,
 			mockFindByEmailValue: entity.User{
-				ID:         3683,
-				ExternalID: "randowm_uuid",
+				ID: "randowm_uuid",
 				Profile: entity.Profile{
 					Name:     input.Profile.Name,
 					LastName: input.Profile.LastName,
@@ -123,7 +115,6 @@ func (s *CreateSuite) TestExecute() {
 					Phone:    input.Profile.Phone,
 				},
 				Email:     "johndoe2@example.com",
-				Roles:     roles,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 				DeletedAt: time.Now(),

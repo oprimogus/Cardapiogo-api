@@ -214,6 +214,54 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/v1/user": {
+            "put": {
+                "description": "Update user profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user profile",
+                "parameters": [
+                    {
+                        "description": "UpdateProfileParams",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/user.UpdateProfileParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -268,8 +316,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "password",
-                "role"
+                "password"
             ],
             "properties": {
                 "email": {
@@ -280,12 +327,6 @@ const docTemplate = `{
                 },
                 "profile": {
                     "$ref": "#/definitions/user.CreateProfileParams"
-                },
-                "role": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         },
@@ -293,7 +334,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "document",
-                "last_name",
+                "lastName",
                 "name",
                 "phone"
             ],
@@ -301,7 +342,26 @@ const docTemplate = `{
                 "document": {
                     "type": "string"
                 },
-                "last_name": {
+                "lastName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UpdateProfileParams": {
+            "type": "object",
+            "required": [
+                "lastName",
+                "name",
+                "phone"
+            ],
+            "properties": {
+                "lastName": {
                     "type": "string"
                 },
                 "name": {
