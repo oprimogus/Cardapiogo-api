@@ -57,19 +57,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     }
                 }
@@ -105,19 +105,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     }
                 }
@@ -151,19 +151,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     }
                 }
@@ -197,19 +197,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     }
                 }
@@ -264,15 +264,6 @@ const docTemplate = `{
                 }
             }
         },
-        "errors.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "details": {},
-                "error": {
-                    "type": "string"
-                }
-            }
-        },
         "user.CreateParams": {
             "type": "object",
             "required": [
@@ -317,6 +308,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "xerrors.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "details": {},
+                "error": {
                     "type": "string"
                 }
             }

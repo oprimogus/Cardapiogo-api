@@ -108,16 +108,16 @@ func isValidUserRole(fl validator.FieldLevel) bool {
 	role := fl.Field()
 
 	if role.Kind() != reflect.Slice {
-        return false
-    }
+		return false
+	}
 	for i := 0; i < role.Len(); i++ {
-        role := role.Index(i).String()
-        if !entity.IsValidUserRole(role) {
-            return false
-        }
-    }
+		role := role.Index(i).String()
+		if !entity.IsValidUserRole(role) {
+			return false
+		}
+	}
 
-    return true
+	return true
 }
 
 func IsValidCpf(fl validator.FieldLevel) bool {

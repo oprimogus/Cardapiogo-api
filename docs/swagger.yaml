@@ -33,12 +33,6 @@ definitions:
       token_type:
         type: string
     type: object
-  errors.ErrorResponse:
-    properties:
-      details: {}
-      error:
-        type: string
-    type: object
   user.CreateParams:
     properties:
       email:
@@ -72,6 +66,12 @@ definitions:
     - name
     - phone
     type: object
+  xerrors.ErrorResponse:
+    properties:
+      details: {}
+      error:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -103,15 +103,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
       summary: Sign-In with email and password
       tags:
       - Authentication
@@ -134,15 +134,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
       summary: Sign-Up with local credentials and data
       tags:
       - Authentication
@@ -161,15 +161,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
       security:
       - Bearer Token: []
       summary: Route for test authentication middleware
@@ -190,15 +190,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/xerrors.ErrorResponse'
       security:
       - Bearer Token: []
       summary: Route for test authorization middleware

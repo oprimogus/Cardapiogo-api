@@ -31,7 +31,7 @@ func Map(err error) *ErrorResponse {
 		return &ErrorResponse{
 			Status:       errResp.Code,
 			ErrorMessage: errResp.Message,
-			Details: errResp.Type,
+			Details:      errResp.Type,
 		}
 	}
 
