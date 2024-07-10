@@ -1,4 +1,4 @@
-package entity
+package object
 
 type JWT struct {
 	AccessToken      string `json:"access_token"`

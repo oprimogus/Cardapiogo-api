@@ -24,14 +24,14 @@ func IsValidUserRole(role string) bool {
 }
 
 type User struct {
-	ID string
-	Profile    Profile
-	Email      string
-	Password   string
-	Roles      []UserRole
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	DeletedAt  time.Time
+	ID        string
+	Profile   Profile
+	Email     string
+	Password  string
+	Roles     []UserRole
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
 }
 
 type Profile struct {
