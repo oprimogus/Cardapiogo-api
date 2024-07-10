@@ -3,12 +3,12 @@ package authentication
 import (
 	"context"
 
-	"github.com/oprimogus/cardapiogo/internal/domain/entity"
+	"github.com/oprimogus/cardapiogo/internal/domain/object"
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
 
 type SignIn interface {
-	Execute(ctx context.Context, email, password string) (entity.JWT, error)
+	Execute(ctx context.Context, email, password string) (object.JWT, error)
 }
 
 type signIn struct {
@@ -21,6 +21,6 @@ func NewSignIn(repository repository.AuthenticationRepository) SignIn {
 	}
 }
 
-func (s signIn) Execute(ctx context.Context, email, password string) (entity.JWT, error) {
+func (s signIn) Execute(ctx context.Context, email, password string) (object.JWT, error) {
 	return s.authenticationRepository.SignIn(ctx, email, password)
 }

@@ -27,5 +27,9 @@ func UserRoutes(router *gin.Engine,
 			middleware.AuthenticationMiddleware(authRepository),
 			middleware.AuthorizationMiddleware([]entity.UserRole{}),
 			userController.UpdateUser)
+		v1.POST("/user/roles",
+			middleware.AuthenticationMiddleware(authRepository),
+			middleware.AuthorizationMiddleware([]entity.UserRole{}),
+			userController.AddRolesToUser)
 	}
 }

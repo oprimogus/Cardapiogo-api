@@ -16,6 +16,7 @@ type UserController struct {
 	create    user.Create
 	update    user.Update
 	delete    user.Delete
+	addRoles  user.AddRoles
 }
 
 func NewUserController(validator *validatorutils.Validator, userRepository repository.UserRepository) *UserController {
@@ -24,6 +25,7 @@ func NewUserController(validator *validatorutils.Validator, userRepository repos
 		create:    user.NewCreate(userRepository),
 		update:    user.NewUpdate(userRepository),
 		delete:    user.NewDelete(userRepository),
+		addRoles:  user.NewAddRoles(userRepository),
 	}
 }
 
@@ -96,6 +98,45 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 	}
 
 	er := c.update.Execute(ctx, updateParams)
+	if er != nil {
+		xerror := xerrors.Map(er)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+	ctx.Status(http.StatusOK)
+}
+
+// SetRoleInUser godoc
+//
+//	@Summary		Add a new role for user
+//	@Description	Add a new role for user
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body	user.AddRolesParams	false	"AddRolesParams"
+//	@Success		200
+//	@Failure		400	{object}	xerrors.ErrorResponse
+//	@Failure		500	{object}	xerrors.ErrorResponse
+//	@Failure		502	{object}	xerrors.ErrorResponse
+//	@Security		Bearer Token
+//	@Router			/v1/user/roles [post]
+func (c *UserController) AddRolesToUser(ctx *gin.Context) {
+	var addRolesParams user.AddRolesParams
+	err := ctx.BindJSON(&addRolesParams)
+	if err != nil {
+		xerror := xerrors.Map(err)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+
+	errValidate := c.validator.Validate(addRolesParams)
+	if errValidate != nil {
+		xerror := xerrors.Map(errValidate)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+
+	er := c.addRoles.Execute(ctx, addRolesParams.Roles)
 	if er != nil {
 		xerror := xerrors.Map(er)
 		ctx.JSON(xerror.Status, xerror)

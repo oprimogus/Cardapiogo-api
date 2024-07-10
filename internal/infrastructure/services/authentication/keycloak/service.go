@@ -119,4 +119,3 @@ func (k *KeycloakService) startTokenRenewer(ctx context.Context) {
 		}
 	}
 }
-	

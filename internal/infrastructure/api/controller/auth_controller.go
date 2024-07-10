@@ -32,7 +32,7 @@ func NewAuthController(validator *validatorutils.Validator, authRepository repos
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		authentication.SignInParams	false	"SignInParams"
-//	@Success		200		{object}	entity.JWT
+//	@Success		200		{object}	object.JWT
 //	@Failure		400		{object}	xerrors.ErrorResponse
 //	@Failure		500		{object}	xerrors.ErrorResponse
 //	@Failure		502		{object}	xerrors.ErrorResponse
@@ -59,42 +59,4 @@ func (c *AuthController) SignIn(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, jwt)
-}
-
-// TestAuthenticationRoute godoc
-//
-//	@Summary		Route for test authentication middleware
-//	@Description	Route for test authentication middleware
-//	@Tags			Authentication
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	entity.JWT
-//	@Failure		400	{object}	xerrors.ErrorResponse
-//	@Failure		500	{object}	xerrors.ErrorResponse
-//	@Failure		502	{object}	xerrors.ErrorResponse
-//	@Security		Bearer Token
-//	@Router			/v1/auth/test/authentication [get]
-func (c *AuthController) ProtectedRoute(ctx *gin.Context) {
-	userID := ctx.GetString("userID")
-	log.Infof(userID)
-	ctx.JSON(http.StatusOK, gin.H{"message": "Alright, you access the protected endpoint!"})
-}
-
-// TestAuthorizationRoute godoc
-//
-//	@Summary		Route for test authorization middleware
-//	@Description	Route for test authorization middleware
-//	@Tags			Authentication
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	entity.JWT
-//	@Failure		400	{object}	xerrors.ErrorResponse
-//	@Failure		500	{object}	xerrors.ErrorResponse
-//	@Failure		502	{object}	xerrors.ErrorResponse
-//	@Security		Bearer Token
-//	@Router			/v1/auth/test/authorization [get]
-func (c *AuthController) ProtectedRouteForRoles(ctx *gin.Context) {
-	userRoles := ctx.GetStringSlice("userRoles")
-	log.Infof("%v", userRoles)
-	ctx.JSON(http.StatusOK, gin.H{"message": "Alright, you access the role protected endpoint!"})
 }

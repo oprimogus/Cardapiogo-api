@@ -8,6 +8,7 @@ import (
 	"github.com/Nerzal/gocloak/v13"
 
 	"github.com/oprimogus/cardapiogo/internal/domain/entity"
+	"github.com/oprimogus/cardapiogo/internal/domain/object"
 )
 
 func entityUserToKeycloakUser(user entity.User, userEnabled, userEmailVerified bool) *gocloak.User {
@@ -49,8 +50,8 @@ func keycloakUserToEntityUser(user *gocloak.User) entity.User {
 	}
 
 	return entity.User{
-		ID: *user.ID,
-		Email:      *user.Email,
+		ID:    *user.ID,
+		Email: *user.Email,
 		Profile: entity.Profile{
 			Name:     *user.FirstName,
 			LastName: *user.LastName,
@@ -114,7 +115,7 @@ func (k *KeycloakService) Update(ctx context.Context, user entity.User) error {
 			phoneValues[0] = user.Profile.Phone
 		}
 	}
-	errUpdateUser := k.client.UpdateUser(ctx, k.token.AccessToken, realm, *actualUser) 
+	errUpdateUser := k.client.UpdateUser(ctx, k.token.AccessToken, realm, *actualUser)
 	if errUpdateUser != nil {
 		return fmt.Errorf("fail in update user data: %w", errUpdateUser)
 	}
@@ -140,12 +141,12 @@ func (k *KeycloakService) ResetPasswordByEmail(ctx context.Context, id string) e
 	)
 }
 
-func (k *KeycloakService) SignIn(ctx context.Context, email, password string) (entity.JWT, error) {
+func (k *KeycloakService) SignIn(ctx context.Context, email, password string) (object.JWT, error) {
 	jwt, err := k.client.Login(ctx, clientID, clientSecret, realm, email, password)
 	if err != nil {
-		return entity.JWT{}, err
+		return object.JWT{}, err
 	}
-	return entity.JWT{
+	return object.JWT{
 		AccessToken:      jwt.AccessToken,
 		IDToken:          jwt.IDToken,
 		ExpiresIn:        jwt.ExpiresIn,
@@ -182,4 +183,45 @@ func (k *KeycloakService) DecodeAccessToken(ctx context.Context, accessToken str
 	}
 
 	return *mapClaims, nil
+}
+
+func (k *KeycloakService) AddRoles(ctx context.Context, userID string, roles []entity.UserRole) error {
+	userKeycloakRoles, err := k.client.GetRealmRolesByUserID(ctx, k.token.AccessToken, realm, userID)
+	if err != nil {
+		return fmt.Errorf("fail in set new roles: %w", err)
+	}
+
+	allKeycloakRoles, err := k.client.GetRealmRoles(ctx, k.token.AccessToken, realm, gocloak.GetRoleParams{})
+	if err != nil {
+		return fmt.Errorf("fail in get all roles of realm: %w", err)
+	}
+
+	userKeycloakRolesMap := make(map[string]bool)
+	for _, v := range userKeycloakRoles {
+		userKeycloakRolesMap[*v.Name] = true
+	}
+
+	allKeycloakRolesMap := make(map[string]*gocloak.Role)
+	for _, v := range allKeycloakRoles {
+		allKeycloakRolesMap[*v.Name] = v
+	}
+
+	var rolesToAdd []gocloak.Role
+	for _, role := range roles {
+		if !userKeycloakRolesMap[string(role)] {
+			if keycloakRole, exists := allKeycloakRolesMap[string(role)]; exists {
+				rolesToAdd = append(rolesToAdd, *keycloakRole)
+			}
+		}
+	}
+
+	if len(rolesToAdd) == 0 {
+		return nil
+	}
+
+	errSetRoles := k.client.AddRealmRoleToUser(ctx, k.token.AccessToken, realm, userID, rolesToAdd)
+	if errSetRoles != nil {
+		return fmt.Errorf("fail in set new roles for user: %w", errSetRoles)
+	}
+	return nil
 }

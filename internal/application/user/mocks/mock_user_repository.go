@@ -40,6 +40,20 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 	return m.recorder
 }
 
+// AddRoles mocks base method.
+func (m *MockUserRepository) AddRoles(ctx context.Context, userID string, roles []entity.UserRole) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddRoles", ctx, userID, roles)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddRoles indicates an expected call of AddRoles.
+func (mr *MockUserRepositoryMockRecorder) AddRoles(ctx, userID, roles any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddRoles", reflect.TypeOf((*MockUserRepository)(nil).AddRoles), ctx, userID, roles)
+}
+
 // Create mocks base method.
 func (m *MockUserRepository) Create(ctx context.Context, user entity.User) error {
 	m.ctrl.T.Helper()

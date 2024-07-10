@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"regexp"
 	"strconv"
 
 	"github.com/go-playground/locales/en"
@@ -134,6 +135,36 @@ func IsValidCpf(fl validator.FieldLevel) bool {
 	return strconv.Itoa(d1) == cpf[9:10] && strconv.Itoa(d2) == cpf[10:11]
 }
 
+func IsValidCnpj(fl validator.FieldLevel) bool {
+	cnpj := fl.Field().String()
+
+	if len(cnpj) != 14 {
+		return false
+	}
+	if isAllEqual(cnpj) {
+		return false
+	}
+	d1 := calculateDigitCnpj(cnpj, 13)
+	d2 := calculateDigitCnpj(cnpj, 14)
+	return strconv.Itoa(d1) == cnpj[12:13] && strconv.Itoa(d2) == cnpj[13:14]
+}
+
+func IsValidCpfOrCnpj(fl validator.FieldLevel) bool {
+	return IsValidCpf(fl) || IsValidCnpj(fl)
+}
+
+func IsValidPhone(fl validator.FieldLevel) bool {
+	phone := fl.Field().String()
+	regex := `^\+(\d{2})(\d{2})(\d{9})$`
+	re := regexp.MustCompile(regex)
+ 
+	return re.MatchString(phone)
+}
+
+func IsValidShopType(fl validator.FieldLevel) bool {
+	return false
+}
+
 func isAllEqual(value string) bool {
 	for i := range value {
 		if value[i] != value[0] {
@@ -173,20 +204,4 @@ func calculateDigitCnpj(cnpj string, factor int) int {
 	return 11 - rest
 }
 
-func IsValidCnpj(fl validator.FieldLevel) bool {
-	cnpj := fl.Field().String()
 
-	if len(cnpj) != 14 {
-		return false
-	}
-	if isAllEqual(cnpj) {
-		return false
-	}
-	d1 := calculateDigitCnpj(cnpj, 13)
-	d2 := calculateDigitCnpj(cnpj, 14)
-	return strconv.Itoa(d1) == cnpj[12:13] && strconv.Itoa(d2) == cnpj[13:14]
-}
-
-func IsValidCpfOrCnpj(fl validator.FieldLevel) bool {
-	return IsValidCpf(fl) || IsValidCnpj(fl)
-}
