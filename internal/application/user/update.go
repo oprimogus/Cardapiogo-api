@@ -7,21 +7,17 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
 
-type Update interface {
-	Execute(ctx context.Context, input UpdateProfileParams) error
-}
-
-type update struct {
+type Update struct {
 	userRepository repository.UserRepository
 }
 
 func NewUpdate(repository repository.UserRepository) Update {
-	return update{
+	return Update{
 		userRepository: repository,
 	}
 }
 
-func (u update) Execute(ctx context.Context, input UpdateProfileParams) error {
+func (u Update) Execute(ctx context.Context, input UpdateProfileParams) error {
 	userID := ctx.Value("userID").(string)
 	if userID == "" {
 		return errors.New("invalid user")

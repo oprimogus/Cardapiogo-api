@@ -164,6 +164,7 @@ definitions:
     type: object
   xerrors.ErrorResponse:
     properties:
+      debug: {}
       details: {}
       error:
         type: string

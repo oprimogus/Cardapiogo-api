@@ -7,19 +7,15 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
 
-type Delete interface {
-	Execute(ctx context.Context) error
-}
-
-type delete struct {
+type Delete struct {
 	userRepository repository.UserRepository
 }
 
 func NewDelete(repository repository.UserRepository) Delete {
-	return delete{userRepository: repository}
+	return Delete{userRepository: repository}
 }
 
-func (d delete) Execute(ctx context.Context) error {
+func (d Delete) Execute(ctx context.Context) error {
 	userID := ctx.Value("userID").(string)
 	if userID == "" {
 		return errors.New("invalid user")

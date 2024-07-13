@@ -7,21 +7,17 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
 
-type ResetPassword interface {
-	Execute(ctx context.Context, id string) error
-}
-
-type resetPassword struct {
+type ResetPassword struct {
 	userRepository repository.UserRepository
 }
 
 func NewResetPassword(repository repository.UserRepository) ResetPassword {
-	return resetPassword{
+	return ResetPassword{
 		userRepository: repository,
 	}
 }
 
-func (r resetPassword) Execute(ctx context.Context, id string) error {
+func (r ResetPassword) Execute(ctx context.Context, id string) error {
 	userID := ctx.Value("userID").(string)
 	if userID == "" {
 		return errors.New("invalid user")

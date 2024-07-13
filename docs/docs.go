@@ -508,6 +508,7 @@ const docTemplate = `{
         "xerrors.ErrorResponse": {
             "type": "object",
             "properties": {
+                "debug": {},
                 "details": {},
                 "error": {
                     "type": "string"

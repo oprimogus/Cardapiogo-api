@@ -11,19 +11,15 @@ import (
 
 var errNotOwner = errors.New("only owner can do this action")
 
-type Update interface {
-	Execute(ctx context.Context, params UpdateParams) error
-}
-
-type update struct {
+type Update struct {
 	repository repository.StoreRepository
 }
 
 func NewUpdate(repository repository.StoreRepository) Update {
-	return update{repository: repository}
+	return Update{repository: repository}
 }
 
-func (u update) Execute(ctx context.Context, params UpdateParams) error {
+func (u Update) Execute(ctx context.Context, params UpdateParams) error {
 	userID := ctx.Value("userID").(string)
 	if userID == "" {
 		return fmt.Errorf("invalid userID: '%s'", userID)
@@ -38,7 +34,7 @@ func (u update) Execute(ctx context.Context, params UpdateParams) error {
 		return errNotOwner
 	}
 
-	updatedStore := entity.Store{
+	UpdatedStore := entity.Store{
 		Name:               params.Name,
 		Phone:              params.Phone,
 		Address:            params.Address,
@@ -47,7 +43,7 @@ func (u update) Execute(ctx context.Context, params UpdateParams) error {
 		PaymentMethodEnums: params.PaymentMethodEnums,
 	}
 
-	err := u.repository.Update(ctx, updatedStore)
+	err := u.repository.Update(ctx, UpdatedStore)
 	if err != nil {
 		return err
 	}

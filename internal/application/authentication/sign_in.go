@@ -7,20 +7,16 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
 
-type SignIn interface {
-	Execute(ctx context.Context, email, password string) (object.JWT, error)
-}
-
-type signIn struct {
+type SignIn struct {
 	authenticationRepository repository.AuthenticationRepository
 }
 
 func NewSignIn(repository repository.AuthenticationRepository) SignIn {
-	return signIn{
+	return SignIn{
 		authenticationRepository: repository,
 	}
 }
 
-func (s signIn) Execute(ctx context.Context, email, password string) (object.JWT, error) {
+func (s SignIn) Execute(ctx context.Context, email, password string) (object.JWT, error) {
 	return s.authenticationRepository.SignIn(ctx, email, password)
 }

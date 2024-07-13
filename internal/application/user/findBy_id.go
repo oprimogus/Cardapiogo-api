@@ -7,20 +7,16 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
 
-type FindByID interface {
-	Execute(ctx context.Context, id string) (entity.User, error)
-}
-
-type findByID struct {
+type FindByID struct {
 	userRepository repository.UserRepository
 }
 
 func NewFindByID(repository repository.UserRepository) FindByID {
-	return findByID{
+	return FindByID{
 		userRepository: repository,
 	}
 }
 
-func (c findByID) Execute(ctx context.Context, id string) (entity.User, error) {
+func (c FindByID) Execute(ctx context.Context, id string) (entity.User, error) {
 	return c.userRepository.FindByID(ctx, id)
 }

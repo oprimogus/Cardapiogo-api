@@ -7,20 +7,16 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
 
-type FindByEmail interface {
-	Execute(ctx context.Context, email string) (entity.User, error)
-}
-
-type findByEmail struct {
+type FindByEmail struct {
 	userRepository repository.UserRepository
 }
 
 func NewFindByEmail(repository repository.UserRepository) FindByEmail {
-	return findByEmail{
+	return FindByEmail{
 		userRepository: repository,
 	}
 }
 
-func (c findByEmail) Execute(ctx context.Context, email string) (entity.User, error) {
+func (c FindByEmail) Execute(ctx context.Context, email string) (entity.User, error) {
 	return c.userRepository.FindByEmail(ctx, email)
 }
