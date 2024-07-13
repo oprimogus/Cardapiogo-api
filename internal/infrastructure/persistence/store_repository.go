@@ -120,7 +120,7 @@ func (s *StoreRepository) FindByID(ctx context.Context, id string) (entity.Store
 	}, nil
 }
 
-func (s *StoreRepository) GetByFilter(ctx context.Context, params entity.StoreFilter) (*[]entity.Store, error) {
+func (s *StoreRepository) FindByFilter(ctx context.Context, params entity.StoreFilter) (*[]entity.Store, error) {
 	return &[]entity.Store{}, nil
 }
 

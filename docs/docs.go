@@ -282,12 +282,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/store.GetStoreByIdOutput"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/xerrors.ErrorResponse"
-                        }
-                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {

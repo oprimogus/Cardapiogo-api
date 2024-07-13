@@ -81,9 +81,13 @@ func ConvertTextToString(textVal pgtype.Text) (string, error) {
 
 // ConvertStringToText converts string to pgtype.Text.
 func ConvertStringToText(str string) pgtype.Text {
+	isValid := true
+	if str == "" {
+		isValid = false
+	}
 	return pgtype.Text{
 		String: str,
-		Valid:  true,
+		Valid:  isValid,
 	}
 }
 

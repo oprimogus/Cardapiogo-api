@@ -37,6 +37,11 @@ type CreateStoreParams struct {
 	Country      string      `db:"country" json:"country"`
 }
 
+// CreateStore
+//
+//	INSERT INTO store (id, cpf_cnpj, owner_id, name, active, phone, score, type, address_line_1, address_line_2, neighborhood, city, state, postal_code,
+//	  latitude, longitude, country, created_at, updated_at)
+//	VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW(), NOW())
 func (q *Queries) CreateStore(ctx context.Context, arg CreateStoreParams) error {
 	_, err := q.db.Exec(ctx, createStore,
 		arg.ID,
@@ -91,6 +96,22 @@ type GetStoreByIDRow struct {
 	Country      string      `db:"country" json:"country"`
 }
 
+// GetStoreByID
+//
+//	SELECT
+//	  id,
+//	  name,
+//	  phone,
+//	  score,
+//	  type,
+//	  address_line_1,
+//	  address_line_2,
+//	  neighborhood,
+//	  city,
+//	  state,
+//	  country
+//	FROM store
+//	  WHERE id = $1
 func (q *Queries) GetStoreByID(ctx context.Context, id pgtype.UUID) (GetStoreByIDRow, error) {
 	row := q.db.QueryRow(ctx, getStoreByID, id)
 	var i GetStoreByIDRow
@@ -119,6 +140,9 @@ type IsOwnerParams struct {
 	OwnerID pgtype.UUID `db:"owner_id" json:"owner_id"`
 }
 
+// IsOwner
+//
+//	SELECT EXISTS(SELECT 1 FROM store WHERE id = $1 AND owner_id = $2)
 func (q *Queries) IsOwner(ctx context.Context, arg IsOwnerParams) (bool, error) {
 	row := q.db.QueryRow(ctx, isOwner, arg.ID, arg.OwnerID)
 	var exists bool
@@ -158,6 +182,22 @@ type UpdateStoreParams struct {
 	Country      string      `db:"country" json:"country"`
 }
 
+// UpdateStore
+//
+//	UPDATE store
+//	  SET
+//	    name = $3,
+//	    phone = $4,
+//	    type = $5,
+//	    address_line_1 = $6,
+//	    address_line_2 = $7,
+//	    neighborhood = $8,
+//	    city = $9,
+//	    state = $10,
+//	    postal_code = $11,
+//	    country = $12,
+//	    updated_at = NOW()
+//	WHERE id = $1 AND owner_id = $2
 func (q *Queries) UpdateStore(ctx context.Context, arg UpdateStoreParams) error {
 	_, err := q.db.Exec(ctx, updateStore,
 		arg.ID,
