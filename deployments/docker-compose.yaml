@@ -1,50 +1,60 @@
-version: "3.7"
-
 services:
-  cardapiogo-api:
-    build:
-      context: ..
-      dockerfile: build/Dockerfile
+  postgres:
+    container_name: cardapiogo-postgres
+    image: postgres
     environment:
-      # APP
-      - APP_REPO=${APP_REPO}
-      - APP_NAME=${APP_NAME}
-      # DATABASE
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_NAME=${DB_NAME}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      # API
-      - API_PORT=${API_PORT}
-      - API_BASE_PATH=${API_BASE_PATH}
-      - API_ENVIRONMENT=${API_ENVIRONMENT}
-      # JWT
-      - JWT_EMISSOR=${JWT_EMISSOR}
-      - JWT_SECRET=${JWT_SECRET}
-      # OAuth2.0
-      ## GOOGLE
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_REDIRECT_PATH=${GOOGLE_REDIRECT_PATH}
-      ### URLS
-      - GOOGLE_USER_INFO_URL=${GOOGLE_USER_INFO_URL}
-    networks:
-      - observability
-
-  nginx:
-    image: nginx:1.25.4-alpine
+      POSTGRES_DB: postgres
+      POSTGRES_USER: cardapiogo
+      POSTGRES_PASSWORD: cardapiogo
     ports:
-      - "80:80"
-      - "443:443"
+      - "5435:5432"
     volumes:
-      - ../configs/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ../configs/nginx/cardapiogo.conf:/etc/nginx/http.d/cardapiogo.conf
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - observability
 
+  create-keycloak-schema:
+    image: postgres
+    container_name: create-keycloak-schema
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: cardapiogo
+      POSTGRES_PASSWORD: cardapiogo
+    command: >
+      sh -c "
+      export PGPASSWORD=$$POSTGRES_PASSWORD;
+      until pg_isready -h postgres -U cardapiogo; do
+        sleep 1;
+      done;
+      psql -h postgres -U cardapiogo -d postgres -c 'CREATE SCHEMA IF NOT EXISTS keycloak;'
+      "
+    networks:
+      - observability
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.4
+    container_name: cardapiogo-keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB_URL: jdbc:postgresql://postgres:5432/postgres
+      KC_DB: postgres
+      KC_DB_SCHEMA: keycloak
+      KC_DB_USERNAME: cardapiogo
+      KC_DB_PASSWORD: cardapiogo
+    ports:
+      - 8081:8080
+    command: ["start-dev"]
+    depends_on: 
+      - create-keycloak-schema
+    networks:
+      - observability  
+  
   prometheus:
     image: bitnami/prometheus
+    container_name: cardapiogo-prometheus
     volumes:
       - ../configs/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
@@ -57,6 +67,7 @@ services:
 
   promtail:
     image: grafana/promtail
+    container_name: cardapiogo-promtail
     volumes:
       - /var/log/journal:/var/log/journal
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
@@ -68,6 +79,7 @@ services:
 
   loki:
     image: grafana/loki
+    container_name: cardapiogo-loki
     command:
       - -config.file=/etc/loki/local-config.yaml
       - -print-config-stderr=true
@@ -76,12 +88,12 @@ services:
 
   grafana:
     image: grafana/grafana
+    container_name: cardapiogo-grafana
     volumes:
       - grafana_data:/var/lib/grafana
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
-      GF_SERVER_ROOT_URL: "http://localhost/grafana/"
     depends_on:
       - prometheus
       - loki
@@ -89,6 +101,7 @@ services:
       - observability
 
 volumes:
+  postgres-data:
   prometheus_data:
   grafana_data:
 

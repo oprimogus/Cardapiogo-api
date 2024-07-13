@@ -81,9 +81,13 @@ func ConvertTextToString(textVal pgtype.Text) (string, error) {
 
 // ConvertStringToText converts string to pgtype.Text.
 func ConvertStringToText(str string) pgtype.Text {
+	isValid := true
+	if str == "" {
+		isValid = false
+	}
 	return pgtype.Text{
 		String: str,
-		Valid:  true,
+		Valid:  isValid,
 	}
 }
 
@@ -96,9 +100,26 @@ func ConvertTimestamptzToTime(tzVal pgtype.Timestamptz) (*time.Time, error) {
 	return &tzVal.Time, nil
 }
 
+// ConvertTimestampToTime converts pgtype.Timestamp to *time.Time. Returns nil if Timestamp is not valid.
+func ConvertTimestamptToTime(tzVal pgtype.Timestamp) (*time.Time, error) {
+	if !tzVal.Valid {
+		return nil, nil
+	}
+
+	return &tzVal.Time, nil
+}
+
 // ConvertTimeToTimestamptz converts time.Time to pgtype.Timestamptz.
 func ConvertTimeToTimestamptz(t time.Time) pgtype.Timestamptz {
 	return pgtype.Timestamptz{
+		Time:  t,
+		Valid: true,
+	}
+}
+
+// ConvertTimeToTimestamptz converts time.Time to pgtype.Timestamptz.
+func ConvertTimeToTimestamp(t time.Time) pgtype.Timestamp {
+	return pgtype.Timestamp{
 		Time:  t,
 		Valid: true,
 	}

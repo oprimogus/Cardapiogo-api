@@ -1,52 +1,36 @@
 package main
 
 import (
-	"os"
-
 	"github.com/subosito/gotenv"
 
-	"github.com/oprimogus/cardapiogo/docs"
-	"github.com/oprimogus/cardapiogo/internal/api/router"
-	"github.com/oprimogus/cardapiogo/internal/infra/database/postgres"
-	"github.com/oprimogus/cardapiogo/internal/infra/factory"
+	"github.com/oprimogus/cardapiogo/internal/infrastructure/api/router"
+	"github.com/oprimogus/cardapiogo/internal/infrastructure/database/postgres"
+	"github.com/oprimogus/cardapiogo/internal/infrastructure/persistence"
 )
 
-// @termsOfService  http://swagger.io/terms/
+//	@title			Cardapiogo API
+//	@version		1.0
+//	@description	Documentação da API de delivery Cardapiogo.
+//	@contact.name	Gustavo Ferreira de Jesus
+//	@contact.email	gustavo081900@gmail.com
 
-// @contact.name   Gustavo Ferreira
-// @contact.url    http://www.swagger.io/support
-// @contact.email  gustavo081900@gmail.com
+//	@host		localhost:8080
+//	@BasePath	/api
+//	@accept		json
+//	@produce	json
 
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @securityDefinitions.apikey JWT Token
-// @in header Cookie: token=$VALUE
-// @name Authorization
-
-// @externalDocs.description  OpenAPI
-// @externalDocs.url          https://swagger.io/resources/open-api/
+// @securityDefinitions.apikey	Bearer Token
+// @in							header
+// @name						Authorization
 func main() {
 	// env
 	_ = gotenv.Load()
-
-	configureSwaggerDocs()
 
 	// database
 	db := postgres.GetInstance()
 	defer db.Close()
 
 	// routes
-	factoryRepository := factory.NewDataBaseRepositoryFactory(db)
+	factoryRepository := persistence.NewDataBaseRepositoryFactory(db)
 	router.Initialize(factoryRepository)
-}
-
-// configureSwaggerDocs Configuração da documentação Swagger
-func configureSwaggerDocs() {
-	docs.SwaggerInfo.Title = "Cardapio-Go"
-	docs.SwaggerInfo.Description = "Simple API of Cardapio"
-	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = os.Getenv("API_HOST") + ":" + os.Getenv("API_PORT")
-	docs.SwaggerInfo.BasePath = "/api"
-	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 }

@@ -5,104 +5,28 @@ import "github.com/swaggo/swag"
 
 const docTemplate = `{
     "schemes": {{ marshal .Schemes }},
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
     "swagger": "2.0",
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
         "contact": {
-            "name": "Gustavo Ferreira",
-            "url": "http://www.swagger.io/support",
+            "name": "Gustavo Ferreira de Jesus",
             "email": "gustavo081900@gmail.com"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/auth/google": {
-            "get": {
-                "description": "Inicia fluxo de OAuth2",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Inicia fluxo de OAuth2",
-                "responses": {
-                    "307": {
-                        "description": "Temporary Redirect"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/auth/google/callback": {
-            "get": {
-                "description": "Callback de login via OAuth2",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Callback de login via OAuth2",
-                "responses": {
-                    "307": {
-                        "description": "Temporary Redirect"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/login": {
+        "/v1/auth/sign-in": {
             "post": {
-                "description": "Login de usuário com email e senha",
+                "description": "Authenticate a user using email and password and issue a JWT on successful login.",
                 "consumes": [
                     "application/json"
                 ],
@@ -110,288 +34,50 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "Authentication"
                 ],
-                "summary": "Login de usuário com email e senha",
+                "summary": "Sign-In with email and password",
                 "parameters": [
                     {
-                        "description": "Login",
+                        "description": "SignInParams",
                         "name": "request",
                         "in": "body",
-                        "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.Login"
+                            "$ref": "#/definitions/authentication.SignInParams"
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/profile": {
-            "get": {
-                "description": "Retorna o perfil do usuário",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profile"
-                ],
-                "summary": "Retorna o perfil do usuário",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/profile.Profile"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Atualiza os dados do perfil do usuário",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profile"
-                ],
-                "summary": "Atualiza os dados do perfil do usuário",
-                "parameters": [
-                    {
-                        "description": "UpdateProfileParams",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/profile.UpdateProfileParams"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Cria um perfil e atribui a um usuário",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profile"
-                ],
-                "summary": "Cria um perfil e atribui a um usuário",
-                "parameters": [
-                    {
-                        "description": "CreateProfileParams",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/profile.CreateProfileParams"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/user": {
-            "get": {
-                "description": "Retorna uma lista de usuários com paginação",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Retorna uma lista de usuários",
-                "parameters": [
-                    {
-                        "type": "number",
-                        "description": "Número de itens por página",
-                        "name": "items",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "number",
-                        "description": "Página",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/user.User"
-                            }
+                            "$ref": "#/definitions/object.JWT"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "Atualiza os dados do usuário",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Atualiza os dados do usuário",
-                "parameters": [
-                    {
-                        "description": "UpdateUserParams",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.UpdateUserParams"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
-                        }
-                    }
-                }
-            },
+            }
+        },
+        "/v1/auth/sign-up": {
             "post": {
-                "description": "Cria um novo usuário através de login email/senha",
+                "description": "Sign-Up with local credentials and data",
                 "consumes": [
                     "application/json"
                 ],
@@ -399,17 +85,16 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "Authentication"
                 ],
-                "summary": "Adiciona um novo usuário",
+                "summary": "Sign-Up with local credentials and data",
                 "parameters": [
                     {
                         "description": "CreateUserParams",
                         "name": "request",
                         "in": "body",
-                        "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.CreateUserParams"
+                            "$ref": "#/definitions/user.CreateParams"
                         }
                     }
                 ],
@@ -420,27 +105,27 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/v1/user/change-password": {
+        "/v1/store": {
             "put": {
-                "description": "Atualiza a senha do usuário",
+                "description": "Owner can update your stores.",
                 "consumes": [
                     "application/json"
                 ],
@@ -448,17 +133,16 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "Store"
                 ],
-                "summary": "Atualiza a senha do usuário",
+                "summary": "Owner can update your stores.",
                 "parameters": [
                     {
-                        "description": "UpdateUserPasswordParams",
+                        "description": "UpdateParams",
                         "name": "request",
                         "in": "body",
-                        "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.UpdateUserPasswordParams"
+                            "$ref": "#/definitions/store.UpdateParams"
                         }
                     }
                 ],
@@ -469,27 +153,43 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     }
                 }
-            }
-        },
-        "/v1/user/{id}": {
-            "get": {
-                "description": "Retorna um usuário através do ID",
+            },
+            "post": {
+                "description": "Owner user can create store",
                 "consumes": [
                     "application/json"
                 ],
@@ -497,13 +197,79 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "Store"
                 ],
-                "summary": "Retorna um usuário",
+                "summary": "Owner can create stores.",
+                "parameters": [
+                    {
+                        "description": "CreateParams",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/store.CreateParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/store/{id}": {
+            "get": {
+                "description": "Any user can view a store.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Any user can view a store.",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID do usuário (UUID)",
+                        "description": "Store ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -513,25 +279,131 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/user.User"
+                            "$ref": "#/definitions/store.GetStoreByIdOutput"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer Token": []
+                    }
+                ],
+                "description": "Update user profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user profile",
+                "parameters": [
+                    {
+                        "description": "UpdateProfileParams",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/user.UpdateProfileParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user/roles": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer Token": []
+                    }
+                ],
+                "description": "Add a new role for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Add a new role for user",
+                "parameters": [
+                    {
+                        "description": "AddRolesParams",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/user.AddRolesParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
                     }
                 }
@@ -539,102 +411,66 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "errors.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "details": {},
-                "error": {
-                    "type": "string"
-                }
-            }
-        },
-        "profile.CreateProfileParams": {
+        "authentication.SignInParams": {
             "type": "object",
             "required": [
-                "last_name",
-                "name",
-                "phone"
+                "email",
+                "password"
             ],
             "properties": {
-                "cpf": {
+                "email": {
                     "type": "string"
                 },
-                "last_name": {
-                    "type": "string",
-                    "maxLength": 40
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 25
-                },
-                "phone": {
-                    "type": "string",
-                    "maxLength": 11
-                }
-            }
-        },
-        "profile.Profile": {
-            "type": "object",
-            "properties": {
-                "cpf": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone": {
+                "password": {
                     "type": "string"
                 }
             }
         },
-        "profile.UpdateProfileParams": {
-            "type": "object",
-            "required": [
-                "last_name",
-                "name",
-                "phone"
-            ],
-            "properties": {
-                "last_name": {
-                    "type": "string",
-                    "maxLength": 40
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 25
-                },
-                "phone": {
-                    "type": "string",
-                    "maxLength": 11
-                }
-            }
+        "entity.BusinessHours": {
+            "type": "object"
         },
-        "types.AccountProvider": {
+        "entity.PaymentMethod": {
             "type": "string",
             "enum": [
-                "Google",
-                "Apple",
-                "Meta",
-                "Local"
+                "credit",
+                "debit",
+                "pix",
+                "cash"
             ],
             "x-enum-varnames": [
-                "AccountProviderGoogle",
-                "AccountProviderApple",
-                "AccountProviderMeta",
-                "AccountProviderLocal"
+                "Credit",
+                "Debit",
+                "Pix",
+                "Cash"
             ]
         },
-        "types.Role": {
+        "entity.ShopType": {
             "type": "string",
             "enum": [
-                "Consumer",
-                "Owner",
-                "Employee",
-                "DeliveryMan",
-                "Admin"
+                "restaurant",
+                "pharmacy",
+                "tobbaco",
+                "market",
+                "convenience",
+                "pub"
+            ],
+            "x-enum-varnames": [
+                "StoreShopRestaurant",
+                "StoreShopPharmacy",
+                "StoreShopTobbaco",
+                "StoreShopMarket",
+                "StoreShopConvenience",
+                "StoreShopPub"
+            ]
+        },
+        "entity.UserRole": {
+            "type": "string",
+            "enum": [
+                "consumer",
+                "owner",
+                "employee",
+                "delivery_man",
+                "admin"
             ],
             "x-enum-varnames": [
                 "UserRoleConsumer",
@@ -644,134 +480,303 @@ const docTemplate = `{
                 "UserRoleAdmin"
             ]
         },
-        "user.CreateUserParams": {
+        "object.Address": {
             "type": "object",
             "required": [
-                "account_provider",
-                "email",
-                "password",
-                "role"
+                "addressLine1",
+                "addressLine2",
+                "city",
+                "country",
+                "neighborhood",
+                "postalCode",
+                "state"
             ],
             "properties": {
-                "account_provider": {
-                    "$ref": "#/definitions/types.AccountProvider"
+                "addressLine1": {
+                    "type": "string",
+                    "maxLength": 40
                 },
-                "email": {
+                "addressLine2": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "city": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "country": {
+                    "type": "string",
+                    "maxLength": 15
+                },
+                "latitude": {
                     "type": "string"
                 },
-                "password": {
+                "longitude": {
                     "type": "string"
                 },
-                "role": {
-                    "$ref": "#/definitions/types.Role"
+                "neighborhood": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "postalCode": {
+                    "type": "string",
+                    "maxLength": 15
+                },
+                "state": {
+                    "type": "string",
+                    "maxLength": 15
                 }
             }
         },
-        "user.Login": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.UpdateUserParams": {
-            "type": "object",
-            "required": [
-                "email",
-                "id",
-                "password",
-                "role"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "role": {
-                    "$ref": "#/definitions/types.Role"
-                }
-            }
-        },
-        "user.UpdateUserPasswordParams": {
-            "type": "object",
-            "required": [
-                "id",
-                "new_password",
-                "password"
-            ],
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "new_password": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.User": {
+        "object.JWT": {
             "type": "object",
             "properties": {
-                "account_provider": {
-                    "$ref": "#/definitions/types.AccountProvider"
-                },
-                "created_at": {
+                "access_token": {
                     "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "profile_id": {
+                "expires_in": {
                     "type": "integer"
                 },
-                "role": {
-                    "$ref": "#/definitions/types.Role"
+                "id_token": {
+                    "type": "string"
                 },
-                "updated_at": {
+                "not-before-policy": {
+                    "type": "integer"
+                },
+                "refresh_expires_in": {
+                    "type": "integer"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "scope": {
+                    "type": "string"
+                },
+                "session_state": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "store.AddressOutput": {
+            "type": "object",
+            "required": [
+                "addressLine1",
+                "addressLine2",
+                "city",
+                "country",
+                "neighborhood",
+                "state"
+            ],
+            "properties": {
+                "addressLine1": {
+                    "type": "string",
+                    "maxLength": 40
+                },
+                "addressLine2": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "city": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "country": {
+                    "type": "string",
+                    "maxLength": 15
+                },
+                "neighborhood": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "state": {
+                    "type": "string",
+                    "maxLength": 15
+                }
+            }
+        },
+        "store.CreateParams": {
+            "type": "object",
+            "required": [
+                "address",
+                "cpfCnpj",
+                "name",
+                "phone",
+                "type"
+            ],
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/object.Address"
+                },
+                "cpfCnpj": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.ShopType"
+                }
+            }
+        },
+        "store.GetStoreByIdOutput": {
+            "type": "object",
+            "required": [
+                "address",
+                "businessHours",
+                "id",
+                "name",
+                "paymentMethod",
+                "phone",
+                "score",
+                "type"
+            ],
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/store.AddressOutput"
+                },
+                "businessHours": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.BusinessHours"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "paymentMethod": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.PaymentMethod"
+                    }
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.ShopType"
+                }
+            }
+        },
+        "store.UpdateParams": {
+            "type": "object"
+        },
+        "user.AddRolesParams": {
+            "type": "object",
+            "required": [
+                "role"
+            ],
+            "properties": {
+                "role": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.UserRole"
+                    }
+                }
+            }
+        },
+        "user.CreateParams": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "profile"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "profile": {
+                    "$ref": "#/definitions/user.CreateProfileParams"
+                }
+            }
+        },
+        "user.CreateProfileParams": {
+            "type": "object",
+            "required": [
+                "document",
+                "lastName",
+                "name",
+                "phone"
+            ],
+            "properties": {
+                "document": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UpdateProfileParams": {
+            "type": "object",
+            "required": [
+                "lastName",
+                "name",
+                "phone"
+            ],
+            "properties": {
+                "lastName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "xerrors.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "debug": {},
+                "details": {},
+                "error": {
                     "type": "string"
                 }
             }
         }
     },
     "securityDefinitions": {
-        "JWT Token": {
+        "Bearer Token": {
             "type": "apiKey",
             "name": "Authorization",
-            "in": "header Cookie: token=$VALUE"
+            "in": "header"
         }
-    },
-    "externalDocs": {
-        "description": "OpenAPI",
-        "url": "https://swagger.io/resources/open-api/"
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/api",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Cardapiogo API",
+	Description:      "Documentação da API de delivery Cardapiogo.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

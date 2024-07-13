@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	_ "github.com/lib/pq"
 )
@@ -27,12 +28,17 @@ func PopulateLocalDatabase() error {
 	if err != nil {
 		panic("Fail connect in local database")
 	}
-
-	// Verifica se os dados de teste já existem
-	if !checkTestDataExists(db) {
-		insertTestData(db)
-	} else {
-		fmt.Println("Os dados de teste já existem no banco de dados.")
+	mocks := getMocks()
+	for _, v := range mocks {
+		exist := checkTestDataExists(db, v)
+		if exist {
+			log.Printf("Mocks para a tabela %v já existem, prosseguindo...", v)
+			continue
+		}
+		err := executeSQLFile(db, v)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -43,7 +49,14 @@ func createStringConn() string {
 	dbUsername := "cardapiogo"
 	dbPassword := "cardapiogo"
 	dbName := "postgres"
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
+	return fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		dbHost,
+		dbPort,
+		dbUsername,
+		dbPassword,
+		dbName,
+	)
 }
 
 func getSQLDBConnection(connStr string) (*sql.DB, error) {
@@ -54,44 +67,42 @@ func getSQLDBConnection(connStr string) (*sql.DB, error) {
 	return sqlDB, nil
 }
 
-func checkTestDataExists(db *sql.DB) bool {
-	var exists bool
-	query := `SELECT EXISTS(SELECT 1 FROM users LIMIT 1);`
+func getMocks() []string {
+	files, err := os.ReadDir("internal/infra/database/sql/mocks")
+	if err != nil {
+		panic(err)
+	}
+	filesPath := make([]string, len(files))
+	for i, v := range files {
+		filesPath[i] = strings.Replace(v.Name(), ".sql", "", -1)
+	}
+	log.Print(filesPath)
+	return filesPath
+}
 
+func checkTestDataExists(db *sql.DB, mock string) bool {
+	var exists bool
+	query := fmt.Sprintf(`SELECT EXISTS(SELECT 1 FROM %v LIMIT 1);`, mock)
 	err := db.QueryRow(query).Scan(&exists)
 	if err != nil {
 		log.Fatalf("Erro ao verificar a existência de dados de teste: %v", err)
+		exists = false
+		return exists
 	}
-
 	return exists
 }
 
-func insertTestData(db *sql.DB) {
-
-	// Caminho para o arquivo .sql com os dados de teste
-	sqlFilePath := "internal/infra/database/sql/mocks/mockUserData.sql"
-
-	// Lê e executa o SQL do arquivo
-	err := executeSQLFile(db, sqlFilePath)
+func executeSQLFile(db *sql.DB, mock string) error {
+	query, err := os.ReadFile(fmt.Sprintf("internal/infra/database/sql/mocks/%v.sql", mock))
 	if err != nil {
-		log.Fatalf("Erro ao executar arquivo SQL: %v", err)
+		log.Println(err)
+		return fmt.Errorf("erro ao ler mock %v: %w", mock, err)
 	}
-
-	fmt.Println("Arquivo SQL executado e dados de teste inseridos com sucesso.")
-}
-
-func executeSQLFile(db *sql.DB, filePath string) error {
-	// Lê o conteúdo do arquivo SQL
-	query, err := os.ReadFile(filePath)
-	if err != nil {
-		return fmt.Errorf("erro ao ler o arquivo SQL: %w", err)
-	}
-
-	// Executa o SQL no banco de dados
 	_, err = db.Exec(string(query))
 	if err != nil {
-		return fmt.Errorf("erro ao executar o SQL: %w", err)
+		log.Println(err)
+		return fmt.Errorf("erro ao executar o mock %v: %v", mock, err)
 	}
-
+	log.Printf("Mock %v adicionado com sucesso\n", mock)
 	return nil
 }
