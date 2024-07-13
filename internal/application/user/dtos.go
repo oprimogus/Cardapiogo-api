@@ -14,7 +14,7 @@ type CreateProfileParams struct {
 	Name     string `json:"name" validate:"required"`
 	LastName string `json:"lastName" validate:"required"`
 	Document string `json:"document" validate:"required,cpf"`
-	Phone    string `json:"phone" validate:"required"`
+	Phone    string `json:"phone" validate:"required,phone"`
 }
 
 func (d CreateProfileParams) ToEntity() entity.Profile {
@@ -29,7 +29,7 @@ func (d CreateProfileParams) ToEntity() entity.Profile {
 type CreateParams struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
-	Profile  CreateProfileParams
+	Profile  CreateProfileParams `json:"profile" validate:"required"`
 }
 
 func (d CreateParams) ToEntity() entity.User {
@@ -47,7 +47,7 @@ type UpdateProfileParams struct {
 }
 
 type AddRolesParams struct {
-	Roles []entity.UserRole `json:"roles" validate:"required,role"`
+	Roles []entity.UserRole `json:"role" validate:"required,role"`
 }
 
 func (d UpdateProfileParams) ToEntity() entity.User {
@@ -67,5 +67,5 @@ type Login struct {
 
 type UpdatePasswordParams struct {
 	Password    string `json:"password" validate:"required"`
-	NewPassword string `json:"new_password" validate:"required"`
+	NewPassword string `json:"newPassword" validate:"required"`
 }

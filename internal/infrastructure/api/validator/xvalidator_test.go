@@ -1,4 +1,4 @@
-package validatorutils_test
+package xvalidator_test
 
 import (
 	"testing"

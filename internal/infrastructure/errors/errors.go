@@ -8,11 +8,11 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/application/user"
 )
 
-// ErrorResponse is the response that represents an error.
 type ErrorResponse struct {
 	Status       int         `json:"-"`
 	ErrorMessage string      `json:"error"`
 	Details      interface{} `json:"details"`
+	Debug interface{} `json:"debug,omitempty"`
 }
 
 func New(status int, message string, details ...interface{}) *ErrorResponse {
@@ -33,6 +33,11 @@ func Map(err error) *ErrorResponse {
 			ErrorMessage: errResp.Message,
 			Details:      errResp.Type,
 		}
+	}
+
+	errResp := mapDatabaseErrors(err)
+	if errResp != nil {
+		return errResp
 	}
 
 	switch err {

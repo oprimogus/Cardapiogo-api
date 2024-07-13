@@ -45,7 +45,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.JWT"
+                            "$ref": "#/definitions/object.JWT"
                         }
                     },
                     "400": {
@@ -117,14 +117,9 @@
                 }
             }
         },
-        "/v1/auth/test/authentication": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer Token": []
-                    }
-                ],
-                "description": "Route for test authentication middleware",
+        "/v1/store": {
+            "post": {
+                "description": "Owner user can create store",
                 "consumes": [
                     "application/json"
                 ],
@@ -132,61 +127,22 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "Store"
                 ],
-                "summary": "Route for test authentication middleware",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.JWT"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/xerrors.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/xerrors.ErrorResponse"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/xerrors.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/auth/test/authorization": {
-            "get": {
-                "security": [
+                "summary": "User can create stores.",
+                "parameters": [
                     {
-                        "Bearer Token": []
+                        "description": "CreateParams",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/store.CreateParams"
+                        }
                     }
                 ],
-                "description": "Route for test authorization middleware",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Route for test authorization middleware",
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.JWT"
-                        }
+                    "201": {
+                        "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -211,6 +167,11 @@
         },
         "/v1/user": {
             "put": {
+                "security": [
+                    {
+                        "Bearer Token": []
+                    }
+                ],
                 "description": "Update user profile",
                 "consumes": [
                     "application/json"
@@ -256,6 +217,59 @@
                     }
                 }
             }
+        },
+        "/v1/user/roles": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer Token": []
+                    }
+                ],
+                "description": "Add a new role for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Add a new role for user",
+                "parameters": [
+                    {
+                        "description": "AddRolesParams",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/user.AddRolesParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -274,7 +288,84 @@
                 }
             }
         },
-        "entity.JWT": {
+        "entity.ShopType": {
+            "type": "string",
+            "enum": [
+                "restaurant",
+                "pharmacy",
+                "tobbaco",
+                "market",
+                "convenience",
+                "pub"
+            ],
+            "x-enum-varnames": [
+                "StoreShopRestaurant",
+                "StoreShopPharmacy",
+                "StoreShopTobbaco",
+                "StoreShopMarket",
+                "StoreShopConvenience",
+                "StoreShopPub"
+            ]
+        },
+        "entity.UserRole": {
+            "type": "string",
+            "enum": [
+                "consumer",
+                "owner",
+                "employee",
+                "delivery_man",
+                "admin"
+            ],
+            "x-enum-varnames": [
+                "UserRoleConsumer",
+                "UserRoleOwner",
+                "UserRoleEmployee",
+                "UserRoleDeliveryMan",
+                "UserRoleAdmin"
+            ]
+        },
+        "object.Address": {
+            "type": "object",
+            "required": [
+                "addressLine1",
+                "addressLine2",
+                "city",
+                "country",
+                "neighborhood",
+                "postalCode",
+                "state"
+            ],
+            "properties": {
+                "addressLine1": {
+                    "type": "string"
+                },
+                "addressLine2": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "string"
+                },
+                "longitude": {
+                    "type": "string"
+                },
+                "neighborhood": {
+                    "type": "string"
+                },
+                "postalCode": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                }
+            }
+        },
+        "object.JWT": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -306,11 +397,53 @@
                 }
             }
         },
+        "store.CreateParams": {
+            "type": "object",
+            "required": [
+                "address",
+                "cpfCnpj",
+                "name",
+                "phone",
+                "type"
+            ],
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/object.Address"
+                },
+                "cpfCnpj": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.ShopType"
+                }
+            }
+        },
+        "user.AddRolesParams": {
+            "type": "object",
+            "required": [
+                "role"
+            ],
+            "properties": {
+                "role": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.UserRole"
+                    }
+                }
+            }
+        },
         "user.CreateParams": {
             "type": "object",
             "required": [
                 "email",
-                "password"
+                "password",
+                "profile"
             ],
             "properties": {
                 "email": {

@@ -24,19 +24,19 @@ func IsValidUserRole(role string) bool {
 }
 
 type User struct {
-	ID        string
-	Profile   Profile
-	Email     string
-	Password  string
-	Roles     []UserRole
+	ID        string `db:"id" json:"id" validate:"required,uuid"`
+	Profile   Profile `db:"profile" json:"profile" validate:"required"`
+	Email     string `db:"email" json:"email" validate:"required,email"`
+	Password  string `db:"password" json:"password" validate:"required"`
+	Roles     []UserRole `db:"role" json:"role" validate:"required,role"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
 }
 
 type Profile struct {
-	Name     string
-	LastName string
-	Document string
-	Phone    string
+	Name     string `db:"name" json:"name" validate:"required"`
+	LastName string `db:"last_name" json:"lastName" validate:"required"`
+	Document string `db:"document" json:"document" validate:"required,cpf"`
+	Phone    string `db:"phone" json:"phone" validate:"required,phone"`
 }

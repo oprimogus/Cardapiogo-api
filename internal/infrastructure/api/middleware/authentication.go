@@ -1,13 +1,11 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 
-	// "github.com/oprimogus/cardapiogo/internal/domain/entity"
 	"github.com/oprimogus/cardapiogo/internal/domain/entity"
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
@@ -59,7 +57,6 @@ func AuthenticationMiddleware(repository repository.AuthenticationRepository) gi
 
 			}
 		}
-		fmt.Println(userRoles)
 		c.Set("userID", claims["sub"])
 		c.Set("userRoles", userRoles)
 		c.Next()

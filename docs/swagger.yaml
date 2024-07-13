@@ -12,7 +12,66 @@ definitions:
     - email
     - password
     type: object
-  entity.JWT:
+  entity.ShopType:
+    enum:
+    - restaurant
+    - pharmacy
+    - tobbaco
+    - market
+    - convenience
+    - pub
+    type: string
+    x-enum-varnames:
+    - StoreShopRestaurant
+    - StoreShopPharmacy
+    - StoreShopTobbaco
+    - StoreShopMarket
+    - StoreShopConvenience
+    - StoreShopPub
+  entity.UserRole:
+    enum:
+    - consumer
+    - owner
+    - employee
+    - delivery_man
+    - admin
+    type: string
+    x-enum-varnames:
+    - UserRoleConsumer
+    - UserRoleOwner
+    - UserRoleEmployee
+    - UserRoleDeliveryMan
+    - UserRoleAdmin
+  object.Address:
+    properties:
+      addressLine1:
+        type: string
+      addressLine2:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      latitude:
+        type: string
+      longitude:
+        type: string
+      neighborhood:
+        type: string
+      postalCode:
+        type: string
+      state:
+        type: string
+    required:
+    - addressLine1
+    - addressLine2
+    - city
+    - country
+    - neighborhood
+    - postalCode
+    - state
+    type: object
+  object.JWT:
     properties:
       access_token:
         type: string
@@ -33,6 +92,34 @@ definitions:
       token_type:
         type: string
     type: object
+  store.CreateParams:
+    properties:
+      address:
+        $ref: '#/definitions/object.Address'
+      cpfCnpj:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      type:
+        $ref: '#/definitions/entity.ShopType'
+    required:
+    - address
+    - cpfCnpj
+    - name
+    - phone
+    - type
+    type: object
+  user.AddRolesParams:
+    properties:
+      role:
+        items:
+          $ref: '#/definitions/entity.UserRole'
+        type: array
+    required:
+    - role
+    type: object
   user.CreateParams:
     properties:
       email:
@@ -44,6 +131,7 @@ definitions:
     required:
     - email
     - password
+    - profile
     type: object
   user.CreateProfileParams:
     properties:
@@ -107,7 +195,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.JWT'
+            $ref: '#/definitions/object.JWT'
         "400":
           description: Bad Request
           schema:
@@ -154,18 +242,22 @@ paths:
       summary: Sign-Up with local credentials and data
       tags:
       - Authentication
-  /v1/auth/test/authentication:
-    get:
+  /v1/store:
+    post:
       consumes:
       - application/json
-      description: Route for test authentication middleware
+      description: Owner user can create store
+      parameters:
+      - description: CreateParams
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/store.CreateParams'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.JWT'
+        "201":
+          description: Created
         "400":
           description: Bad Request
           schema:
@@ -178,40 +270,9 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/xerrors.ErrorResponse'
-      security:
-      - Bearer Token: []
-      summary: Route for test authentication middleware
+      summary: User can create stores.
       tags:
-      - Authentication
-  /v1/auth/test/authorization:
-    get:
-      consumes:
-      - application/json
-      description: Route for test authorization middleware
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.JWT'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/xerrors.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/xerrors.ErrorResponse'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/xerrors.ErrorResponse'
-      security:
-      - Bearer Token: []
-      summary: Route for test authorization middleware
-      tags:
-      - Authentication
+      - Store
   /v1/user:
     put:
       consumes:
@@ -240,7 +301,42 @@ paths:
           description: Bad Gateway
           schema:
             $ref: '#/definitions/xerrors.ErrorResponse'
+      security:
+      - Bearer Token: []
       summary: Update user profile
+      tags:
+      - User
+  /v1/user/roles:
+    post:
+      consumes:
+      - application/json
+      description: Add a new role for user
+      parameters:
+      - description: AddRolesParams
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/user.AddRolesParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+      security:
+      - Bearer Token: []
+      summary: Add a new role for user
       tags:
       - User
 produces:
