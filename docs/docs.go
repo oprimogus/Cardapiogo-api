@@ -124,6 +124,70 @@ const docTemplate = `{
             }
         },
         "/v1/store": {
+            "put": {
+                "description": "Owner can update your stores.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Owner can update your stores.",
+                "parameters": [
+                    {
+                        "description": "UpdateParams",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/store.UpdateParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Owner user can create store",
                 "consumes": [
@@ -135,7 +199,7 @@ const docTemplate = `{
                 "tags": [
                     "Store"
                 ],
-                "summary": "User can create stores.",
+                "summary": "Owner can create stores.",
                 "parameters": [
                     {
                         "description": "CreateParams",
@@ -152,6 +216,24 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
                         "schema": {
                             "$ref": "#/definitions/xerrors.ErrorResponse"
                         }
@@ -343,16 +425,20 @@ const docTemplate = `{
             ],
             "properties": {
                 "addressLine1": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 40
                 },
                 "addressLine2": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 20
                 },
                 "city": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 25
                 },
                 "country": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 15
                 },
                 "latitude": {
                     "type": "string"
@@ -361,13 +447,16 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "neighborhood": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 25
                 },
                 "postalCode": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 15
                 },
                 "state": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 15
                 }
             }
         },
@@ -420,7 +509,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 25
                 },
                 "phone": {
                     "type": "string"
@@ -429,6 +519,9 @@ const docTemplate = `{
                     "$ref": "#/definitions/entity.ShopType"
                 }
             }
+        },
+        "store.UpdateParams": {
+            "type": "object"
         },
         "user.AddRolesParams": {
             "type": "object",

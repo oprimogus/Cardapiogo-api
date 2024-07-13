@@ -6,8 +6,8 @@ import (
 )
 
 type CreateParams struct {
-	CpfCnpj string          `json:"cpfCnpj" validate:"required"`
-	Name    string          `json:"name" validate:"required"`
+	CpfCnpj string          `json:"cpfCnpj" validate:"required,cpfCnpj"`
+	Name    string          `json:"name" validate:"required,lte=25"`
 	Phone   string          `json:"phone" validate:"required,phone"`
 	Address object.Address  `json:"address" validate:"required"`
 	Type    entity.ShopType `json:"type" validate:"required,shopType"`
@@ -15,11 +15,11 @@ type CreateParams struct {
 
 type UpdateParams struct {
 	ID                 string                 `json:"id" validate:"required"`
-	Name               string                 `json:"name" validate:"required"`
+	Name               string                 `json:"name" validate:"required,lte=25"`
 	Phone              string                 `json:"phone" validate:"required,phone"`
 	Address            object.Address         `json:"address" validate:"required"`
 	Type               entity.ShopType        `json:"type" validate:"required,shopType"`
-	BusinessHours      []entity.BusinessHours `json:"businessHours" validate:"required"`
+	BusinessHours      []entity.BusinessHours `json:"businessHours"`
 	PaymentMethodEnums []entity.PaymentMethod
 }
 

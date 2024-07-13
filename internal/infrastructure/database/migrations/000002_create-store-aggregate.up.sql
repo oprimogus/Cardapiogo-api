@@ -21,20 +21,20 @@ CREATE TABLE "store" (
   "id" uuid UNIQUE PRIMARY KEY,
   "cpf_cnpj" varchar UNIQUE NOT NULL,
   "owner_id" uuid NOT NULL,
-  "name" varchar UNIQUE NOT NULL,
+  "name" varchar(25) UNIQUE NOT NULL,
   "active" bool NOT NULL,
-  "phone" varchar UNIQUE NOT NULL,
+  "phone" varchar(18) UNIQUE NOT NULL,
   "score" int NOT NULL,
   "type" "ShopType" NOT NULL,
-  "address_line_1" varchar NOT NULL,
-  "address_line_2" varchar NOT NULL,
-  "neighborhood" varchar NOT NULL,
-  "city" varchar NOT NULL,
-  "state" varchar NOT NULL,
-  "postal_code" varchar NOT NULL,
+  "address_line_1" varchar(40) NOT NULL,
+  "address_line_2" varchar(20) NOT NULL,
+  "neighborhood" varchar(25) NOT NULL,
+  "city" varchar(25) NOT NULL,
+  "state" varchar(15) NOT NULL,
+  "postal_code" varchar(15) NOT NULL,
   "latitude" varchar,
   "longitude" varchar,
-  "country" varchar NOT NULL,
+  "country" varchar(15) NOT NULL,
   "created_at" timestamp NOT NULL,
   "updated_at" timestamp,
   "deleted_at" timestamp
@@ -43,8 +43,8 @@ CREATE TABLE "store" (
 CREATE TABLE "bussiness_hour" (
   "store_id" uuid PRIMARY KEY,
   "week_day" int NOT NULL,
-  "opening_time" varchar NOT NULL,
-  "closing_time" varchar NOT NULL
+  "opening_time" varchar(5) NOT NULL,
+  "closing_time" varchar(5) NOT NULL
 );
 
 CREATE TABLE "payment_method" (

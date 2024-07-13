@@ -25,7 +25,7 @@ func (u Update) Execute(ctx context.Context, params UpdateParams) error {
 		return fmt.Errorf("invalid userID: '%s'", userID)
 	}
 
-	isOwner, errIsOwner := u.repository.IsOwner(ctx, userID)
+	isOwner, errIsOwner := u.repository.IsOwner(ctx, params.ID, userID)
 	if errIsOwner != nil {
 		return errIsOwner
 	}
@@ -35,6 +35,7 @@ func (u Update) Execute(ctx context.Context, params UpdateParams) error {
 	}
 
 	UpdatedStore := entity.Store{
+		ID: params.ID,
 		Name:               params.Name,
 		Phone:              params.Phone,
 		Address:            params.Address,
@@ -43,7 +44,7 @@ func (u Update) Execute(ctx context.Context, params UpdateParams) error {
 		PaymentMethodEnums: params.PaymentMethodEnums,
 	}
 
-	err := u.repository.Update(ctx, UpdatedStore)
+	err := u.repository.Update(ctx, userID, UpdatedStore)
 	if err != nil {
 		return err
 	}

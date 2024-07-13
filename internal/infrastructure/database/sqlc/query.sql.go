@@ -25,7 +25,7 @@ type CreateStoreParams struct {
 	Active       bool        `db:"active" json:"active"`
 	Phone        string      `db:"phone" json:"phone"`
 	Score        int32       `db:"score" json:"score"`
-	Type         interface{} `db:"type" json:"type"`
+	Type         ShopType    `db:"type" json:"type"`
 	AddressLine1 string      `db:"address_line_1" json:"address_line_1"`
 	AddressLine2 string      `db:"address_line_2" json:"address_line_2"`
 	Neighborhood string      `db:"neighborhood" json:"neighborhood"`
@@ -55,6 +55,72 @@ func (q *Queries) CreateStore(ctx context.Context, arg CreateStoreParams) error 
 		arg.PostalCode,
 		arg.Latitude,
 		arg.Longitude,
+		arg.Country,
+	)
+	return err
+}
+
+const isOwner = `-- name: IsOwner :one
+SELECT EXISTS(SELECT 1 FROM store WHERE id = $1 AND owner_id = $2)
+`
+
+type IsOwnerParams struct {
+	ID      pgtype.UUID `db:"id" json:"id"`
+	OwnerID pgtype.UUID `db:"owner_id" json:"owner_id"`
+}
+
+func (q *Queries) IsOwner(ctx context.Context, arg IsOwnerParams) (bool, error) {
+	row := q.db.QueryRow(ctx, isOwner, arg.ID, arg.OwnerID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const updateStore = `-- name: UpdateStore :exec
+UPDATE store
+  SET 
+    name = $3,
+    phone = $4,
+    type = $5,
+    address_line_1 = $6,
+    address_line_2 = $7,
+    neighborhood = $8,
+    city = $9,
+    state = $10,
+    postal_code = $11,
+    country = $12,
+    updated_at = NOW()
+WHERE id = $1 AND owner_id = $2
+`
+
+type UpdateStoreParams struct {
+	ID           pgtype.UUID `db:"id" json:"id"`
+	OwnerID      pgtype.UUID `db:"owner_id" json:"owner_id"`
+	Name         string      `db:"name" json:"name"`
+	Phone        string      `db:"phone" json:"phone"`
+	Type         ShopType    `db:"type" json:"type"`
+	AddressLine1 string      `db:"address_line_1" json:"address_line_1"`
+	AddressLine2 string      `db:"address_line_2" json:"address_line_2"`
+	Neighborhood string      `db:"neighborhood" json:"neighborhood"`
+	City         string      `db:"city" json:"city"`
+	State        string      `db:"state" json:"state"`
+	PostalCode   string      `db:"postal_code" json:"postal_code"`
+	Country      string      `db:"country" json:"country"`
+}
+
+func (q *Queries) UpdateStore(ctx context.Context, arg UpdateStoreParams) error {
+	_, err := q.db.Exec(ctx, updateStore,
+		arg.ID,
+		arg.OwnerID,
+		arg.Name,
+		arg.Phone,
+		arg.Type,
+		arg.AddressLine1,
+		arg.AddressLine2,
+		arg.Neighborhood,
+		arg.City,
+		arg.State,
+		arg.PostalCode,
 		arg.Country,
 	)
 	return err

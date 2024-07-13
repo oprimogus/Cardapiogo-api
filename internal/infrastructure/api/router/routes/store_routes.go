@@ -26,5 +26,9 @@ func StoreRoutes(router *gin.Engine,
 			middleware.AuthenticationMiddleware(authRepository),
 			middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleOwner}),
 			storeController.Create)
+		v1.PUT("/store",
+			middleware.AuthenticationMiddleware(authRepository),
+			middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleOwner}),
+			storeController.Update)
 	}
 }

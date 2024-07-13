@@ -10,6 +10,8 @@ import (
 
 type Querier interface {
 	CreateStore(ctx context.Context, arg CreateStoreParams) error
+	IsOwner(ctx context.Context, arg IsOwnerParams) (bool, error)
+	UpdateStore(ctx context.Context, arg UpdateStoreParams) error
 }
 
 var _ Querier = (*Queries)(nil)

@@ -138,7 +138,7 @@ type Store struct {
 	Active       bool             `db:"active" json:"active"`
 	Phone        string           `db:"phone" json:"phone"`
 	Score        int32            `db:"score" json:"score"`
-	Type         interface{}      `db:"type" json:"type"`
+	Type         ShopType         `db:"type" json:"type"`
 	AddressLine1 string           `db:"address_line_1" json:"address_line_1"`
 	AddressLine2 string           `db:"address_line_2" json:"address_line_2"`
 	Neighborhood string           `db:"neighborhood" json:"neighborhood"`

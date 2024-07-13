@@ -38,20 +38,20 @@ func NewAuthController(validator *validatorutils.Validator, authRepository repos
 //	@Failure		502		{object}	xerrors.ErrorResponse
 //	@Router			/v1/auth/sign-in [post]
 func (c *AuthController) SignIn(ctx *gin.Context) {
-	var loginParams authentication.SignInParams
-	err := ctx.BindJSON(&loginParams)
+	var params authentication.SignInParams
+	err := ctx.BindJSON(&params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	errValidate := c.validator.Validate(loginParams)
+	errValidate := c.validator.Validate(params)
 	if errValidate != nil {
 		xerror := xerrors.Map(errValidate)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	jwt, err := c.signIn.Execute(ctx, loginParams.Email, loginParams.Password)
+	jwt, err := c.signIn.Execute(ctx, params.Email, params.Password)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)

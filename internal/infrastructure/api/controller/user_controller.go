@@ -43,22 +43,22 @@ func NewUserController(validator *validatorutils.Validator, userRepository repos
 //	@Failure		502	{object}	xerrors.ErrorResponse
 //	@Router			/v1/auth/sign-up [post]
 func (c *UserController) CreateUser(ctx *gin.Context) {
-	var signUpParams user.CreateParams
-	err := ctx.BindJSON(&signUpParams)
+	var params user.CreateParams
+	err := ctx.BindJSON(&params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
-	errValidate := c.validator.Validate(signUpParams)
+	errValidate := c.validator.Validate(params)
 	if errValidate != nil {
 		xerror := xerrors.Map(errValidate)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
-	er := c.create.Execute(ctx, signUpParams)
+	er := c.create.Execute(ctx, params)
 	if er != nil {
 		xerror := xerrors.Map(er)
 		ctx.JSON(xerror.Status, xerror)
@@ -82,22 +82,22 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 //	@Security		Bearer Token
 //	@Router			/v1/user [put]
 func (c *UserController) UpdateUser(ctx *gin.Context) {
-	var updateParams user.UpdateProfileParams
-	err := ctx.BindJSON(&updateParams)
+	var params user.UpdateProfileParams
+	err := ctx.BindJSON(&params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
-	errValidate := c.validator.Validate(updateParams)
+	errValidate := c.validator.Validate(params)
 	if errValidate != nil {
 		xerror := xerrors.Map(errValidate)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
-	er := c.update.Execute(ctx, updateParams)
+	er := c.update.Execute(ctx, params)
 	if er != nil {
 		xerror := xerrors.Map(er)
 		ctx.JSON(xerror.Status, xerror)
@@ -121,22 +121,22 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 //	@Security		Bearer Token
 //	@Router			/v1/user/roles [post]
 func (c *UserController) AddRolesToUser(ctx *gin.Context) {
-	var addRolesParams user.AddRolesParams
-	err := ctx.BindJSON(&addRolesParams)
+	var params user.AddRolesParams
+	err := ctx.BindJSON(&params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
-	errValidate := c.validator.Validate(addRolesParams)
+	errValidate := c.validator.Validate(params)
 	if errValidate != nil {
 		xerror := xerrors.Map(errValidate)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
-	er := c.addRoles.Execute(ctx, addRolesParams.Roles)
+	er := c.addRoles.Execute(ctx, params.Roles)
 	if er != nil {
 		xerror := xerrors.Map(er)
 		ctx.JSON(xerror.Status, xerror)

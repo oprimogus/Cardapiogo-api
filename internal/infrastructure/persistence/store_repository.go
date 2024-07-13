@@ -63,7 +63,33 @@ func (s *StoreRepository) Create(ctx context.Context, params entity.Store) error
 	return nil
 }
 
-func (s *StoreRepository) Update(ctx context.Context, params entity.Store) error {
+func (s *StoreRepository) Update(ctx context.Context, userID string, params entity.Store) error {
+	convertedUserID, errUserID := converters.ConvertStringToUUID(userID)
+	if errUserID != nil {
+		return fmt.Errorf("fail in convert uuidv7: %w", errUserID)
+	}
+
+	convertedStoreID, errStoreId := converters.ConvertStringToUUID(params.ID)
+	if errStoreId != nil {
+		return fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
+	}
+	err := s.querier.UpdateStore(ctx, sqlc.UpdateStoreParams{
+		ID: convertedStoreID,
+		OwnerID: convertedUserID,
+		Name: params.Name,
+		Phone: params.Phone,
+		Type: sqlc.ShopType(params.Type),
+		AddressLine1: params.Address.AddressLine1,
+		AddressLine2: params.Address.AddressLine2,
+		Neighborhood: params.Address.Neighborhood,
+		City: params.Address.City,
+		State: params.Address.State,
+		PostalCode: params.Address.PostalCode,
+		Country: params.Address.Country,
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -83,6 +109,19 @@ func (s *StoreRepository) Enable(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *StoreRepository) IsOwner(ctx context.Context, userID string) (bool, error) {
-	return false, nil
+func (s *StoreRepository) IsOwner(ctx context.Context, id, userID string) (bool, error) {
+	convertedUserID, errUserID := converters.ConvertStringToUUID(userID)
+	if errUserID != nil {
+		return false, fmt.Errorf("fail in convert uuidv7: %w", errUserID)
+	}
+
+	convertedStoreID, errStoreId := converters.ConvertStringToUUID(id)
+	if errStoreId != nil {
+		return false, fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
+	}
+	isOwner, err := s.querier.IsOwner(ctx, sqlc.IsOwnerParams{ID: convertedStoreID, OwnerID: convertedUserID})
+	if err != nil {
+		return false, err
+	}
+	return isOwner, nil
 }
