@@ -25,10 +25,10 @@ const (
 )
 
 type fieldError struct {
-	Field   string `json:"field"`
-	Input   string `json:"input"`
-	Message string `json:"message"`
-	Debug interface{} `json:"debug,omitempty"`
+	Field   string      `json:"field"`
+	Input   string      `json:"input"`
+	Message string      `json:"message"`
+	Debug   interface{} `json:"debug,omitempty"`
 }
 
 func mapDatabaseErrors(err error) *ErrorResponse {

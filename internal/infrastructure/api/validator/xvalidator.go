@@ -17,10 +17,12 @@ import (
 var personalizedValidations = map[string]func(fl validator.FieldLevel) bool{
 	"role":          isValidUserRole,
 	"cpf":           IsValidCpf,
+	"cnpj":          IsValidCnpj,
 	"cpfCnpj":       IsValidCpfOrCnpj,
 	"shopType":      IsValidShopType,
 	"paymentMethod": IsValidPaymentMethod,
 	"phone":         IsValidPhone,
+	"businessHour": IsValidBusinessHour,
 }
 
 type Validator struct {
@@ -71,6 +73,8 @@ func NewValidator(locale string) (*Validator, error) {
 
 func (v *Validator) Validate(i interface{}) *xerrors.ErrorResponse {
 	out := make(map[string]string)
+
+	// err1 := v.Validator.StructCtx(nil, i)
 
 	err := v.Validator.Struct(i)
 	if err != nil {

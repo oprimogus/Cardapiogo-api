@@ -72,7 +72,7 @@ type StoreFilter struct {
 
 type Store struct {
 	ID                 string          `db:"id" json:"id" validate:"required,uuid"`
-	CpfCnpj            string          `db:"cpf_cnpj" json:"cpfCnpj" validate:"required"`
+	CpfCnpj            string          `db:"cpf_cnpj" json:"cpfCnpj" validate:"required,cpfCnpj"`
 	OwnerID            string          `db:"owner_id" json:"owner_id" validate:"required,uuid"`
 	Name               string          `db:"name" json:"name" validate:"required"`
 	Active             bool            `db:"active" json:"active" validate:"required,boolean"`

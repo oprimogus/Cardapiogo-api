@@ -12,7 +12,7 @@ type ErrorResponse struct {
 	Status       int         `json:"-"`
 	ErrorMessage string      `json:"error"`
 	Details      interface{} `json:"details"`
-	Debug interface{} `json:"debug,omitempty"`
+	Debug        interface{} `json:"debug,omitempty"`
 }
 
 func New(status int, message string, details ...interface{}) *ErrorResponse {

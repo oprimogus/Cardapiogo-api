@@ -27,8 +27,8 @@ func (d CreateProfileParams) ToEntity() entity.Profile {
 }
 
 type CreateParams struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
+	Email    string              `json:"email" validate:"required,email"`
+	Password string              `json:"password" validate:"required"`
 	Profile  CreateProfileParams `json:"profile" validate:"required"`
 }
 

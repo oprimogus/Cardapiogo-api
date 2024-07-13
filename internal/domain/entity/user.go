@@ -24,10 +24,10 @@ func IsValidUserRole(role string) bool {
 }
 
 type User struct {
-	ID        string `db:"id" json:"id" validate:"required,uuid"`
-	Profile   Profile `db:"profile" json:"profile" validate:"required"`
-	Email     string `db:"email" json:"email" validate:"required,email"`
-	Password  string `db:"password" json:"password" validate:"required"`
+	ID        string     `db:"id" json:"id" validate:"required,uuid"`
+	Profile   Profile    `db:"profile" json:"profile" validate:"required"`
+	Email     string     `db:"email" json:"email" validate:"required,email"`
+	Password  string     `db:"password" json:"password" validate:"required"`
 	Roles     []UserRole `db:"role" json:"role" validate:"required,role"`
 	CreatedAt time.Time
 	UpdatedAt time.Time

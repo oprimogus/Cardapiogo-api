@@ -76,9 +76,11 @@ func IsValidCnpj(fl validator.FieldLevel) bool {
 	if isAllEqual(cnpj) {
 		return false
 	}
+
 	d1 := calculateDigitCnpj(cnpj, 12)
 	d2 := calculateDigitCnpj(cnpj, 13)
-	return strconv.Itoa(d1) == cnpj[10:11] && strconv.Itoa(d2) == cnpj[12:13]
+
+	return strconv.Itoa(d1) == string(cnpj[12]) && strconv.Itoa(d2) == string(cnpj[13])
 }
 
 func isAllEqual(value string) bool {
@@ -107,12 +109,19 @@ func calculateDigitCpf(cpf string, weight int) int {
 
 func calculateDigitCnpj(cnpj string, factor int) int {
 	sum := 0
-	weights := []int{6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
-
-	for i := 0; i < factor-1; i++ {
-		num, _ := strconv.Atoi(string(cnpj[i]))
-		sum += num * weights[i+12-factor]
+	var weights []int
+	if factor < 13 {
+		weights = []int{5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
+	} else {
+		weights = []int{6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
 	}
+	
+
+	for i := 0; i < factor; i++ {
+		num, _ := strconv.Atoi(string(cnpj[i]))
+		sum += num * weights[i]
+	}
+
 	rest := sum % 11
 	if rest < 2 {
 		return 0
