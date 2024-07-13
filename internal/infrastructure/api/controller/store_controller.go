@@ -15,6 +15,7 @@ type StoreController struct {
 	validator *validatorutils.Validator
 	create    store.Create
 	update store.Update
+	getByID store.GetByID
 }
 
 func NewStoreController(validator *validatorutils.Validator, repository repository.StoreRepository) *StoreController {
@@ -22,6 +23,7 @@ func NewStoreController(validator *validatorutils.Validator, repository reposito
 		validator: validator,
 		create:    store.NewCreate(repository),
 		update: store.NewUpdate(repository),
+		getByID: store.NewGetByID(repository),
 	}
 }
 
@@ -103,4 +105,28 @@ func (c *StoreController) Update(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusOK)
+}
+
+// GetStoreByID godoc
+//
+//	@Summary		Any user can view a store.
+//	@Description	Any user can view a store.
+//	@Tags			Store
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string	true	"Store ID"
+//	@Success		200	{object}	store.GetStoreByIdOutput
+//	@Failure		404	{object}	xerrors.ErrorResponse
+//	@Failure		500	{object}	xerrors.ErrorResponse
+//	@Failure		502	{object}	xerrors.ErrorResponse
+//	@Router			/v1/store/{id} [get]
+func (c *StoreController) GetStoreByID(ctx *gin.Context) {
+	id := ctx.Param("id")
+	store, err := c.getByID.Execute(ctx, id)
+	if err != nil {
+		xerror := xerrors.Map(err)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+	ctx.JSON(http.StatusOK, store)
 }

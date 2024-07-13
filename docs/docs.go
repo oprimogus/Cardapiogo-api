@@ -253,6 +253,62 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/store/{id}": {
+            "get": {
+                "description": "Any user can view a store.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Any user can view a store.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Store ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.GetStoreByIdOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/user": {
             "put": {
                 "security": [
@@ -376,6 +432,24 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.BusinessHours": {
+            "type": "object"
+        },
+        "entity.PaymentMethod": {
+            "type": "string",
+            "enum": [
+                "credit",
+                "debit",
+                "pix",
+                "cash"
+            ],
+            "x-enum-varnames": [
+                "Credit",
+                "Debit",
+                "Pix",
+                "Cash"
+            ]
+        },
         "entity.ShopType": {
             "type": "string",
             "enum": [
@@ -492,6 +566,43 @@ const docTemplate = `{
                 }
             }
         },
+        "store.AddressOutput": {
+            "type": "object",
+            "required": [
+                "addressLine1",
+                "addressLine2",
+                "city",
+                "country",
+                "neighborhood",
+                "state"
+            ],
+            "properties": {
+                "addressLine1": {
+                    "type": "string",
+                    "maxLength": 40
+                },
+                "addressLine2": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "city": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "country": {
+                    "type": "string",
+                    "maxLength": 15
+                },
+                "neighborhood": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "state": {
+                    "type": "string",
+                    "maxLength": 15
+                }
+            }
+        },
         "store.CreateParams": {
             "type": "object",
             "required": [
@@ -514,6 +625,52 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.ShopType"
+                }
+            }
+        },
+        "store.GetStoreByIdOutput": {
+            "type": "object",
+            "required": [
+                "address",
+                "businessHours",
+                "id",
+                "name",
+                "paymentMethod",
+                "phone",
+                "score",
+                "type"
+            ],
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/store.AddressOutput"
+                },
+                "businessHours": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.BusinessHours"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "paymentMethod": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.PaymentMethod"
+                    }
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer"
                 },
                 "type": {
                     "$ref": "#/definitions/entity.ShopType"

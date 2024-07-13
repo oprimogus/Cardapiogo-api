@@ -6,10 +6,13 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
 	CreateStore(ctx context.Context, arg CreateStoreParams) error
+	GetStoreByID(ctx context.Context, id pgtype.UUID) (GetStoreByIDRow, error)
 	IsOwner(ctx context.Context, arg IsOwnerParams) (bool, error)
 	UpdateStore(ctx context.Context, arg UpdateStoreParams) error
 }

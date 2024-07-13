@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/oprimogus/cardapiogo/internal/domain/entity"
+	"github.com/oprimogus/cardapiogo/internal/domain/object"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/database/sqlc"
 	"github.com/oprimogus/cardapiogo/pkg/converters"
@@ -74,18 +75,18 @@ func (s *StoreRepository) Update(ctx context.Context, userID string, params enti
 		return fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
 	}
 	err := s.querier.UpdateStore(ctx, sqlc.UpdateStoreParams{
-		ID: convertedStoreID,
-		OwnerID: convertedUserID,
-		Name: params.Name,
-		Phone: params.Phone,
-		Type: sqlc.ShopType(params.Type),
+		ID:           convertedStoreID,
+		OwnerID:      convertedUserID,
+		Name:         params.Name,
+		Phone:        params.Phone,
+		Type:         sqlc.ShopType(params.Type),
 		AddressLine1: params.Address.AddressLine1,
 		AddressLine2: params.Address.AddressLine2,
 		Neighborhood: params.Address.Neighborhood,
-		City: params.Address.City,
-		State: params.Address.State,
-		PostalCode: params.Address.PostalCode,
-		Country: params.Address.Country,
+		City:         params.Address.City,
+		State:        params.Address.State,
+		PostalCode:   params.Address.PostalCode,
+		Country:      params.Address.Country,
 	})
 	if err != nil {
 		return err
@@ -93,8 +94,30 @@ func (s *StoreRepository) Update(ctx context.Context, userID string, params enti
 	return nil
 }
 
-func (s *StoreRepository) GetByID(ctx context.Context, id string) (entity.Store, error) {
-	return entity.Store{}, nil
+func (s *StoreRepository) FindByID(ctx context.Context, id string) (entity.Store, error) {
+	convertedStoreID, errStoreId := converters.ConvertStringToUUID(id)
+	if errStoreId != nil {
+		return entity.Store{}, fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
+	}
+	store, err := s.querier.GetStoreByID(ctx, convertedStoreID)
+	if err != nil {
+		return entity.Store{}, err
+	}
+	return entity.Store{
+		ID:    id,
+		Name:  store.Name,
+		Phone: store.Phone,
+		Score: int(store.Score),
+		Type:  entity.ShopType(store.Type),
+		Address: object.Address{
+			AddressLine1: store.AddressLine1,
+			AddressLine2: store.AddressLine2,
+			Neighborhood: store.Neighborhood,
+			City:         store.City,
+			State:        store.State,
+			Country:      store.Country,
+		},
+	}, nil
 }
 
 func (s *StoreRepository) GetByFilter(ctx context.Context, params entity.StoreFilter) (*[]entity.Store, error) {

@@ -7,7 +7,7 @@ type Address struct {
 	City         string `db:"city" json:"city" validate:"required,lte=25"`
 	State        string `db:"state" json:"state" validate:"required,lte=15"`
 	PostalCode   string `db:"postal_code" json:"postalCode" validate:"required,lte=15"`
-	Latitude     string `db:"latitude" json:"latitude" validate:""`
-	Longitude    string `db:"longitude" json:"longitude" validate:""`
+	Latitude     string `db:"latitude" json:"latitude"`
+	Longitude    string `db:"longitude" json:"longitude"`
 	Country      string `db:"country" json:"country" validate:"required,lte=15"`
 }

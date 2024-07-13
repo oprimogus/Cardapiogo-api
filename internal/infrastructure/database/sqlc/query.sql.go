@@ -60,6 +60,56 @@ func (q *Queries) CreateStore(ctx context.Context, arg CreateStoreParams) error 
 	return err
 }
 
+const getStoreByID = `-- name: GetStoreByID :one
+SELECT 
+  id,
+  name,
+  phone,
+  score,
+  type,
+  address_line_1,
+  address_line_2,
+  neighborhood,
+  city,
+  state,
+  country
+FROM store
+  WHERE id = $1
+`
+
+type GetStoreByIDRow struct {
+	ID           pgtype.UUID `db:"id" json:"id"`
+	Name         string      `db:"name" json:"name"`
+	Phone        string      `db:"phone" json:"phone"`
+	Score        int32       `db:"score" json:"score"`
+	Type         ShopType    `db:"type" json:"type"`
+	AddressLine1 string      `db:"address_line_1" json:"address_line_1"`
+	AddressLine2 string      `db:"address_line_2" json:"address_line_2"`
+	Neighborhood string      `db:"neighborhood" json:"neighborhood"`
+	City         string      `db:"city" json:"city"`
+	State        string      `db:"state" json:"state"`
+	Country      string      `db:"country" json:"country"`
+}
+
+func (q *Queries) GetStoreByID(ctx context.Context, id pgtype.UUID) (GetStoreByIDRow, error) {
+	row := q.db.QueryRow(ctx, getStoreByID, id)
+	var i GetStoreByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Phone,
+		&i.Score,
+		&i.Type,
+		&i.AddressLine1,
+		&i.AddressLine2,
+		&i.Neighborhood,
+		&i.City,
+		&i.State,
+		&i.Country,
+	)
+	return i, err
+}
+
 const isOwner = `-- name: IsOwner :one
 SELECT EXISTS(SELECT 1 FROM store WHERE id = $1 AND owner_id = $2)
 `

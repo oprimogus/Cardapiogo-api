@@ -21,3 +21,19 @@ WHERE id = $1 AND owner_id = $2;
 
 -- name: IsOwner :one
 SELECT EXISTS(SELECT 1 FROM store WHERE id = $1 AND owner_id = $2);
+
+-- name: GetStoreByID :one
+SELECT 
+  id,
+  name,
+  phone,
+  score,
+  type,
+  address_line_1,
+  address_line_2,
+  neighborhood,
+  city,
+  state,
+  country
+FROM store
+  WHERE id = $1;

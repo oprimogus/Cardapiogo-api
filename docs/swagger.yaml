@@ -12,6 +12,20 @@ definitions:
     - email
     - password
     type: object
+  entity.BusinessHours:
+    type: object
+  entity.PaymentMethod:
+    enum:
+    - credit
+    - debit
+    - pix
+    - cash
+    type: string
+    x-enum-varnames:
+    - Credit
+    - Debit
+    - Pix
+    - Cash
   entity.ShopType:
     enum:
     - restaurant
@@ -99,6 +113,34 @@ definitions:
       token_type:
         type: string
     type: object
+  store.AddressOutput:
+    properties:
+      addressLine1:
+        maxLength: 40
+        type: string
+      addressLine2:
+        maxLength: 20
+        type: string
+      city:
+        maxLength: 25
+        type: string
+      country:
+        maxLength: 15
+        type: string
+      neighborhood:
+        maxLength: 25
+        type: string
+      state:
+        maxLength: 15
+        type: string
+    required:
+    - addressLine1
+    - addressLine2
+    - city
+    - country
+    - neighborhood
+    - state
+    type: object
   store.CreateParams:
     properties:
       address:
@@ -117,6 +159,39 @@ definitions:
     - cpfCnpj
     - name
     - phone
+    - type
+    type: object
+  store.GetStoreByIdOutput:
+    properties:
+      address:
+        $ref: '#/definitions/store.AddressOutput'
+      businessHours:
+        items:
+          $ref: '#/definitions/entity.BusinessHours'
+        type: array
+      id:
+        type: string
+      name:
+        maxLength: 25
+        type: string
+      paymentMethod:
+        items:
+          $ref: '#/definitions/entity.PaymentMethod'
+        type: array
+      phone:
+        type: string
+      score:
+        type: integer
+      type:
+        $ref: '#/definitions/entity.ShopType'
+    required:
+    - address
+    - businessHours
+    - id
+    - name
+    - paymentMethod
+    - phone
+    - score
     - type
     type: object
   store.UpdateParams:
@@ -336,6 +411,43 @@ paths:
           schema:
             $ref: '#/definitions/xerrors.ErrorResponse'
       summary: Owner can update your stores.
+      tags:
+      - Store
+  /v1/store/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Any user can view a store.
+      parameters:
+      - description: Store ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.GetStoreByIdOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+      summary: Any user can view a store.
       tags:
       - Store
   /v1/user:

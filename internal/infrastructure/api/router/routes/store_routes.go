@@ -30,5 +30,6 @@ func StoreRoutes(router *gin.Engine,
 			middleware.AuthenticationMiddleware(authRepository),
 			middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleOwner}),
 			storeController.Update)
+		v1.GET("/store/:id", storeController.GetStoreByID)
 	}
 }
