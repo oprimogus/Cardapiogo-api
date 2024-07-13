@@ -20,9 +20,8 @@ const (
 	NULL_VIOLATION        = "Null value not allowed for column."
 	VALUE_TOO_LONG        = "Input value too long for column."
 	INTERNAL_SERVER_ERROR = "Internal Server Error."
-	INVALID_VALUE         = "Invalid value for field."
-	UNKNOWN_ERROR         = "UnknoThre wn error."
-	// DUPLICATED_RECORD     = "Already exist a resource with this field registered"
+	INVALID_VALUES        = "Invalid values for few fields"
+	UNKNOWN_ERROR         = "Unknown error."
 )
 
 type fieldError struct {
@@ -42,15 +41,12 @@ func mapDatabaseErrors(err error) *ErrorResponse {
 		switch pgErr.Code {
 		case "23505":
 			return handleUniqueViolation(pgErr)
-		case "23503": // Violação de chave estrangeira
-			return New(http.StatusBadRequest, FOREIGN_KEY_VIOLATION, pgErr.Message)
-		case "23502": // Violação de campo não nulo
-			return New(http.StatusBadRequest, NULL_VIOLATION, pgErr.Message)
-		case "22001": // Dados da string muito longos
-			return New(http.StatusBadRequest, VALUE_TOO_LONG, pgErr.Message)
-		case "22P02": // Inserção de dado inválido
-			return New(http.StatusBadRequest, INVALID_VALUE, pgErr.Message)
+		case "23502", "22001", "22P02":
+			return handleColumnViolation(pgErr)
 		default:
+			if environment != "release" {
+				return New(http.StatusInternalServerError, UNKNOWN_ERROR, pgErr)
+			}
 			return New(http.StatusInternalServerError, UNKNOWN_ERROR, pgErr.Message)
 		}
 	}
@@ -92,4 +88,16 @@ func handleUniqueViolation(pgErr *pgconn.PgError) *ErrorResponse {
 		fieldError.Debug = pgErr
 	}
 	return New(http.StatusConflict, DUPLICATED_RECORD, fieldError)
+}
+
+func handleColumnViolation(pgErr *pgconn.PgError) *ErrorResponse {
+	fieldError := fieldError{
+		Field:   "",
+		Input:   "",
+		Message: pgErr.Message,
+	}
+	if environment != "release" {
+		fieldError.Debug = pgErr
+	}
+	return New(http.StatusBadRequest, INVALID_VALUES, fieldError)
 }

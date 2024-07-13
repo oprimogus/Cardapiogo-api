@@ -50,7 +50,7 @@ func (s *StoreRepository) Create(ctx context.Context, params entity.Store) error
 		AddressLine2: params.Address.AddressLine2,
 		Neighborhood: params.Address.Neighborhood,
 		City:         params.Address.City,
-		State:        params.Address.PostalCode,
+		State:        params.Address.State,
 		PostalCode:   params.Address.PostalCode,
 		Latitude:     converters.ConvertStringToText(params.Address.Latitude),
 		Longitude:    converters.ConvertStringToText(params.Address.Longitude),
