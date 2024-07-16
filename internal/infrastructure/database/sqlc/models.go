@@ -117,7 +117,7 @@ type Address struct {
 	CreatedAt    pgtype.Timestamp `db:"created_at" json:"created_at"`
 }
 
-type BussinessHour struct {
+type BusinessHour struct {
 	StoreID     pgtype.UUID `db:"store_id" json:"store_id"`
 	WeekDay     int32       `db:"week_day" json:"week_day"`
 	OpeningTime string      `db:"opening_time" json:"opening_time"`

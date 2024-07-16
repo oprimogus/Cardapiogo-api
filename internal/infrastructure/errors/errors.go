@@ -1,6 +1,8 @@
 package xerrors
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/Nerzal/gocloak/v13"
@@ -26,6 +28,13 @@ func New(status int, message string, details ...interface{}) *ErrorResponse {
 func Map(err error) *ErrorResponse {
 	if errResp, ok := err.(*ErrorResponse); ok {
 		return errResp
+	}
+	if errResp, ok := err.(*json.UnmarshalTypeError); ok {
+		return &ErrorResponse{
+			Status:       http.StatusBadRequest,
+			ErrorMessage: fmt.Sprintf("Invalid JSON: field %s is not valid for type %s", errResp.Field, errResp.Value),
+			Details:      errResp.Struct,
+		}
 	}
 	if errResp, ok := err.(*gocloak.APIError); ok {
 		return &ErrorResponse{

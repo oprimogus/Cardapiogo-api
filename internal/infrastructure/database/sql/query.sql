@@ -23,17 +23,27 @@ WHERE id = $1 AND owner_id = $2;
 SELECT EXISTS(SELECT 1 FROM store WHERE id = $1 AND owner_id = $2);
 
 -- name: GetStoreByID :one
-SELECT 
-  id,
-  name,
-  phone,
-  score,
-  type,
-  address_line_1,
-  address_line_2,
-  neighborhood,
-  city,
-  state,
-  country
-FROM store
-  WHERE id = $1;
+SELECT s.id, s.name, s.phone, s.score, s.type, s.address_line_1, s.address_line_2, s.neighborhood, s.city, s.state, s.country
+FROM store s
+WHERE id = $1;
+
+-- name: GetStoreBusinessHoursByID :many
+SELECT week_day, opening_time, closing_time
+FROM business_hour
+WHERE store_id = $1
+ORDER BY week_day;
+
+-- name: UpsertBusinessHours :batchexec
+INSERT INTO business_hour(store_id, week_day, opening_time, closing_time)
+VALUES ($1, $2, $3, $4)
+ON CONFLICT (store_id, week_day)
+DO UPDATE SET
+  opening_time = EXCLUDED.opening_time,
+  closing_time = EXCLUDED.closing_time;
+
+-- name: DeleteBusinessHours :batchexec
+DELETE FROM business_hour
+WHERE store_id = $1
+  AND week_day = $2
+  AND opening_time = $3
+  AND closing_time = $4;

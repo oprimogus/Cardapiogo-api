@@ -9,7 +9,7 @@ type CreateParams struct {
 	CpfCnpj string          `json:"cpfCnpj" validate:"required,cpfCnpj"`
 	Name    string          `json:"name" validate:"required,lte=25"`
 	Phone   string          `json:"phone" validate:"required,phone"`
-	Address object.Address  `json:"address" validate:"required"`
+	Address object.Address  `json:"address" validate:"required, dive"`
 	Type    entity.ShopType `json:"type" validate:"required,shopType"`
 }
 
@@ -19,28 +19,33 @@ type UpdateParams struct {
 	Phone              string                 `json:"phone" validate:"required,phone"`
 	Address            object.Address         `json:"address" validate:"required"`
 	Type               entity.ShopType        `json:"type" validate:"required,shopType"`
-	BusinessHours      []entity.BusinessHours `json:"businessHours"`
-	PaymentMethodEnums []entity.PaymentMethod
+	BusinessHours      []entity.BusinessHours `json:"businessHours" validate:"dive"`
+	PaymentMethodEnums []entity.PaymentMethod `json:"paymentMethod" validate:"dive"`
+}
+
+type StoreBusinessHoursParams struct {
+	ID            string                 `json:"id" validate:"required"`
+	BusinessHours []entity.BusinessHours `json:"businessHours" validate:"dive"`
 }
 
 type GetStoreByIdOutput struct {
-	ID                 string          `db:"id" json:"id" validate:"required,uuid"`
-	Name               string          `db:"name" json:"name" validate:"required,lte=25"`
-	Phone              string          `db:"phone" json:"phone" validate:"required,phone"`
-	Score              int             `db:"score" json:"score" validate:"required,number"`
-	Address            AddressOutput  `db:"address" json:"address" validate:"required"`
-	Type               entity.ShopType        `db:"type" json:"type" validate:"required,shopType"`
-	BusinessHours      []entity.BusinessHours `db:"business_hour" json:"businessHours" validate:"required"`
-	PaymentMethodEnums []entity.PaymentMethod `db:"payment_method" json:"paymentMethod" validate:"required"`
+	ID                 string                 `json:"id"`
+	Name               string                 `json:"name"`
+	Phone              string                 `json:"phone"`
+	Score              int                    `json:"score"`
+	Address            AddressOutput          `json:"address"`
+	Type               entity.ShopType        `json:"type"`
+	BusinessHours      []entity.BusinessHours `json:"businessHours"`
+	PaymentMethodEnums []entity.PaymentMethod `json:"paymentMethod"`
 }
 
 type AddressOutput struct {
-	AddressLine1 string `db:"address_line_1" json:"addressLine1" validate:"required,lte=40"`
-	AddressLine2 string `db:"address_line_2" json:"addressLine2" validate:"required,lte=20"`
-	Neighborhood string `db:"neighborhood" json:"neighborhood" validate:"required,lte=25"`
-	City         string `db:"city" json:"city" validate:"required,lte=25"`
-	State        string `db:"state" json:"state" validate:"required,lte=15"`
-	Country      string `db:"country" json:"country" validate:"required,lte=15"`
+	AddressLine1 string `json:"addressLine1"`
+	AddressLine2 string `json:"addressLine2"`
+	Neighborhood string `json:"neighborhood"`
+	City         string `json:"city"`
+	State        string `json:"state"`
+	Country      string `json:"country"`
 }
 
 func (c CreateParams) Entity(userID string) entity.Store {

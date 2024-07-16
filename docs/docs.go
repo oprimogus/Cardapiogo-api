@@ -138,9 +138,10 @@ const docTemplate = `{
                 "summary": "Owner can update your stores.",
                 "parameters": [
                     {
-                        "description": "UpdateParams",
-                        "name": "request",
+                        "description": "Params to update a store",
+                        "name": "Params",
                         "in": "body",
+                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/store.UpdateParams"
                         }
@@ -202,9 +203,10 @@ const docTemplate = `{
                 "summary": "Owner can create stores.",
                 "parameters": [
                     {
-                        "description": "CreateParams",
-                        "name": "request",
+                        "description": "Params to create a store",
+                        "name": "Params",
                         "in": "body",
+                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/store.CreateParams"
                         }
@@ -213,6 +215,138 @@ const docTemplate = `{
                 "responses": {
                     "201": {
                         "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/store/business-hours": {
+            "put": {
+                "description": "Owner can update business hours of store.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Owner can update business hours of store.",
+                "parameters": [
+                    {
+                        "description": "Params to update business hours of store",
+                        "name": "Params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/store.StoreBusinessHoursParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Owner can delete business hours of store.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Owner can delete business hours of store.",
+                "parameters": [
+                    {
+                        "description": "Params to delete business hours of store",
+                        "name": "Params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/store.StoreBusinessHoursParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -427,7 +561,22 @@ const docTemplate = `{
             }
         },
         "entity.BusinessHours": {
-            "type": "object"
+            "type": "object",
+            "required": [
+                "closingTime",
+                "openingTime"
+            ],
+            "properties": {
+                "closingTime": {
+                    "type": "string"
+                },
+                "openingTime": {
+                    "type": "string"
+                },
+                "weekDay": {
+                    "type": "integer"
+                }
+            }
         },
         "entity.PaymentMethod": {
             "type": "string",
@@ -562,38 +711,24 @@ const docTemplate = `{
         },
         "store.AddressOutput": {
             "type": "object",
-            "required": [
-                "addressLine1",
-                "addressLine2",
-                "city",
-                "country",
-                "neighborhood",
-                "state"
-            ],
             "properties": {
                 "addressLine1": {
-                    "type": "string",
-                    "maxLength": 40
+                    "type": "string"
                 },
                 "addressLine2": {
-                    "type": "string",
-                    "maxLength": 20
+                    "type": "string"
                 },
                 "city": {
-                    "type": "string",
-                    "maxLength": 25
+                    "type": "string"
                 },
                 "country": {
-                    "type": "string",
-                    "maxLength": 15
+                    "type": "string"
                 },
                 "neighborhood": {
-                    "type": "string",
-                    "maxLength": 25
+                    "type": "string"
                 },
                 "state": {
-                    "type": "string",
-                    "maxLength": 15
+                    "type": "string"
                 }
             }
         },
@@ -627,19 +762,68 @@ const docTemplate = `{
         },
         "store.GetStoreByIdOutput": {
             "type": "object",
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/store.AddressOutput"
+                },
+                "businessHours": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.BusinessHours"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "paymentMethod": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.PaymentMethod"
+                    }
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.ShopType"
+                }
+            }
+        },
+        "store.StoreBusinessHoursParams": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "businessHours": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.BusinessHours"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "store.UpdateParams": {
+            "type": "object",
             "required": [
                 "address",
-                "businessHours",
                 "id",
                 "name",
-                "paymentMethod",
                 "phone",
-                "score",
                 "type"
             ],
             "properties": {
                 "address": {
-                    "$ref": "#/definitions/store.AddressOutput"
+                    "$ref": "#/definitions/object.Address"
                 },
                 "businessHours": {
                     "type": "array",
@@ -663,16 +847,10 @@ const docTemplate = `{
                 "phone": {
                     "type": "string"
                 },
-                "score": {
-                    "type": "integer"
-                },
                 "type": {
                     "$ref": "#/definitions/entity.ShopType"
                 }
             }
-        },
-        "store.UpdateParams": {
-            "type": "object"
         },
         "user.AddRolesParams": {
             "type": "object",

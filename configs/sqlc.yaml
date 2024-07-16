@@ -15,3 +15,10 @@ sql:
         emit_exact_table_names: true
         json_tags_case_style: "snake"
         emit_sql_as_comment: true
+#     rules:
+#       - no-delete
+# rules:
+#   - name: no-delete
+#     message: "don't use delete statements"
+#     rule: |
+#       query.sql.contains("DELETE")

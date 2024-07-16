@@ -58,9 +58,25 @@ func IsBusinessHour(value string) bool {
 }
 
 type BusinessHours struct {
-	WeekDay     time.Weekday `db:"week_day" json:"weekDay" validate:"required,number,gte=0,lte=6"`
-	OpeningTime string       `db:"opening_time" json:"openingTime" validate:"required,businessHour"`
-	ClosingTime string       `db:"closing_time" json:"closingTime" validate:"required,businessHour"`
+	WeekDay     int    `json:"weekDay" validate:"weekDay"`
+	OpeningTime string `json:"openingTime" validate:"required,businessHour"`
+	ClosingTime string `json:"closingTime" validate:"required,businessHour"`
+}
+
+func IsValidBusinessHourSlice(slice []BusinessHours) bool {
+	businessHours := slice
+	if len(businessHours) > 0 {
+		mapFrequency := map[int]int{}
+		for _, v := range businessHours {
+			mapFrequency[v.WeekDay] += 1
+		}
+		for i := range businessHours {
+			if mapFrequency[i] > 1 {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 type StoreFilter struct {
@@ -71,20 +87,20 @@ type StoreFilter struct {
 }
 
 type Store struct {
-	ID                 string          `db:"id" json:"id" validate:"required,uuid"`
-	CpfCnpj            string          `db:"cpf_cnpj" json:"cpfCnpj" validate:"required,cpfCnpj"`
-	OwnerID            string          `db:"owner_id" json:"owner_id" validate:"required,uuid"`
-	Name               string          `db:"name" json:"name" validate:"required,lte=25"`
-	Active             bool            `db:"active" json:"active" validate:"required,boolean"`
-	Phone              string          `db:"phone" json:"phone" validate:"required,phone"`
-	Score              int             `db:"score" json:"score" validate:"required,number"`
-	Address            object.Address  `db:"address" json:"address" validate:"required"`
-	Type               ShopType        `db:"type" json:"type" validate:"required,shopType"`
-	BusinessHours      []BusinessHours `db:"business_hour" json:"businessHours" validate:"required"`
-	PaymentMethodEnums []PaymentMethod `db:"payment_method" json:"paymentMethod" validate:"required"`
-	CreatedAt          time.Time       `db:"created_at" json:"created_at"`
-	UpdatedAt          time.Time       `db:"updated_at" json:"updated_at"`
-	DeletedAt          time.Time       `db:"deleted_at" json:"deleted_at"`
+	ID                 string          `json:"id" validate:"required,uuid"`
+	CpfCnpj            string          `json:"cpfCnpj" validate:"required,cpfCnpj"`
+	OwnerID            string          `json:"owner_id" validate:"required,uuid"`
+	Name               string          `json:"name" validate:"required,lte=25"`
+	Active             bool            `json:"active" validate:"required,boolean"`
+	Phone              string          `json:"phone" validate:"required,phone"`
+	Score              int             `json:"score" validate:"required,number"`
+	Address            object.Address  `json:"address" validate:"required"`
+	Type               ShopType        `json:"type" validate:"required,shopType"`
+	BusinessHours      []BusinessHours `json:"businessHours" validate:"dive"`
+	PaymentMethodEnums []PaymentMethod `json:"paymentMethod" validate:"dive"`
+	CreatedAt          time.Time       `json:"created_at"`
+	UpdatedAt          time.Time       `json:"updated_at"`
+	DeletedAt          time.Time       `json:"deleted_at"`
 }
 
 func NewStore(ownerID, name, cpfCnpj, phone string, address object.Address, shopType ShopType) Store {

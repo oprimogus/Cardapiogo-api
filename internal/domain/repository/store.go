@@ -14,4 +14,6 @@ type StoreRepository interface {
 	Delete(ctx context.Context, id string) error
 	Enable(ctx context.Context, id string) error
 	IsOwner(ctx context.Context, id, userID string) (bool, error)
+	UpsertBusinessHour(ctx context.Context, storeID string, params []entity.BusinessHours) error
+	DeleteBusinessHour(ctx context.Context, storeID string, params []entity.BusinessHours) error
 }

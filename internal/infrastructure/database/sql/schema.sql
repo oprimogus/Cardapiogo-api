@@ -40,11 +40,12 @@ CREATE TABLE "store" (
   "deleted_at" timestamp
 );
 
-CREATE TABLE "bussiness_hour" (
-  "store_id" uuid PRIMARY KEY,
-  "week_day" int NOT NULL,
+CREATE TABLE "business_hour" (
+  "store_id" uuid NOT NULL,
+  "week_day" int NOT NULL CHECK ("week_day" >= 0 AND "week_day" <= 6),
   "opening_time" varchar NOT NULL,
-  "closing_time" varchar NOT NULL
+  "closing_time" varchar NOT NULL,
+  PRIMARY KEY ("store_id", "week_day")
 );
 
 CREATE TABLE "payment_method" (
@@ -74,7 +75,7 @@ CREATE TABLE "address" (
 
 COMMENT ON COLUMN "store"."owner_id" IS 'user ID of store owner';
 
-ALTER TABLE "bussiness_hour" ADD FOREIGN KEY ("store_id") REFERENCES "store" ("id");
+ALTER TABLE "business_hour" ADD FOREIGN KEY ("store_id") REFERENCES "store" ("id");
 
 ALTER TABLE "store_payment_method" ADD FOREIGN KEY ("store_id") REFERENCES "store" ("id");
 

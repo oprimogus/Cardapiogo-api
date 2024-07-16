@@ -74,7 +74,8 @@ func (s *StoreRepository) Update(ctx context.Context, userID string, params enti
 	if errStoreId != nil {
 		return fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
 	}
-	err := s.querier.UpdateStore(ctx, sqlc.UpdateStoreParams{
+
+	errUpdateStore := s.querier.UpdateStore(ctx, sqlc.UpdateStoreParams{
 		ID:           convertedStoreID,
 		OwnerID:      convertedUserID,
 		Name:         params.Name,
@@ -88,9 +89,50 @@ func (s *StoreRepository) Update(ctx context.Context, userID string, params enti
 		PostalCode:   params.Address.PostalCode,
 		Country:      params.Address.Country,
 	})
-	if err != nil {
-		return err
+	if errUpdateStore != nil {
+		return errUpdateStore
 	}
+	return nil
+}
+
+func (s *StoreRepository) UpsertBusinessHour(ctx context.Context, storeID string, params []entity.BusinessHours) error {
+	convertedStoreID, errStoreId := converters.ConvertStringToUUID(storeID)
+	if errStoreId != nil {
+		return fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
+	}
+
+	argsSlice := make([]sqlc.UpsertBusinessHoursParams, len(params))
+	for i, v := range params {
+		argsSlice[i] = sqlc.UpsertBusinessHoursParams{
+			StoreID: convertedStoreID,
+			WeekDay: int32(v.WeekDay),
+			OpeningTime: v.OpeningTime,
+			ClosingTime: v.ClosingTime,
+		}
+	}
+
+	batchUpsertBusinessHour := s.querier.UpsertBusinessHours(ctx, argsSlice)
+	batchUpsertBusinessHour.Exec(nil)
+	return nil
+}
+
+func (s *StoreRepository) DeleteBusinessHour(ctx context.Context, storeID string, params []entity.BusinessHours) error {
+	convertedStoreID, errStoreId := converters.ConvertStringToUUID(storeID)
+	if errStoreId != nil {
+		return fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
+	}
+
+	argsSlice := make([]sqlc.DeleteBusinessHoursParams, len(params))
+	for i, v := range params {
+		argsSlice[i] = sqlc.DeleteBusinessHoursParams{
+			StoreID: convertedStoreID,
+			WeekDay: int32(v.WeekDay),
+			OpeningTime: v.OpeningTime,
+			ClosingTime: v.ClosingTime,
+		}
+	}
+	batchDeleteBusinessHours := s.querier.DeleteBusinessHours(ctx, argsSlice)
+	batchDeleteBusinessHours.Exec(nil)
 	return nil
 }
 
@@ -103,6 +145,23 @@ func (s *StoreRepository) FindByID(ctx context.Context, id string) (entity.Store
 	if err != nil {
 		return entity.Store{}, err
 	}
+
+	sqlcStoreBusinessHours, errSqlc := s.querier.GetStoreBusinessHoursByID(ctx, convertedStoreID)
+	if errSqlc != nil {
+		return entity.Store{}, errSqlc
+	}
+
+	businessHours := make([]entity.BusinessHours, len(sqlcStoreBusinessHours))
+	if len(sqlcStoreBusinessHours) > 0 {
+		for i, v := range sqlcStoreBusinessHours {
+			businessHours[i] = entity.BusinessHours{
+				WeekDay:     int(v.WeekDay),
+				OpeningTime: v.OpeningTime,
+				ClosingTime: v.ClosingTime,
+			}
+		}
+	}
+
 	return entity.Store{
 		ID:    id,
 		Name:  store.Name,
@@ -117,6 +176,7 @@ func (s *StoreRepository) FindByID(ctx context.Context, id string) (entity.Store
 			State:        store.State,
 			Country:      store.Country,
 		},
+		BusinessHours: businessHours,
 	}, nil
 }
 

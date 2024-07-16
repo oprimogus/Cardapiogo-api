@@ -83,6 +83,14 @@ func IsValidCnpj(fl validator.FieldLevel) bool {
 	return strconv.Itoa(d1) == string(cnpj[12]) && strconv.Itoa(d2) == string(cnpj[13])
 }
 
+func isValidWeekDay(fl validator.FieldLevel) bool {
+	weekDay := fl.Field().Int()
+	if weekDay >= 0 && weekDay <= 6 {
+		return true
+	}
+	return false
+}
+
 func isAllEqual(value string) bool {
 	for i := range value {
 		if value[i] != value[0] {
@@ -115,7 +123,6 @@ func calculateDigitCnpj(cnpj string, factor int) int {
 	} else {
 		weights = []int{6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
 	}
-	
 
 	for i := 0; i < factor; i++ {
 		num, _ := strconv.Atoi(string(cnpj[i]))

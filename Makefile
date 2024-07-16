@@ -28,6 +28,9 @@ mock:
 
 sqlc:
 	sqlc generate -f configs/sqlc.yaml
+
+sqlc-vet:
+	sqlc vet -f configs/sqlc.yaml
 	
 lint-docs:
 	swag fmt

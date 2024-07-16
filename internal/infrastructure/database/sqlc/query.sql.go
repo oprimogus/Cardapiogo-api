@@ -65,21 +65,49 @@ func (q *Queries) CreateStore(ctx context.Context, arg CreateStoreParams) error 
 	return err
 }
 
+const getStoreBusinessHoursByID = `-- name: GetStoreBusinessHoursByID :many
+SELECT week_day, opening_time, closing_time
+FROM business_hour
+WHERE store_id = $1
+ORDER BY week_day
+`
+
+type GetStoreBusinessHoursByIDRow struct {
+	WeekDay     int32  `db:"week_day" json:"week_day"`
+	OpeningTime string `db:"opening_time" json:"opening_time"`
+	ClosingTime string `db:"closing_time" json:"closing_time"`
+}
+
+// GetStoreBusinessHoursByID
+//
+//	SELECT week_day, opening_time, closing_time
+//	FROM business_hour
+//	WHERE store_id = $1
+//	ORDER BY week_day
+func (q *Queries) GetStoreBusinessHoursByID(ctx context.Context, storeID pgtype.UUID) ([]GetStoreBusinessHoursByIDRow, error) {
+	rows, err := q.db.Query(ctx, getStoreBusinessHoursByID, storeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetStoreBusinessHoursByIDRow
+	for rows.Next() {
+		var i GetStoreBusinessHoursByIDRow
+		if err := rows.Scan(&i.WeekDay, &i.OpeningTime, &i.ClosingTime); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getStoreByID = `-- name: GetStoreByID :one
-SELECT 
-  id,
-  name,
-  phone,
-  score,
-  type,
-  address_line_1,
-  address_line_2,
-  neighborhood,
-  city,
-  state,
-  country
-FROM store
-  WHERE id = $1
+SELECT s.id, s.name, s.phone, s.score, s.type, s.address_line_1, s.address_line_2, s.neighborhood, s.city, s.state, s.country
+FROM store s
+WHERE id = $1
 `
 
 type GetStoreByIDRow struct {
@@ -98,20 +126,9 @@ type GetStoreByIDRow struct {
 
 // GetStoreByID
 //
-//	SELECT
-//	  id,
-//	  name,
-//	  phone,
-//	  score,
-//	  type,
-//	  address_line_1,
-//	  address_line_2,
-//	  neighborhood,
-//	  city,
-//	  state,
-//	  country
-//	FROM store
-//	  WHERE id = $1
+//	SELECT s.id, s.name, s.phone, s.score, s.type, s.address_line_1, s.address_line_2, s.neighborhood, s.city, s.state, s.country
+//	FROM store s
+//	WHERE id = $1
 func (q *Queries) GetStoreByID(ctx context.Context, id pgtype.UUID) (GetStoreByIDRow, error) {
 	row := q.db.QueryRow(ctx, getStoreByID, id)
 	var i GetStoreByIDRow

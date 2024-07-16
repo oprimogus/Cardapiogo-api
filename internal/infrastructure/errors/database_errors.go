@@ -9,9 +9,12 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+
+	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
 var environment = os.Getenv("GIN_MODE")
+var log = logger.NewLogger("xerrorsDatabase")
 
 const (
 	NOT_FOUND_RECORD      = "Record not found."
@@ -38,6 +41,7 @@ func mapDatabaseErrors(err error) *ErrorResponse {
 
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) {
+		log.Error(pgErr)
 		switch pgErr.Code {
 		case "23505":
 			return handleUniqueViolation(pgErr)

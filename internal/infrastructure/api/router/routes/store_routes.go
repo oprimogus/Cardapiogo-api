@@ -30,6 +30,14 @@ func StoreRoutes(router *gin.Engine,
 			middleware.AuthenticationMiddleware(authRepository),
 			middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleOwner}),
 			storeController.Update)
+		v1.PUT("/store/business-hour",
+			middleware.AuthenticationMiddleware(authRepository),
+			middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleOwner}),
+			storeController.UpsertBusinessHours)
+		v1.DELETE("/store/business-hour",
+			middleware.AuthenticationMiddleware(authRepository),
+			middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleOwner}),
+			storeController.DeleteStoreBusinessHours)
 		v1.GET("/store/:id", storeController.GetStoreByID)
 	}
 }

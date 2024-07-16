@@ -12,29 +12,57 @@ import (
 )
 
 type StoreController struct {
-	validator *validatorutils.Validator
-	create    store.Create
-	update store.Update
-	getByID store.GetByID
+	validator           *validatorutils.Validator
+	create              store.Create
+	update              store.Update
+	updateBusinessHours store.UpdateBusinessHour
+	deleteBusinessHours store.DeleteBusinessHour
+	getByID             store.GetByID
 }
 
 func NewStoreController(validator *validatorutils.Validator, repository repository.StoreRepository) *StoreController {
 	return &StoreController{
-		validator: validator,
-		create:    store.NewCreate(repository),
-		update: store.NewUpdate(repository),
-		getByID: store.NewGetByID(repository),
+		validator:           validator,
+		create:              store.NewCreate(repository),
+		update:              store.NewUpdate(repository),
+		updateBusinessHours: store.NewUpdateBusinessHour(repository),
+		deleteBusinessHours: store.NewDeleteBusinessHour(repository),
+		getByID:             store.NewGetByID(repository),
 	}
 }
 
-// CreateStore godoc
+// GetStoreByID godoc
+//
+//	@Summary		Any user can view a store.
+//	@Description	Any user can view a store.
+//	@Tags			Store
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string	true	"Store ID"
+//	@Success		200	{object}	store.GetStoreByIdOutput
+//	@Failure		404	{object}	xerrors.ErrorResponse
+//	@Failure		500	{object}	xerrors.ErrorResponse
+//	@Failure		502	{object}	xerrors.ErrorResponse
+//	@Router			/v1/store/{id} [get]
+func (c *StoreController) GetStoreByID(ctx *gin.Context) {
+	id := ctx.Param("id")
+	storeInstance, err := c.getByID.Execute(ctx, id)
+	if err != nil {
+		xerror := xerrors.Map(err)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+	ctx.JSON(http.StatusOK, storeInstance)
+}
+
+// Create godoc
 //
 //	@Summary		Owner can create stores.
 //	@Description	Owner user can create store
 //	@Tags			Store
 //	@Accept			json
 //	@Produce		json
-//	@Param			request	body	store.CreateParams	false	"CreateParams"
+//	@Param			Params	body	store.CreateParams	true	"Params to create a store"
 //	@Success		201
 //	@Failure		400	{object}	xerrors.ErrorResponse
 //	@Failure		401	{object}	xerrors.ErrorResponse
@@ -67,14 +95,14 @@ func (c *StoreController) Create(ctx *gin.Context) {
 	ctx.Status(http.StatusCreated)
 }
 
-// UpdateStore godoc
+// Update godoc
 //
 //	@Summary		Owner can update your stores.
 //	@Description	Owner can update your stores.
 //	@Tags			Store
 //	@Accept			json
 //	@Produce		json
-//	@Param			request	body	store.UpdateParams	false	"UpdateParams"
+//	@Param			Params	body	store.UpdateParams	true	"Params to update a store"
 //	@Success		200
 //	@Failure		400	{object}	xerrors.ErrorResponse
 //	@Failure		401	{object}	xerrors.ErrorResponse
@@ -107,26 +135,82 @@ func (c *StoreController) Update(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-// GetStoreByID godoc
+// UpsertBusinessHours godoc
 //
-//	@Summary		Any user can view a store.
-//	@Description	Any user can view a store.
+//	@Summary		Owner can update business hours of store.
+//	@Description	Owner can update business hours of store.
 //	@Tags			Store
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		string	true	"Store ID"
-//	@Success		200	{object}	store.GetStoreByIdOutput
-//	@Failure		404	{object}	xerrors.ErrorResponse
+//	@Param			Params	body	store.StoreBusinessHoursParams	true	"Params to update business hours of store"
+//	@Success		200
+//	@Failure		400	{object}	xerrors.ErrorResponse
+//	@Failure		401	{object}	xerrors.ErrorResponse
+//	@Failure		403	{object}	xerrors.ErrorResponse
+//	@Failure		409	{object}	xerrors.ErrorResponse
 //	@Failure		500	{object}	xerrors.ErrorResponse
 //	@Failure		502	{object}	xerrors.ErrorResponse
-//	@Router			/v1/store/{id} [get]
-func (c *StoreController) GetStoreByID(ctx *gin.Context) {
-	id := ctx.Param("id")
-	store, err := c.getByID.Execute(ctx, id)
+//	@Router			/v1/store/business-hours [put]
+func (c *StoreController) UpsertBusinessHours(ctx *gin.Context) {
+	var params store.StoreBusinessHoursParams
+	err := ctx.BindJSON(&params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	ctx.JSON(http.StatusOK, store)
+	errValidate := c.validator.Validate(params)
+	if errValidate != nil {
+		xerror := xerrors.Map(errValidate)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+	err = c.updateBusinessHours.Execute(ctx, params)
+	if err != nil {
+		xerror := xerrors.Map(err)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+// DeleteStoreBusinessHours godoc
+//
+//	@Summary		Owner can delete business hours of store.
+//	@Description	Owner can delete business hours of store.
+//	@Tags			Store
+//	@Accept			json
+//	@Produce		json
+//	@Param			Params	body	store.StoreBusinessHoursParams	true	"Params to delete business hours of store"
+//	@Success		200
+//	@Failure		400	{object}	xerrors.ErrorResponse
+//	@Failure		401	{object}	xerrors.ErrorResponse
+//	@Failure		403	{object}	xerrors.ErrorResponse
+//	@Failure		409	{object}	xerrors.ErrorResponse
+//	@Failure		500	{object}	xerrors.ErrorResponse
+//	@Failure		502	{object}	xerrors.ErrorResponse
+//	@Router			/v1/store/business-hours [delete]
+func (c *StoreController) DeleteStoreBusinessHours(ctx *gin.Context) {
+	var params store.StoreBusinessHoursParams
+	err := ctx.BindJSON(&params)
+	if err != nil {
+		xerror := xerrors.Map(err)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+	errValidate := c.validator.Validate(params)
+	if errValidate != nil {
+		xerror := xerrors.Map(errValidate)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+	err = c.deleteBusinessHours.Execute(ctx, params)
+	if err != nil {
+		xerror := xerrors.Map(err)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }

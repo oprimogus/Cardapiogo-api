@@ -25,6 +25,11 @@ func (u Update) Execute(ctx context.Context, params UpdateParams) error {
 		return fmt.Errorf("invalid userID: '%s'", userID)
 	}
 
+	isValidBusinessHourSlice := entity.IsValidBusinessHourSlice(params.BusinessHours)
+	if !isValidBusinessHourSlice {
+		return fmt.Errorf("invalid businessHours: 2 or more entries to same weekDay")
+	}
+
 	isOwner, errIsOwner := u.repository.IsOwner(ctx, params.ID, userID)
 	if errIsOwner != nil {
 		return errIsOwner
@@ -35,7 +40,7 @@ func (u Update) Execute(ctx context.Context, params UpdateParams) error {
 	}
 
 	UpdatedStore := entity.Store{
-		ID: params.ID,
+		ID:                 params.ID,
 		Name:               params.Name,
 		Phone:              params.Phone,
 		Address:            params.Address,

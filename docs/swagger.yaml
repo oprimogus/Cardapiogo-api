@@ -13,6 +13,16 @@ definitions:
     - password
     type: object
   entity.BusinessHours:
+    properties:
+      closingTime:
+        type: string
+      openingTime:
+        type: string
+      weekDay:
+        type: integer
+    required:
+    - closingTime
+    - openingTime
     type: object
   entity.PaymentMethod:
     enum:
@@ -116,30 +126,17 @@ definitions:
   store.AddressOutput:
     properties:
       addressLine1:
-        maxLength: 40
         type: string
       addressLine2:
-        maxLength: 20
         type: string
       city:
-        maxLength: 25
         type: string
       country:
-        maxLength: 15
         type: string
       neighborhood:
-        maxLength: 25
         type: string
       state:
-        maxLength: 15
         type: string
-    required:
-    - addressLine1
-    - addressLine2
-    - city
-    - country
-    - neighborhood
-    - state
     type: object
   store.CreateParams:
     properties:
@@ -172,7 +169,6 @@ definitions:
       id:
         type: string
       name:
-        maxLength: 25
         type: string
       paymentMethod:
         items:
@@ -184,17 +180,45 @@ definitions:
         type: integer
       type:
         $ref: '#/definitions/entity.ShopType'
+    type: object
+  store.StoreBusinessHoursParams:
+    properties:
+      businessHours:
+        items:
+          $ref: '#/definitions/entity.BusinessHours'
+        type: array
+      id:
+        type: string
     required:
-    - address
-    - businessHours
     - id
-    - name
-    - paymentMethod
-    - phone
-    - score
-    - type
     type: object
   store.UpdateParams:
+    properties:
+      address:
+        $ref: '#/definitions/object.Address'
+      businessHours:
+        items:
+          $ref: '#/definitions/entity.BusinessHours'
+        type: array
+      id:
+        type: string
+      name:
+        maxLength: 25
+        type: string
+      paymentMethod:
+        items:
+          $ref: '#/definitions/entity.PaymentMethod'
+        type: array
+      phone:
+        type: string
+      type:
+        $ref: '#/definitions/entity.ShopType'
+    required:
+    - address
+    - id
+    - name
+    - phone
+    - type
     type: object
   user.AddRolesParams:
     properties:
@@ -334,9 +358,10 @@ paths:
       - application/json
       description: Owner user can create store
       parameters:
-      - description: CreateParams
+      - description: Params to create a store
         in: body
-        name: request
+        name: Params
+        required: true
         schema:
           $ref: '#/definitions/store.CreateParams'
       produces:
@@ -376,9 +401,10 @@ paths:
       - application/json
       description: Owner can update your stores.
       parameters:
-      - description: UpdateParams
+      - description: Params to update a store
         in: body
-        name: request
+        name: Params
+        required: true
         schema:
           $ref: '#/definitions/store.UpdateParams'
       produces:
@@ -444,6 +470,93 @@ paths:
           schema:
             $ref: '#/definitions/xerrors.ErrorResponse'
       summary: Any user can view a store.
+      tags:
+      - Store
+  /v1/store/business-hours:
+    delete:
+      consumes:
+      - application/json
+      description: Owner can delete business hours of store.
+      parameters:
+      - description: Params to delete business hours of store
+        in: body
+        name: Params
+        required: true
+        schema:
+          $ref: '#/definitions/store.StoreBusinessHoursParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+      summary: Owner can delete business hours of store.
+      tags:
+      - Store
+    put:
+      consumes:
+      - application/json
+      description: Owner can update business hours of store.
+      parameters:
+      - description: Params to update business hours of store
+        in: body
+        name: Params
+        required: true
+        schema:
+          $ref: '#/definitions/store.StoreBusinessHoursParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+      summary: Owner can update business hours of store.
       tags:
       - Store
   /v1/user:
