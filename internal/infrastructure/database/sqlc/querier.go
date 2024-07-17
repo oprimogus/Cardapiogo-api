@@ -11,6 +11,11 @@ import (
 )
 
 type Querier interface {
+	//AddBusinessHours
+	//
+	//  INSERT INTO business_hour(store_id, week_day, opening_time, closing_time)
+	//  VALUES ($1, $2, $3, $4)
+	AddBusinessHours(ctx context.Context, arg []AddBusinessHoursParams) *AddBusinessHoursBatchResults
 	//CreateStore
 	//
 	//  INSERT INTO store (id, cpf_cnpj, owner_id, name, active, phone, score, type, address_line_1, address_line_2, neighborhood, city, state, postal_code,
@@ -59,15 +64,6 @@ type Querier interface {
 	//      updated_at = NOW()
 	//  WHERE id = $1 AND owner_id = $2
 	UpdateStore(ctx context.Context, arg UpdateStoreParams) error
-	//UpsertBusinessHours
-	//
-	//  INSERT INTO business_hour(store_id, week_day, opening_time, closing_time)
-	//  VALUES ($1, $2, $3, $4)
-	//  ON CONFLICT (store_id, week_day)
-	//  DO UPDATE SET
-	//    opening_time = EXCLUDED.opening_time,
-	//    closing_time = EXCLUDED.closing_time
-	UpsertBusinessHours(ctx context.Context, arg []UpsertBusinessHoursParams) *UpsertBusinessHoursBatchResults
 }
 
 var _ Querier = (*Queries)(nil)

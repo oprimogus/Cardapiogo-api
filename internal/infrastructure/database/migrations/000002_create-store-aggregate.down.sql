@@ -1,4 +1,4 @@
-ALTER TABLE "business_hour" DROP CONSTRAINT "business_hour_store_id_fkey";
+ALTER TABLE "business_hour" DROP CONSTRAINT "unique_business_hour";
 ALTER TABLE "store_payment_method" DROP CONSTRAINT "store_payment_method_store_id_fkey";
 ALTER TABLE "store_payment_method" DROP CONSTRAINT "store_payment_method_payment_method_id_fkey";
 

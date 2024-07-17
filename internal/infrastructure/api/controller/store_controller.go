@@ -15,7 +15,7 @@ type StoreController struct {
 	validator           *validatorutils.Validator
 	create              store.Create
 	update              store.Update
-	updateBusinessHours store.UpdateBusinessHour
+	addBusinessHours store.AddBusinessHour
 	deleteBusinessHours store.DeleteBusinessHour
 	getByID             store.GetByID
 }
@@ -25,7 +25,7 @@ func NewStoreController(validator *validatorutils.Validator, repository reposito
 		validator:           validator,
 		create:              store.NewCreate(repository),
 		update:              store.NewUpdate(repository),
-		updateBusinessHours: store.NewUpdateBusinessHour(repository),
+		addBusinessHours: store.NewUpdateBusinessHour(repository),
 		deleteBusinessHours: store.NewDeleteBusinessHour(repository),
 		getByID:             store.NewGetByID(repository),
 	}
@@ -135,7 +135,7 @@ func (c *StoreController) Update(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-// UpsertBusinessHours godoc
+// AddBusinessHours godoc
 //
 //	@Summary		Owner can update business hours of store.
 //	@Description	Owner can update business hours of store.
@@ -151,7 +151,7 @@ func (c *StoreController) Update(ctx *gin.Context) {
 //	@Failure		500	{object}	xerrors.ErrorResponse
 //	@Failure		502	{object}	xerrors.ErrorResponse
 //	@Router			/v1/store/business-hours [put]
-func (c *StoreController) UpsertBusinessHours(ctx *gin.Context) {
+func (c *StoreController) AddBusinessHours(ctx *gin.Context) {
 	var params store.StoreBusinessHoursParams
 	err := ctx.BindJSON(&params)
 	if err != nil {
@@ -165,7 +165,7 @@ func (c *StoreController) UpsertBusinessHours(ctx *gin.Context) {
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	err = c.updateBusinessHours.Execute(ctx, params)
+	err = c.addBusinessHours.Execute(ctx, params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
@@ -175,7 +175,7 @@ func (c *StoreController) UpsertBusinessHours(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-// DeleteStoreBusinessHours godoc
+// DeleteBusinessHours godoc
 //
 //	@Summary		Owner can delete business hours of store.
 //	@Description	Owner can delete business hours of store.
@@ -191,7 +191,7 @@ func (c *StoreController) UpsertBusinessHours(ctx *gin.Context) {
 //	@Failure		500	{object}	xerrors.ErrorResponse
 //	@Failure		502	{object}	xerrors.ErrorResponse
 //	@Router			/v1/store/business-hours [delete]
-func (c *StoreController) DeleteStoreBusinessHours(ctx *gin.Context) {
+func (c *StoreController) DeleteBusinessHours(ctx *gin.Context) {
 	var params store.StoreBusinessHoursParams
 	err := ctx.BindJSON(&params)
 	if err != nil {

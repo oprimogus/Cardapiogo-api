@@ -45,9 +45,8 @@ CREATE TABLE "business_hour" (
   "week_day" int NOT NULL CHECK ("week_day" >= 0 AND "week_day" <= 6),
   "opening_time" varchar NOT NULL,
   "closing_time" varchar NOT NULL,
-  PRIMARY KEY ("store_id", "week_day")
+  CONSTRAINT unique_business_hour UNIQUE ("store_id", "week_day", "opening_time", "closing_time")
 );
-
 CREATE TABLE "payment_method" (
   "id" integer PRIMARY KEY,
   "method" "PaymentMethodEnum"

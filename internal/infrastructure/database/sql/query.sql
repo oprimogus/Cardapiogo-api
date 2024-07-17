@@ -33,13 +33,9 @@ FROM business_hour
 WHERE store_id = $1
 ORDER BY week_day;
 
--- name: UpsertBusinessHours :batchexec
+-- name: AddBusinessHours :batchexec
 INSERT INTO business_hour(store_id, week_day, opening_time, closing_time)
-VALUES ($1, $2, $3, $4)
-ON CONFLICT (store_id, week_day)
-DO UPDATE SET
-  opening_time = EXCLUDED.opening_time,
-  closing_time = EXCLUDED.closing_time;
+VALUES ($1, $2, $3, $4);
 
 -- name: DeleteBusinessHours :batchexec
 DELETE FROM business_hour

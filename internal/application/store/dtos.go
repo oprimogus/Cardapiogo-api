@@ -9,7 +9,7 @@ type CreateParams struct {
 	CpfCnpj string          `json:"cpfCnpj" validate:"required,cpfCnpj"`
 	Name    string          `json:"name" validate:"required,lte=25"`
 	Phone   string          `json:"phone" validate:"required,phone"`
-	Address object.Address  `json:"address" validate:"required, dive"`
+	Address object.Address  `json:"address" validate:"required"`
 	Type    entity.ShopType `json:"type" validate:"required,shopType"`
 }
 

@@ -7,15 +7,15 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
 
-type UpdateBusinessHour struct {
+type AddBusinessHour struct {
 	repository repository.StoreRepository
 }
 
-func NewUpdateBusinessHour(repository repository.StoreRepository) UpdateBusinessHour {
-	return UpdateBusinessHour{repository: repository}
+func NewUpdateBusinessHour(repository repository.StoreRepository) AddBusinessHour {
+	return AddBusinessHour{repository: repository}
 }
 
-func (u UpdateBusinessHour) Execute(ctx context.Context, params StoreBusinessHoursParams) error {
+func (u AddBusinessHour) Execute(ctx context.Context, params StoreBusinessHoursParams) error {
 	userID := ctx.Value("userID").(string)
 	if userID == "" {
 		return fmt.Errorf("invalid userID: '%s'", userID)
@@ -30,7 +30,7 @@ func (u UpdateBusinessHour) Execute(ctx context.Context, params StoreBusinessHou
 		return errNotOwner
 	}
 
-	err := u.repository.UpsertBusinessHour(ctx, params.ID, params.BusinessHours)
+	err := u.repository.AddBusinessHour(ctx, params.ID, params.BusinessHours)
 	if err != nil {
 		return err
 	}

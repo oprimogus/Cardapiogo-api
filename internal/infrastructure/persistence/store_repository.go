@@ -95,15 +95,15 @@ func (s *StoreRepository) Update(ctx context.Context, userID string, params enti
 	return nil
 }
 
-func (s *StoreRepository) UpsertBusinessHour(ctx context.Context, storeID string, params []entity.BusinessHours) error {
+func (s *StoreRepository) AddBusinessHour(ctx context.Context, storeID string, params []entity.BusinessHours) error {
 	convertedStoreID, errStoreId := converters.ConvertStringToUUID(storeID)
 	if errStoreId != nil {
 		return fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
 	}
 
-	argsSlice := make([]sqlc.UpsertBusinessHoursParams, len(params))
+	argsSlice := make([]sqlc.AddBusinessHoursParams, len(params))
 	for i, v := range params {
-		argsSlice[i] = sqlc.UpsertBusinessHoursParams{
+		argsSlice[i] = sqlc.AddBusinessHoursParams{
 			StoreID: convertedStoreID,
 			WeekDay: int32(v.WeekDay),
 			OpeningTime: v.OpeningTime,
@@ -111,8 +111,12 @@ func (s *StoreRepository) UpsertBusinessHour(ctx context.Context, storeID string
 		}
 	}
 
-	batchUpsertBusinessHour := s.querier.UpsertBusinessHours(ctx, argsSlice)
-	batchUpsertBusinessHour.Exec(nil)
+	batchAddBusinessHour := s.querier.AddBusinessHours(ctx, argsSlice)
+	batchAddBusinessHour.Exec(nil)
+	errBatchAddBusinessHour := batchAddBusinessHour.Close()
+	if errBatchAddBusinessHour != nil {
+		return errBatchAddBusinessHour
+	}
 	return nil
 }
 

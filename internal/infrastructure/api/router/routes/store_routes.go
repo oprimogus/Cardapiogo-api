@@ -33,11 +33,11 @@ func StoreRoutes(router *gin.Engine,
 		v1.PUT("/store/business-hour",
 			middleware.AuthenticationMiddleware(authRepository),
 			middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleOwner}),
-			storeController.UpsertBusinessHours)
+			storeController.AddBusinessHours)
 		v1.DELETE("/store/business-hour",
 			middleware.AuthenticationMiddleware(authRepository),
 			middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleOwner}),
-			storeController.DeleteStoreBusinessHours)
+			storeController.DeleteBusinessHours)
 		v1.GET("/store/:id", storeController.GetStoreByID)
 	}
 }
