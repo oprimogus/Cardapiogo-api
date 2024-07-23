@@ -1,6 +1,7 @@
 package converters
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -92,21 +93,21 @@ func ConvertStringToText(str string) pgtype.Text {
 }
 
 // ConvertTimestamptzToTime converts pgtype.Timestamptz to *time.Time. Returns nil if Timestamptz is not valid.
-func ConvertTimestamptzToTime(tzVal pgtype.Timestamptz) (*time.Time, error) {
+func ConvertTimestamptzToTime(tzVal pgtype.Timestamptz) (time.Time, error) {
 	if !tzVal.Valid {
-		return nil, nil
+		return time.Time{}, nil
 	}
 
-	return &tzVal.Time, nil
+	return tzVal.Time, nil
 }
 
 // ConvertTimestampToTime converts pgtype.Timestamp to *time.Time. Returns nil if Timestamp is not valid.
-func ConvertTimestamptToTime(tzVal pgtype.Timestamp) (*time.Time, error) {
+func ConvertTimestamptToTime(tzVal pgtype.Timestamp) (time.Time, error) {
 	if !tzVal.Valid {
-		return nil, nil
+		return time.Time{}, nil
 	}
 
-	return &tzVal.Time, nil
+	return tzVal.Time, nil
 }
 
 // ConvertTimeToTimestamptz converts time.Time to pgtype.Timestamptz.
@@ -122,5 +123,34 @@ func ConvertTimeToTimestamp(t time.Time) pgtype.Timestamp {
 	return pgtype.Timestamp{
 		Time:  t,
 		Valid: true,
+	}
+}
+
+func Time(value pgtype.Time) (time.Time, error) {
+	baseDate := time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+
+	if value.Microseconds < 0 || value.Microseconds >= 24*60*60*1e6 {
+		return time.Time{}, fmt.Errorf("time out of range")
+	}
+
+	duration := time.Duration(value.Microseconds) * time.Microsecond
+
+	result := baseDate.Add(duration)
+	return result, nil
+}
+
+func PgtypeTime(value time.Time) pgtype.Time {
+	dayStart := time.Date(value.Year(), value.Month(), value.Day(), 0, 0, 0, 0, value.Location())
+	microsecondsSinceMidnight := (value.Sub(dayStart)).Microseconds()
+
+	if value.Hour() < 0 || value.Hour() >= 24 ||
+		value.Minute() < 0 || value.Minute() >= 60 ||
+		value.Second() < 0 || value.Second() >= 60 {
+		return pgtype.Time{Valid: false}
+	}
+
+	return pgtype.Time{
+		Microseconds: microsecondsSinceMidnight,
+		Valid:        true,
 	}
 }

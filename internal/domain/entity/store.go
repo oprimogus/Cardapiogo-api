@@ -1,13 +1,19 @@
 package entity
 
 import (
-	"regexp"
+	"fmt"
 	"time"
 
 	"github.com/oprimogus/cardapiogo/internal/domain/object"
 )
 
-const defaultScoreStore = 500
+var ErrClosingTimeBeforeOpeningTime = fmt.Errorf("closingTime cannot be before openingTime")
+var ErrOpeningTimeAfterClosingTime = fmt.Errorf("openingTime cannot be after closingTime")
+
+const (
+	defaultStoreScore  = 500
+	BusinessHourLayout = "15:04:05"
+)
 
 type ShopType string
 
@@ -52,15 +58,28 @@ func IsValidPaymentMethod(PaymentMethodEnum string) bool {
 	}
 }
 
-func IsBusinessHour(value string) bool {
-	re := regexp.MustCompile(`^(?:[01]\d|2[0-3]):[0-5]\d$`)
-	return re.MatchString(value)
+func IsBusinessHourString(value string) bool {
+	_, err := time.Parse(BusinessHourLayout, value)
+	return err == nil
+}
+
+func IsValidBusinessHour(bh BusinessHours) (bool, error) {
+	if bh.ClosingTime.Before(bh.OpeningTime) {
+		return false, ErrClosingTimeBeforeOpeningTime
+	}
+
+	if bh.OpeningTime.After(bh.ClosingTime) {
+		return false, ErrOpeningTimeAfterClosingTime
+	}
+
+	return true, nil
 }
 
 type BusinessHours struct {
-	WeekDay     int    `json:"weekDay" validate:"weekDay"`
-	OpeningTime string `json:"openingTime" validate:"required,businessHour"`
-	ClosingTime string `json:"closingTime" validate:"required,businessHour"`
+	WeekDay     int       `json:"weekDay" validate:"min=0,max=6"`
+	OpeningTime time.Time `json:"openingTime" validate:"required"`
+	ClosingTime time.Time `json:"closingTime" validate:"required"`
+	TimeZone    string    `json:"timeZone" validate:"required"`
 }
 
 func IsValidBusinessHourSlice(slice []BusinessHours) bool {
@@ -80,10 +99,13 @@ func IsValidBusinessHourSlice(slice []BusinessHours) bool {
 }
 
 type StoreFilter struct {
-	Range int
-	Name  string
-	Score int
-	Type  ShopType
+	Range     int      `json:"range"`
+	Score     int      `json:"score"`
+	Name      string   `json:"name"`
+	City      string   `json:"city"`
+	Latitude  string   `json:"latitude"`
+	Longitude string   `json:"longitude"`
+	Type      ShopType `json:"type"`
 }
 
 type Store struct {
@@ -111,7 +133,7 @@ func NewStore(ownerID, name, cpfCnpj, phone string, address object.Address, shop
 		Phone:              phone,
 		Address:            address,
 		Type:               shopType,
-		Score:              defaultScoreStore,
+		Score:              defaultStoreScore,
 		BusinessHours:      []BusinessHours{},
 		PaymentMethodEnums: []PaymentMethod{},
 	}

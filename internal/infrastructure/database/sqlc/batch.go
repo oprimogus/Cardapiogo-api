@@ -18,8 +18,8 @@ var (
 )
 
 const addBusinessHours = `-- name: AddBusinessHours :batchexec
-INSERT INTO business_hour(store_id, week_day, opening_time, closing_time)
-VALUES ($1, $2, $3, $4)
+INSERT INTO business_hour(store_id, week_day, opening_time, closing_time, timezone)
+VALUES ($1, $2, $3, $4, $5)
 `
 
 type AddBusinessHoursBatchResults struct {
@@ -31,14 +31,15 @@ type AddBusinessHoursBatchResults struct {
 type AddBusinessHoursParams struct {
 	StoreID     pgtype.UUID `db:"store_id" json:"store_id"`
 	WeekDay     int32       `db:"week_day" json:"week_day"`
-	OpeningTime string      `db:"opening_time" json:"opening_time"`
-	ClosingTime string      `db:"closing_time" json:"closing_time"`
+	OpeningTime pgtype.Time `db:"opening_time" json:"opening_time"`
+	ClosingTime pgtype.Time `db:"closing_time" json:"closing_time"`
+	Timezone    string      `db:"timezone" json:"timezone"`
 }
 
 // AddBusinessHours
 //
-//	INSERT INTO business_hour(store_id, week_day, opening_time, closing_time)
-//	VALUES ($1, $2, $3, $4)
+//	INSERT INTO business_hour(store_id, week_day, opening_time, closing_time, timezone)
+//	VALUES ($1, $2, $3, $4, $5)
 func (q *Queries) AddBusinessHours(ctx context.Context, arg []AddBusinessHoursParams) *AddBusinessHoursBatchResults {
 	batch := &pgx.Batch{}
 	for _, a := range arg {
@@ -47,6 +48,7 @@ func (q *Queries) AddBusinessHours(ctx context.Context, arg []AddBusinessHoursPa
 			a.WeekDay,
 			a.OpeningTime,
 			a.ClosingTime,
+			a.Timezone,
 		}
 		batch.Queue(addBusinessHours, vals...)
 	}
@@ -92,8 +94,8 @@ type DeleteBusinessHoursBatchResults struct {
 type DeleteBusinessHoursParams struct {
 	StoreID     pgtype.UUID `db:"store_id" json:"store_id"`
 	WeekDay     int32       `db:"week_day" json:"week_day"`
-	OpeningTime string      `db:"opening_time" json:"opening_time"`
-	ClosingTime string      `db:"closing_time" json:"closing_time"`
+	OpeningTime pgtype.Time `db:"opening_time" json:"opening_time"`
+	ClosingTime pgtype.Time `db:"closing_time" json:"closing_time"`
 }
 
 // DeleteBusinessHours

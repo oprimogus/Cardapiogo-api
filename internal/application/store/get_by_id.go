@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 
+	"github.com/oprimogus/cardapiogo/internal/domain/entity"
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
 
@@ -15,25 +16,33 @@ func NewGetByID(repository repository.StoreRepository) GetByID {
 }
 
 func (g GetByID) Execute(ctx context.Context, id string) (GetStoreByIdOutput, error) {
-	store, err := g.repository.FindByID(ctx, id)
+	storeInstance, err := g.repository.FindByID(ctx, id)
 	if err != nil {
 		return GetStoreByIdOutput{}, err
 	}
+	businessHours := make([]BusinessHoursParams, len(storeInstance.BusinessHours))
+	for i, v := range storeInstance.BusinessHours {
+		businessHours[i] = BusinessHoursParams{
+			WeekDay:     v.WeekDay,
+			OpeningTime: v.OpeningTime.Format(entity.BusinessHourLayout),
+			ClosingTime: v.ClosingTime.Format(entity.BusinessHourLayout),
+		}
+	}
 	return GetStoreByIdOutput{
-		ID:    store.ID,
-		Name:  store.Name,
-		Phone: store.Phone,
-		Score: store.Score,
+		ID:    storeInstance.ID,
+		Name:  storeInstance.Name,
+		Phone: storeInstance.Phone,
+		Score: storeInstance.Score,
 		Address: AddressOutput{
-			AddressLine1: store.Address.AddressLine1,
-			AddressLine2: store.Address.AddressLine2,
-			Neighborhood: store.Address.Neighborhood,
-			City:         store.Address.City,
-			State:        store.Address.State,
-			Country:      store.Address.Country,
+			AddressLine1: storeInstance.Address.AddressLine1,
+			AddressLine2: storeInstance.Address.AddressLine2,
+			Neighborhood: storeInstance.Address.Neighborhood,
+			City:         storeInstance.Address.City,
+			State:        storeInstance.Address.State,
+			Country:      storeInstance.Address.Country,
 		},
-		Type:               store.Type,
-		BusinessHours:      store.BusinessHours,
-		PaymentMethodEnums: store.PaymentMethodEnums,
+		Type:               storeInstance.Type,
+		BusinessHours:      businessHours,
+		PaymentMethodEnums: storeInstance.PaymentMethodEnums,
 	}, nil
 }

@@ -1,8 +1,13 @@
 package entity
 
 import (
+	"errors"
 	"time"
 )
+
+var ErrExistUserWithEmail = errors.New("exist user with this email")
+var ErrExistUserWithDocument = errors.New("exist user with this document")
+var ErrExistUserWithPhone = errors.New("exist user with this phone")
 
 type UserRole string
 

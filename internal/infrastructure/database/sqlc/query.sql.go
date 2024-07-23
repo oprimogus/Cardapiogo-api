@@ -14,7 +14,7 @@ import (
 const createStore = `-- name: CreateStore :exec
 INSERT INTO store (id, cpf_cnpj, owner_id, name, active, phone, score, type, address_line_1, address_line_2, neighborhood, city, state, postal_code,
   latitude, longitude, country, created_at, updated_at)
-VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW(), NOW())
+VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW() AT TIME ZONE 'UTC', NOW() AT TIME ZONE 'UTC')
 `
 
 type CreateStoreParams struct {
@@ -41,7 +41,7 @@ type CreateStoreParams struct {
 //
 //	INSERT INTO store (id, cpf_cnpj, owner_id, name, active, phone, score, type, address_line_1, address_line_2, neighborhood, city, state, postal_code,
 //	  latitude, longitude, country, created_at, updated_at)
-//	VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW(), NOW())
+//	VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW() AT TIME ZONE 'UTC', NOW() AT TIME ZONE 'UTC')
 func (q *Queries) CreateStore(ctx context.Context, arg CreateStoreParams) error {
 	_, err := q.db.Exec(ctx, createStore,
 		arg.ID,
@@ -65,22 +65,62 @@ func (q *Queries) CreateStore(ctx context.Context, arg CreateStoreParams) error 
 	return err
 }
 
+const findStoreBusinessHoursByStoreId = `-- name: FindStoreBusinessHoursByStoreId :many
+SELECT bh.store_id, bh.week_day, bh.opening_time, bh.closing_time, bh.timezone
+FROM business_hour bh
+WHERE 1 = 1
+  AND bh.store_id = ANY($1::UUID[])
+`
+
+// FindStoreBusinessHoursByStoreId
+//
+//	SELECT bh.store_id, bh.week_day, bh.opening_time, bh.closing_time, bh.timezone
+//	FROM business_hour bh
+//	WHERE 1 = 1
+//	  AND bh.store_id = ANY($1::UUID[])
+func (q *Queries) FindStoreBusinessHoursByStoreId(ctx context.Context, dollar_1 []pgtype.UUID) ([]BusinessHour, error) {
+	rows, err := q.db.Query(ctx, findStoreBusinessHoursByStoreId, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []BusinessHour
+	for rows.Next() {
+		var i BusinessHour
+		if err := rows.Scan(
+			&i.StoreID,
+			&i.WeekDay,
+			&i.OpeningTime,
+			&i.ClosingTime,
+			&i.Timezone,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getStoreBusinessHoursByID = `-- name: GetStoreBusinessHoursByID :many
-SELECT week_day, opening_time, closing_time
+SELECT week_day, timezone, opening_time, closing_time
 FROM business_hour
 WHERE store_id = $1
 ORDER BY week_day
 `
 
 type GetStoreBusinessHoursByIDRow struct {
-	WeekDay     int32  `db:"week_day" json:"week_day"`
-	OpeningTime string `db:"opening_time" json:"opening_time"`
-	ClosingTime string `db:"closing_time" json:"closing_time"`
+	WeekDay     int32       `db:"week_day" json:"week_day"`
+	Timezone    string      `db:"timezone" json:"timezone"`
+	OpeningTime pgtype.Time `db:"opening_time" json:"opening_time"`
+	ClosingTime pgtype.Time `db:"closing_time" json:"closing_time"`
 }
 
 // GetStoreBusinessHoursByID
 //
-//	SELECT week_day, opening_time, closing_time
+//	SELECT week_day, timezone, opening_time, closing_time
 //	FROM business_hour
 //	WHERE store_id = $1
 //	ORDER BY week_day
@@ -93,7 +133,83 @@ func (q *Queries) GetStoreBusinessHoursByID(ctx context.Context, storeID pgtype.
 	var items []GetStoreBusinessHoursByIDRow
 	for rows.Next() {
 		var i GetStoreBusinessHoursByIDRow
-		if err := rows.Scan(&i.WeekDay, &i.OpeningTime, &i.ClosingTime); err != nil {
+		if err := rows.Scan(
+			&i.WeekDay,
+			&i.Timezone,
+			&i.OpeningTime,
+			&i.ClosingTime,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getStoreByFilter = `-- name: GetStoreByFilter :many
+SELECT s.id, s.name, s.score, s.type, s.neighborhood, s.latitude, s.longitude
+FROM store s
+WHERE 1 = 1
+  AND (COALESCE(NULLIF($1, ''), s.name) IS NULL OR s.name LIKE '%' || COALESCE(NULLIF($1, ''), s.name) || '%')
+  AND (COALESCE($2, s.score) IS NULL OR s.score >= COALESCE($2, s.score))
+  AND (COALESCE(NULLIF($3, '')::"ShopType", s.type) IS NULL OR s.type = COALESCE(NULLIF($3, '')::"ShopType", s.type))
+  AND (COALESCE(NULLIF($4, ''), s.city) IS NULL OR s.city = COALESCE(NULLIF($4, ''), s.city))
+ORDER BY s.score DESC, s.type
+`
+
+type GetStoreByFilterParams struct {
+	Column1 interface{} `db:"column_1" json:"column_1"`
+	Column2 interface{} `db:"column_2" json:"column_2"`
+	Column3 interface{} `db:"column_3" json:"column_3"`
+	Column4 interface{} `db:"column_4" json:"column_4"`
+}
+
+type GetStoreByFilterRow struct {
+	ID           pgtype.UUID `db:"id" json:"id"`
+	Name         string      `db:"name" json:"name"`
+	Score        int32       `db:"score" json:"score"`
+	Type         ShopType    `db:"type" json:"type"`
+	Neighborhood string      `db:"neighborhood" json:"neighborhood"`
+	Latitude     pgtype.Text `db:"latitude" json:"latitude"`
+	Longitude    pgtype.Text `db:"longitude" json:"longitude"`
+}
+
+// GetStoreByFilter
+//
+//	SELECT s.id, s.name, s.score, s.type, s.neighborhood, s.latitude, s.longitude
+//	FROM store s
+//	WHERE 1 = 1
+//	  AND (COALESCE(NULLIF($1, ''), s.name) IS NULL OR s.name LIKE '%' || COALESCE(NULLIF($1, ''), s.name) || '%')
+//	  AND (COALESCE($2, s.score) IS NULL OR s.score >= COALESCE($2, s.score))
+//	  AND (COALESCE(NULLIF($3, '')::"ShopType", s.type) IS NULL OR s.type = COALESCE(NULLIF($3, '')::"ShopType", s.type))
+//	  AND (COALESCE(NULLIF($4, ''), s.city) IS NULL OR s.city = COALESCE(NULLIF($4, ''), s.city))
+//	ORDER BY s.score DESC, s.type
+func (q *Queries) GetStoreByFilter(ctx context.Context, arg GetStoreByFilterParams) ([]GetStoreByFilterRow, error) {
+	rows, err := q.db.Query(ctx, getStoreByFilter,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetStoreByFilterRow
+	for rows.Next() {
+		var i GetStoreByFilterRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Score,
+			&i.Type,
+			&i.Neighborhood,
+			&i.Latitude,
+			&i.Longitude,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -180,7 +296,7 @@ UPDATE store
     state = $10,
     postal_code = $11,
     country = $12,
-    updated_at = NOW()
+    updated_at = NOW() AT TIME ZONE 'UTC'
 WHERE id = $1 AND owner_id = $2
 `
 
@@ -213,7 +329,7 @@ type UpdateStoreParams struct {
 //	    state = $10,
 //	    postal_code = $11,
 //	    country = $12,
-//	    updated_at = NOW()
+//	    updated_at = NOW() AT TIME ZONE 'UTC'
 //	WHERE id = $1 AND owner_id = $2
 func (q *Queries) UpdateStore(ctx context.Context, arg UpdateStoreParams) error {
 	_, err := q.db.Exec(ctx, updateStore,

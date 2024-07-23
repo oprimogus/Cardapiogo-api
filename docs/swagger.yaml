@@ -12,18 +12,6 @@ definitions:
     - email
     - password
     type: object
-  entity.BusinessHours:
-    properties:
-      closingTime:
-        type: string
-      openingTime:
-        type: string
-      weekDay:
-        type: integer
-    required:
-    - closingTime
-    - openingTime
-    type: object
   entity.PaymentMethod:
     enum:
     - credit
@@ -138,6 +126,20 @@ definitions:
       state:
         type: string
     type: object
+  store.BusinessHoursParams:
+    properties:
+      closingTime:
+        type: string
+      openingTime:
+        type: string
+      weekDay:
+        maximum: 6
+        minimum: 0
+        type: integer
+    required:
+    - closingTime
+    - openingTime
+    type: object
   store.CreateParams:
     properties:
       address:
@@ -164,7 +166,7 @@ definitions:
         $ref: '#/definitions/store.AddressOutput'
       businessHours:
         items:
-          $ref: '#/definitions/entity.BusinessHours'
+          $ref: '#/definitions/store.BusinessHoursParams'
         type: array
       id:
         type: string
@@ -185,21 +187,20 @@ definitions:
     properties:
       businessHours:
         items:
-          $ref: '#/definitions/entity.BusinessHours'
+          $ref: '#/definitions/store.BusinessHoursParams'
         type: array
       id:
         type: string
+      timeZone:
+        type: string
     required:
     - id
+    - timeZone
     type: object
   store.UpdateParams:
     properties:
       address:
         $ref: '#/definitions/object.Address'
-      businessHours:
-        items:
-          $ref: '#/definitions/entity.BusinessHours'
-        type: array
       id:
         type: string
       name:
@@ -353,6 +354,61 @@ paths:
       tags:
       - Authentication
   /v1/store:
+    get:
+      consumes:
+      - application/json
+      description: Any user can view filtered stores.
+      parameters:
+      - description: Specify max range
+        in: query
+        name: range
+        type: integer
+      - description: Specify in score
+        in: query
+        name: score
+        type: integer
+      - description: Specify name like
+        in: query
+        name: name
+        type: string
+      - description: Specify city
+        in: query
+        name: city
+        type: string
+      - description: latitude of address selected
+        in: query
+        name: latitude
+        type: string
+      - description: longitude of address selected
+        in: query
+        name: longitude
+        type: string
+      - description: Specify store type
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.GetStoreByIdOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+      summary: Any user can view filtered stores.
+      tags:
+      - Store
     post:
       consumes:
       - application/json

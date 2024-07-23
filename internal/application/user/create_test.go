@@ -80,7 +80,7 @@ func (s *CreateSuite) TestExecute() {
 			mockFindByEmailError: nil,
 			mockCreateError:      nil,
 			mockCreateErrorTimes: 0,
-			expected:             user.ErrExistUserWithEmail,
+			expected:             entity.ErrExistUserWithEmail,
 		},
 		{
 			name:  "Exist user with this document",
@@ -101,7 +101,7 @@ func (s *CreateSuite) TestExecute() {
 			mockFindByEmailError: nil,
 			mockCreateError:      nil,
 			mockCreateErrorTimes: 0,
-			expected:             user.ErrExistUserWithDocument,
+			expected:             entity.ErrExistUserWithDocument,
 		},
 		{
 			name:  "Exist user with this phone",
@@ -122,7 +122,7 @@ func (s *CreateSuite) TestExecute() {
 			mockFindByEmailError: nil,
 			mockCreateError:      nil,
 			mockCreateErrorTimes: 0,
-			expected:             user.ErrExistUserWithPhone,
+			expected:             entity.ErrExistUserWithPhone,
 		},
 		{
 			name:                 "Fail on find user on repository",

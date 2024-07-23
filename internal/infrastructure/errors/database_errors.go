@@ -9,12 +9,9 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
-
-	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
 var environment = os.Getenv("GIN_MODE")
-var log = logger.NewLogger("xerrorsDatabase")
 
 const (
 	NOT_FOUND_RECORD      = "Record not found."

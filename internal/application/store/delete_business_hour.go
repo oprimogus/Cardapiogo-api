@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/oprimogus/cardapiogo/internal/domain/entity"
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
 
@@ -30,7 +31,16 @@ func (u DeleteBusinessHour) Execute(ctx context.Context, params StoreBusinessHou
 		return errNotOwner
 	}
 
-	err := u.repository.DeleteBusinessHour(ctx, params.ID, params.BusinessHours)
+	businessHours := make([]entity.BusinessHours, len(params.BusinessHours))
+	for i, v := range params.BusinessHours {
+		businessHoursConverted, err := v.Entity(params.TimeZone)
+		if err != nil {
+			return fmt.Errorf("fail on convert businessHour: %w", err)
+		}
+		businessHours[i] = businessHoursConverted
+	}
+
+	err := u.repository.DeleteBusinessHour(ctx, params.ID, businessHours)
 	if err != nil {
 		return err
 	}

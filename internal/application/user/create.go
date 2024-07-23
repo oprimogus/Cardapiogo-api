@@ -2,14 +2,10 @@ package user
 
 import (
 	"context"
-	"errors"
 
+	"github.com/oprimogus/cardapiogo/internal/domain/entity"
 	"github.com/oprimogus/cardapiogo/internal/domain/repository"
 )
-
-var ErrExistUserWithEmail = errors.New("exist user with this email")
-var ErrExistUserWithDocument = errors.New("exist user with this document")
-var ErrExistUserWithPhone = errors.New("exist user with this phone")
 
 type Create struct {
 	userRepository repository.UserRepository
@@ -27,13 +23,13 @@ func (c Create) Execute(ctx context.Context, input CreateParams) error {
 		return err
 	}
 	if existUser.Email == input.Email {
-		return ErrExistUserWithEmail
+		return entity.ErrExistUserWithEmail
 	}
 	if existUser.Profile.Document == input.Profile.Document {
-		return ErrExistUserWithDocument
+		return entity.ErrExistUserWithDocument
 	}
 	if existUser.Profile.Phone == input.Profile.Phone {
-		return ErrExistUserWithPhone
+		return entity.ErrExistUserWithPhone
 	}
 	return c.userRepository.Create(ctx, input.ToEntity())
 }

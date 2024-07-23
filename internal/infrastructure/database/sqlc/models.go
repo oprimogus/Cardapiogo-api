@@ -120,8 +120,9 @@ type Address struct {
 type BusinessHour struct {
 	StoreID     pgtype.UUID `db:"store_id" json:"store_id"`
 	WeekDay     int32       `db:"week_day" json:"week_day"`
-	OpeningTime string      `db:"opening_time" json:"opening_time"`
-	ClosingTime string      `db:"closing_time" json:"closing_time"`
+	OpeningTime pgtype.Time `db:"opening_time" json:"opening_time"`
+	ClosingTime pgtype.Time `db:"closing_time" json:"closing_time"`
+	Timezone    string      `db:"timezone" json:"timezone"`
 }
 
 type PaymentMethod struct {

@@ -50,7 +50,7 @@ func IsValidPaymentMethod(fl validator.FieldLevel) bool {
 
 func IsValidBusinessHour(fl validator.FieldLevel) bool {
 	value := fl.Field().String()
-	return entity.IsBusinessHour(value)
+	return entity.IsBusinessHourString(value)
 }
 
 func IsValidCpf(fl validator.FieldLevel) bool {

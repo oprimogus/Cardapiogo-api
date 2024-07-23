@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/oprimogus/cardapiogo/internal/domain/entity"
 	"github.com/oprimogus/cardapiogo/internal/domain/object"
@@ -104,10 +105,11 @@ func (s *StoreRepository) AddBusinessHour(ctx context.Context, storeID string, p
 	argsSlice := make([]sqlc.AddBusinessHoursParams, len(params))
 	for i, v := range params {
 		argsSlice[i] = sqlc.AddBusinessHoursParams{
-			StoreID: convertedStoreID,
-			WeekDay: int32(v.WeekDay),
-			OpeningTime: v.OpeningTime,
-			ClosingTime: v.ClosingTime,
+			StoreID:     convertedStoreID,
+			WeekDay:     int32(v.WeekDay),
+			OpeningTime: converters.PgtypeTime(v.OpeningTime),
+			ClosingTime: converters.PgtypeTime(v.ClosingTime),
+			Timezone:    v.TimeZone,
 		}
 	}
 
@@ -129,10 +131,10 @@ func (s *StoreRepository) DeleteBusinessHour(ctx context.Context, storeID string
 	argsSlice := make([]sqlc.DeleteBusinessHoursParams, len(params))
 	for i, v := range params {
 		argsSlice[i] = sqlc.DeleteBusinessHoursParams{
-			StoreID: convertedStoreID,
-			WeekDay: int32(v.WeekDay),
-			OpeningTime: v.OpeningTime,
-			ClosingTime: v.ClosingTime,
+			StoreID:     convertedStoreID,
+			WeekDay:     int32(v.WeekDay),
+			OpeningTime: converters.PgtypeTime(v.OpeningTime),
+			ClosingTime: converters.PgtypeTime(v.ClosingTime),
 		}
 	}
 	batchDeleteBusinessHours := s.querier.DeleteBusinessHours(ctx, argsSlice)
@@ -158,10 +160,19 @@ func (s *StoreRepository) FindByID(ctx context.Context, id string) (entity.Store
 	businessHours := make([]entity.BusinessHours, len(sqlcStoreBusinessHours))
 	if len(sqlcStoreBusinessHours) > 0 {
 		for i, v := range sqlcStoreBusinessHours {
+			openingTime, errOpeningTime := converters.Time(v.OpeningTime)
+			if errOpeningTime != nil {
+				return entity.Store{}, errOpeningTime
+			}
+			closingTime, errClosingTime := converters.Time(v.ClosingTime)
+			if errClosingTime != nil {
+				return entity.Store{}, errClosingTime
+			}
+
 			businessHours[i] = entity.BusinessHours{
 				WeekDay:     int(v.WeekDay),
-				OpeningTime: v.OpeningTime,
-				ClosingTime: v.ClosingTime,
+				OpeningTime: openingTime,
+				ClosingTime: closingTime,
 			}
 		}
 	}
@@ -185,7 +196,72 @@ func (s *StoreRepository) FindByID(ctx context.Context, id string) (entity.Store
 }
 
 func (s *StoreRepository) FindByFilter(ctx context.Context, params entity.StoreFilter) (*[]entity.Store, error) {
-	return &[]entity.Store{}, nil
+
+	args := sqlc.GetStoreByFilterParams{
+		Column1: converters.ConvertStringToText(params.Name),
+		Column2: int32(params.Score),
+		Column3: params.Type,
+		Column4: params.City,
+	}
+	filteredStores, err := s.querier.GetStoreByFilter(ctx, args)
+	if err != nil {
+		return nil, err
+	}
+
+	uuids := make([]pgtype.UUID, len(filteredStores))
+	for i, v := range filteredStores {
+		uuids[i] = v.ID
+	}
+
+	businessHours, errFindBusinessHour := s.querier.FindStoreBusinessHoursByStoreId(ctx, uuids)
+	if errFindBusinessHour != nil {
+		return nil, errFindBusinessHour
+	}
+
+	mapBusinessHours := make(map[pgtype.UUID][]sqlc.BusinessHour)
+	for _, v := range businessHours {
+		mapBusinessHours[v.StoreID] = append(mapBusinessHours[v.StoreID], v)
+	}
+
+	stores := make([]entity.Store, len(filteredStores))
+	for i, v := range filteredStores {
+		convertedID, errConvertUUID := converters.ConvertUUIDToString(v.ID)
+		if errConvertUUID != nil {
+			return nil, fmt.Errorf("fail on convert database UUID: %w", errConvertUUID)
+		}
+		businessHours := mapBusinessHours[v.ID]
+		entityBusinessHour := make([]entity.BusinessHours, len(businessHours))
+		for i, v := range businessHours {
+			openingTime, errOpeningTime := converters.Time(v.OpeningTime)
+			if errOpeningTime != nil {
+				return nil, fmt.Errorf("fail on convert openingTime: %w", errOpeningTime)
+			}
+			closingTime, errClosingTime := converters.Time(v.ClosingTime)
+			if errClosingTime != nil {
+				return nil, fmt.Errorf("fail on convert closingTime: %w", errClosingTime)
+			}
+			entityBusinessHour[i] = entity.BusinessHours{
+				WeekDay:     int(v.WeekDay),
+				OpeningTime: openingTime,
+				ClosingTime: closingTime,
+			}
+
+		}
+		stores[i] = entity.Store{
+			ID:    *convertedID,
+			Name:  v.Name,
+			Score: int(v.Score),
+			Type:  entity.ShopType(v.Type),
+			Address: object.Address{
+				Neighborhood: v.Neighborhood,
+				Latitude:     v.Latitude.String,
+				Longitude:    v.Longitude.String,
+			},
+			BusinessHours: entityBusinessHour,
+		}
+	}
+
+	return &stores, nil
 }
 
 func (s *StoreRepository) Delete(ctx context.Context, id string) error {

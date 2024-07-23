@@ -39,5 +39,6 @@ func StoreRoutes(router *gin.Engine,
 			middleware.AuthorizationMiddleware([]entity.UserRole{entity.UserRoleOwner}),
 			storeController.DeleteBusinessHours)
 		v1.GET("/store/:id", storeController.GetStoreByID)
+		v1.GET("/store", storeController.GetStoreByFilter)
 	}
 }

@@ -124,6 +124,89 @@ const docTemplate = `{
             }
         },
         "/v1/store": {
+            "get": {
+                "description": "Any user can view filtered stores.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Any user can view filtered stores.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Specify max range",
+                        "name": "range",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Specify in score",
+                        "name": "score",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Specify name like",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Specify city",
+                        "name": "city",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "latitude of address selected",
+                        "name": "latitude",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "longitude of address selected",
+                        "name": "longitude",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Specify store type",
+                        "name": "type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/store.GetStoreByIdOutput"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "put": {
                 "description": "Owner can update your stores.",
                 "consumes": [
@@ -560,24 +643,6 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.BusinessHours": {
-            "type": "object",
-            "required": [
-                "closingTime",
-                "openingTime"
-            ],
-            "properties": {
-                "closingTime": {
-                    "type": "string"
-                },
-                "openingTime": {
-                    "type": "string"
-                },
-                "weekDay": {
-                    "type": "integer"
-                }
-            }
-        },
         "entity.PaymentMethod": {
             "type": "string",
             "enum": [
@@ -732,6 +797,26 @@ const docTemplate = `{
                 }
             }
         },
+        "store.BusinessHoursParams": {
+            "type": "object",
+            "required": [
+                "closingTime",
+                "openingTime"
+            ],
+            "properties": {
+                "closingTime": {
+                    "type": "string"
+                },
+                "openingTime": {
+                    "type": "string"
+                },
+                "weekDay": {
+                    "type": "integer",
+                    "maximum": 6,
+                    "minimum": 0
+                }
+            }
+        },
         "store.CreateParams": {
             "type": "object",
             "required": [
@@ -769,7 +854,7 @@ const docTemplate = `{
                 "businessHours": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entity.BusinessHours"
+                        "$ref": "#/definitions/store.BusinessHoursParams"
                     }
                 },
                 "id": {
@@ -798,16 +883,20 @@ const docTemplate = `{
         "store.StoreBusinessHoursParams": {
             "type": "object",
             "required": [
-                "id"
+                "id",
+                "timeZone"
             ],
             "properties": {
                 "businessHours": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entity.BusinessHours"
+                        "$ref": "#/definitions/store.BusinessHoursParams"
                     }
                 },
                 "id": {
+                    "type": "string"
+                },
+                "timeZone": {
                     "type": "string"
                 }
             }
@@ -824,12 +913,6 @@ const docTemplate = `{
             "properties": {
                 "address": {
                     "$ref": "#/definitions/object.Address"
-                },
-                "businessHours": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.BusinessHours"
-                    }
                 },
                 "id": {
                     "type": "string"

@@ -7,8 +7,11 @@ import (
 
 	"github.com/Nerzal/gocloak/v13"
 
-	"github.com/oprimogus/cardapiogo/internal/application/user"
+	"github.com/oprimogus/cardapiogo/internal/domain/entity"
+	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
+
+var log = logger.NewLogger("Error Handling")
 
 type ErrorResponse struct {
 	Status       int         `json:"-"`
@@ -26,6 +29,7 @@ func New(status int, message string, details ...interface{}) *ErrorResponse {
 }
 
 func Map(err error) *ErrorResponse {
+	log.Error(err.Error())
 	if errResp, ok := err.(*ErrorResponse); ok {
 		return errResp
 	}
@@ -50,14 +54,19 @@ func Map(err error) *ErrorResponse {
 	}
 
 	switch err {
-	case user.ErrExistUserWithDocument,
-		user.ErrExistUserWithEmail,
-		user.ErrExistUserWithPhone:
+	case entity.ErrExistUserWithDocument,
+		entity.ErrExistUserWithEmail,
+		entity.ErrExistUserWithPhone:
 		return &ErrorResponse{
 			Status:       http.StatusConflict,
 			ErrorMessage: err.Error(),
 		}
-
+	case entity.ErrClosingTimeBeforeOpeningTime,
+		entity.ErrOpeningTimeAfterClosingTime:
+		return &ErrorResponse{
+			Status:       http.StatusBadRequest,
+			ErrorMessage: err.Error(),
+		}
 	default:
 		return &ErrorResponse{
 			Status:       http.StatusInternalServerError,
