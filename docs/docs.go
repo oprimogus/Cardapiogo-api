@@ -24,6 +24,58 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/auth/refresh": {
+            "post": {
+                "description": "Refresh token when access token expires",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Refresh token when access token expires",
+                "parameters": [
+                    {
+                        "description": "RefreshParams",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/authentication.RefreshParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/object.JWT"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/xerrors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/auth/sign-in": {
             "post": {
                 "description": "Authenticate a user using email and password and issue a JWT on successful login.",
@@ -628,6 +680,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "authentication.RefreshParams": {
+            "type": "object",
+            "required": [
+                "refreshToken"
+            ],
+            "properties": {
+                "refreshToken": {
+                    "type": "string"
+                }
+            }
+        },
         "authentication.SignInParams": {
             "type": "object",
             "required": [
@@ -745,31 +808,31 @@ const docTemplate = `{
         "object.JWT": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "accessToken": {
                     "type": "string"
                 },
-                "expires_in": {
+                "expiresIn": {
                     "type": "integer"
                 },
-                "id_token": {
+                "idToken": {
                     "type": "string"
                 },
-                "not-before-policy": {
+                "notBeforePolicy": {
                     "type": "integer"
                 },
-                "refresh_expires_in": {
+                "refreshExpiresIn": {
                     "type": "integer"
                 },
-                "refresh_token": {
+                "refreshToken": {
                     "type": "string"
                 },
                 "scope": {
                     "type": "string"
                 },
-                "session_state": {
+                "sessionState": {
                     "type": "string"
                 },
-                "token_type": {
+                "tokenType": {
                     "type": "string"
                 }
             }

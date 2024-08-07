@@ -18,5 +18,6 @@ func AuthRoutes(router *gin.Engine, validator *validatorutils.Validator, authRep
 	v1 := router.Group(basePath + "/v1")
 	{
 		v1.POST("/auth/sign-in", authController.SignIn)
+		v1.POST("/auth/refresh", authController.RefreshUserToken)
 	}
 }

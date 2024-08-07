@@ -1,13 +1,13 @@
 package object
 
 type JWT struct {
-	AccessToken      string `json:"access_token"`
-	IDToken          string `json:"id_token"`
-	ExpiresIn        int    `json:"expires_in"`
-	RefreshExpiresIn int    `json:"refresh_expires_in"`
-	RefreshToken     string `json:"refresh_token"`
-	TokenType        string `json:"token_type"`
-	NotBeforePolicy  int    `json:"not-before-policy"`
-	SessionState     string `json:"session_state"`
+	AccessToken      string `json:"accessToken"`
+	IDToken          string `json:"idToken"`
+	ExpiresIn        int    `json:"expiresIn"`
+	RefreshExpiresIn int    `json:"refreshExpiresIn"`
+	RefreshToken     string `json:"refreshToken"`
+	TokenType        string `json:"tokenType"`
+	NotBeforePolicy  int    `json:"notBeforePolicy"`
+	SessionState     string `json:"sessionState"`
 	Scope            string `json:"scope"`
 }

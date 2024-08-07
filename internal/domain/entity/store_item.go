@@ -1,10 +1,10 @@
 package entity
 
-type ItemType string
+type StoreItemType string
 
 const (
-	ItemTypeRetail    ItemType = "retail"
-	ItemTypeMadeOrder ItemType = "made_to_order"
+	ItemTypeRetail    StoreItemType = "retail"
+	ItemTypeMadeOrder StoreItemType = "made_to_order"
 )
 
 type StoreItem struct {
@@ -15,6 +15,6 @@ type StoreItem struct {
 	Price       int               `json:"price"`
 	Cost        int               `json:"cost"`
 	Stock       int               `json:"stock"`
-	Type        ItemType          `json:"type"`
+	Type        StoreItemType     `json:"type"`
 	Attributes  map[string]string `json:"attributes"`
 }

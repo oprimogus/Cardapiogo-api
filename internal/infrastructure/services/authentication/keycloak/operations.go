@@ -159,6 +159,24 @@ func (k *KeycloakService) SignIn(ctx context.Context, email, password string) (o
 	}, nil
 }
 
+func (k *KeycloakService) RefreshToken(ctx context.Context, refreshToken string) (object.JWT, error) {
+	jwt, err := k.client.RefreshToken(ctx, refreshToken, clientID, clientSecret, realm)
+	if err != nil {
+		return object.JWT{}, err
+	}
+	return object.JWT{
+		AccessToken:      jwt.AccessToken,
+		IDToken:          jwt.IDToken,
+		ExpiresIn:        jwt.ExpiresIn,
+		RefreshExpiresIn: jwt.RefreshExpiresIn,
+		RefreshToken:     jwt.RefreshToken,
+		TokenType:        jwt.TokenType,
+		NotBeforePolicy:  jwt.NotBeforePolicy,
+		SessionState:     jwt.SessionState,
+		Scope:            jwt.Scope,
+	}, nil
+}
+
 func (k *KeycloakService) IsValidToken(ctx context.Context, token string) (bool, error) {
 	a, err := k.client.RetrospectToken(ctx, token, clientID, clientSecret, realm)
 	if err != nil {

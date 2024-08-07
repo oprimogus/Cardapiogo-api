@@ -15,12 +15,14 @@ import (
 type AuthController struct {
 	validator *validatorutils.Validator
 	signIn    authentication.SignIn
+	refresh authentication.Refresh
 }
 
 func NewAuthController(validator *validatorutils.Validator, authRepository repository.AuthenticationRepository) *AuthController {
 	return &AuthController{
 		validator: validator,
 		signIn:    authentication.NewSignIn(authRepository),
+		refresh: authentication.NewRefresh(authRepository),
 	}
 }
 
@@ -52,6 +54,43 @@ func (c *AuthController) SignIn(ctx *gin.Context) {
 		return
 	}
 	jwt, err := c.signIn.Execute(ctx, params.Email, params.Password)
+	if err != nil {
+		xerror := xerrors.Map(err)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, jwt)
+}
+
+// RefreshUserToken godoc
+//
+//	@Summary		Refresh token when access token expires
+//	@Description	Refresh token when access token expires
+//	@Tags			Authentication
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		authentication.RefreshParams	true	"RefreshParams"
+//	@Success		200		{object}	object.JWT
+//	@Failure		400		{object}	xerrors.ErrorResponse
+//	@Failure		500		{object}	xerrors.ErrorResponse
+//	@Failure		502		{object}	xerrors.ErrorResponse
+//	@Router			/v1/auth/refresh [post]
+func (c *AuthController) RefreshUserToken(ctx *gin.Context) {
+	var params authentication.RefreshParams
+	err := ctx.BindJSON(&params)
+	if err != nil {
+		xerror := xerrors.Map(err)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+	errValidate := c.validator.Validate(params)
+	if errValidate != nil {
+		xerror := xerrors.Map(errValidate)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+	jwt, err := c.refresh.Execute(ctx, params.RefreshToken)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)

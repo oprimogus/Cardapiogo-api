@@ -2,6 +2,13 @@ basePath: /api
 consumes:
 - application/json
 definitions:
+  authentication.RefreshParams:
+    properties:
+      refreshToken:
+        type: string
+    required:
+    - refreshToken
+    type: object
   authentication.SignInParams:
     properties:
       email:
@@ -92,23 +99,23 @@ definitions:
     type: object
   object.JWT:
     properties:
-      access_token:
+      accessToken:
         type: string
-      expires_in:
+      expiresIn:
         type: integer
-      id_token:
+      idToken:
         type: string
-      not-before-policy:
+      notBeforePolicy:
         type: integer
-      refresh_expires_in:
+      refreshExpiresIn:
         type: integer
-      refresh_token:
+      refreshToken:
         type: string
       scope:
         type: string
-      session_state:
+      sessionState:
         type: string
-      token_type:
+      tokenType:
         type: string
     type: object
   store.AddressOutput:
@@ -288,6 +295,40 @@ info:
   title: Cardapiogo API
   version: "1.0"
 paths:
+  /v1/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh token when access token expires
+      parameters:
+      - description: RefreshParams
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/authentication.RefreshParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/object.JWT'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+      summary: Refresh token when access token expires
+      tags:
+      - Authentication
   /v1/auth/sign-in:
     post:
       consumes:
