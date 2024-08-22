@@ -12,19 +12,8 @@ import (
 )
 
 var (
-	log          = logger.NewLogger("Keycloak")
-	keycloakURL  string
-	realm        string
-	clientID     string
-	clientSecret string
+	log = logger.NewLogger("Keycloak")
 )
-
-func init() {
-	keycloakURL = os.Getenv("KEYCLOAK_BASE_URL")
-	realm = os.Getenv("KEYCLOAK_REALM")
-	clientID = os.Getenv("KEYCLOAK_CLIENT_ID")
-	clientSecret = os.Getenv("KEYCLOAK_CLIENT_SECRET")
-}
 
 type KeycloakService struct {
 	client       *gocloak.GoCloak
@@ -36,6 +25,12 @@ type KeycloakService struct {
 }
 
 func NewKeycloakService(ctx context.Context) (*KeycloakService, error) {
+
+	keycloakURL := os.Getenv("KEYCLOAK_BASE_URL")
+	realm := os.Getenv("KEYCLOAK_REALM")
+	clientID := os.Getenv("KEYCLOAK_CLIENT_ID")
+	clientSecret := os.Getenv("KEYCLOAK_CLIENT_SECRET")
+
 	client := gocloak.NewClient(keycloakURL)
 	token, err := client.LoginClient(ctx, clientID, clientSecret, realm)
 	if err != nil {
@@ -54,68 +49,63 @@ func NewKeycloakService(ctx context.Context) (*KeycloakService, error) {
 	return service, nil
 }
 
-func (k *KeycloakService) shouldRefreshToken(initialTime time.Time, duration time.Duration) bool {
-	now := time.Now()
-	maxTime := initialTime.Add(duration)
-	return now.After(maxTime)
+func shouldRefreshToken(expirationTime time.Time) bool {
+	return time.Now().After(expirationTime)
 }
 
 func (k *KeycloakService) startTokenRenewer(ctx context.Context) {
-	actualTime := time.Now()
-	refreshBefore := time.Second * 60
+	log.Info("Starting renew service...")
 
-	accessTokenExpireIn := actualTime.Add(time.Duration(k.token.ExpiresIn) * time.Second)
-	accessTokenShouldRenewIn := accessTokenExpireIn.Sub(actualTime) - refreshBefore
-	tickerAccessToken := time.NewTicker(accessTokenShouldRenewIn)
-	defer tickerAccessToken.Stop()
+	refreshBefore := time.Second * 60 // 1 min
 
-	refreshTokenExpireIn := actualTime.Add(time.Duration(k.token.RefreshExpiresIn) * time.Second)
-	refreshTokenShouldRenewIn := refreshTokenExpireIn.Sub(actualTime) - refreshBefore
-	tickerRefreshToken := time.NewTicker(refreshTokenShouldRenewIn)
-	defer tickerRefreshToken.Stop()
+	accessTokenTicker, accessTokenExpireIn := k.startTicker("accessToken", refreshBefore, k.token.ExpiresIn)
+	defer accessTokenTicker.Stop()
+
+	refreshTokenTicker, refreshTokenExpireIn := k.startTicker("refreshToken", refreshBefore, k.token.RefreshExpiresIn)
+	defer refreshTokenTicker.Stop()
 
 	for {
 		select {
-		case <-tickerAccessToken.C:
-			k.mu.Lock()
-			if k.shouldRefreshToken(actualTime, accessTokenShouldRenewIn) {
-				token, err := k.client.RefreshToken(ctx, k.token.RefreshToken, clientID, clientSecret, realm)
-				if err != nil {
-					log.Errorf("Failed in refresh client token: %v", err)
-				} else {
-					k.token = token
-					log.Info("AccessToken refreshed successfully")
-					actualTime = time.Now()
-					accessTokenExpireIn = actualTime.Add(time.Duration(k.token.ExpiresIn) * time.Second)
-					accessTokenShouldRenewIn = accessTokenExpireIn.Sub(actualTime) - refreshBefore
-					tickerAccessToken.Reset(accessTokenShouldRenewIn)
-				}
-			}
-			k.mu.Unlock()
-		case <-tickerRefreshToken.C:
-			k.mu.Lock()
-			if k.shouldRefreshToken(actualTime, refreshTokenShouldRenewIn) {
-				token, err := k.client.LoginClient(ctx, clientID, clientSecret, realm)
-				if err != nil {
-					log.Errorf("Failed in authentication: %v", err)
-				} else {
-					k.token = token
-					log.Info("RefreshToken refreshed successfully")
-
-					actualTime = time.Now()
-					refreshTokenExpireIn = actualTime.Add(time.Duration(k.token.RefreshExpiresIn) * time.Second)
-					refreshTokenShouldRenewIn = refreshTokenExpireIn.Sub(actualTime) - refreshBefore
-					tickerRefreshToken.Reset(refreshTokenShouldRenewIn)
-
-					accessTokenExpireIn = actualTime.Add(time.Duration(k.token.ExpiresIn) * time.Second)
-					accessTokenShouldRenewIn = accessTokenExpireIn.Sub(actualTime) - refreshBefore
-					tickerAccessToken.Reset(accessTokenShouldRenewIn)
-				}
-			}
-			k.mu.Unlock()
+		case <-accessTokenTicker.C:
+			k.handleTokenRenewal(ctx, accessTokenExpireIn, false)
+		case <-refreshTokenTicker.C:
+			k.handleTokenRenewal(ctx, refreshTokenExpireIn, true)
 		case <-ctx.Done():
 			log.Info("AccessToken renewal stopped")
 			return
 		}
+	}
+}
+
+func (k *KeycloakService) startTicker(name string, renewBefore time.Duration, tokenExpiresIn int) (ticker *time.Ticker, willExpireIn time.Time)   {
+	actualTime := time.Now()
+	tokenExpireIn := time.Second * time.Duration(tokenExpiresIn)
+	willExpireIn = actualTime.Add(time.Duration(tokenExpireIn) - renewBefore)
+	log.Infof("token %s will expire in: %s", name, willExpireIn)
+
+	return time.NewTicker(time.Duration(tokenExpireIn) - renewBefore), willExpireIn
+}
+
+func (k *KeycloakService) handleTokenRenewal(ctx context.Context, tokenExpireIn time.Time, isRefreshToken bool) {
+	k.mu.Lock()
+	defer k.mu.Unlock()
+
+	if shouldRefreshToken(tokenExpireIn) {
+		var token *gocloak.JWT
+		var err error
+
+		if isRefreshToken {
+			token, err = k.client.LoginClient(ctx, k.clientID, k.clientSecret, k.realm)
+		} else {
+			token, err = k.client.RefreshToken(ctx, k.token.RefreshToken, k.clientID, k.clientSecret, k.realm)
+		}
+
+		if err != nil {
+			log.Errorf("Failed to renew token: %v", err)
+			return
+		}
+
+		k.token = token
+		log.Infof("Token refreshed successfully (isRefreshToken: %v)", isRefreshToken)
 	}
 }
