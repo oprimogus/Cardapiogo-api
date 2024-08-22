@@ -42,6 +42,6 @@ type User struct {
 type Profile struct {
 	Name     string `db:"name" json:"name" validate:"required"`
 	LastName string `db:"last_name" json:"lastName" validate:"required"`
-	Document string `db:"document" json:"document" validate:"required,cpf"`
+	Document string `db:"document" json:"document" validate:"cpf"`
 	Phone    string `db:"phone" json:"phone" validate:"required,phone"`
 }

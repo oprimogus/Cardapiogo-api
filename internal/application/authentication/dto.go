@@ -6,5 +6,5 @@ type SignInParams struct {
 }
 
 type RefreshParams struct {
-	RefreshToken    string `json:"refreshToken" validate:"required"`
+	RefreshToken string `json:"refreshToken" validate:"required"`
 }

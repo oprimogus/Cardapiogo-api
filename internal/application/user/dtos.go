@@ -13,7 +13,6 @@ func Roles(rolesJSON []string) []entity.UserRole {
 type CreateProfileParams struct {
 	Name     string `json:"name" validate:"required"`
 	LastName string `json:"lastName" validate:"required"`
-	Document string `json:"document" validate:"required,cpf"`
 	Phone    string `json:"phone" validate:"required,phone"`
 }
 
@@ -21,7 +20,6 @@ func (d CreateProfileParams) ToEntity() entity.Profile {
 	return entity.Profile{
 		Name:     d.Name,
 		LastName: d.LastName,
-		Document: d.Document,
 		Phone:    d.Phone,
 	}
 }

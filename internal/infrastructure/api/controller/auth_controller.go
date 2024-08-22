@@ -15,14 +15,14 @@ import (
 type AuthController struct {
 	validator *validatorutils.Validator
 	signIn    authentication.SignIn
-	refresh authentication.Refresh
+	refresh   authentication.Refresh
 }
 
 func NewAuthController(validator *validatorutils.Validator, authRepository repository.AuthenticationRepository) *AuthController {
 	return &AuthController{
 		validator: validator,
 		signIn:    authentication.NewSignIn(authRepository),
-		refresh: authentication.NewRefresh(authRepository),
+		refresh:   authentication.NewRefresh(authRepository),
 	}
 }
 

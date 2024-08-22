@@ -25,9 +25,6 @@ func (c Create) Execute(ctx context.Context, input CreateParams) error {
 	if existUser.Email == input.Email {
 		return entity.ErrExistUserWithEmail
 	}
-	if existUser.Profile.Document == input.Profile.Document {
-		return entity.ErrExistUserWithDocument
-	}
 	if existUser.Profile.Phone == input.Profile.Phone {
 		return entity.ErrExistUserWithPhone
 	}

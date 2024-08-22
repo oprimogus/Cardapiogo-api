@@ -252,8 +252,6 @@ definitions:
     type: object
   user.CreateProfileParams:
     properties:
-      document:
-        type: string
       lastName:
         type: string
       name:
@@ -261,7 +259,6 @@ definitions:
       phone:
         type: string
     required:
-    - document
     - lastName
     - name
     - phone

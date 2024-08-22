@@ -40,9 +40,11 @@ func (s *CreateSuite) TestExecute() {
 	input := user.CreateParams{
 		Email:    "johndoe@example.com",
 		Password: "teste123",
-		Profile:  user.CreateProfileParams{Name: "John", LastName: "Doe", Document: "50338097949", Phone: "13981142501"},
+		Profile:  user.CreateProfileParams{
+			Name: "John", 
+			LastName: "Doe", 
+			Phone: "13981142501"},
 	}
-
 	tests := []struct {
 		name                 string
 		input                user.CreateParams
@@ -69,7 +71,6 @@ func (s *CreateSuite) TestExecute() {
 				Profile: entity.Profile{
 					Name:     input.Profile.Name,
 					LastName: input.Profile.LastName,
-					Document: input.Profile.Document,
 					Phone:    input.Profile.Phone,
 				},
 				Email:     input.Email,
@@ -90,7 +91,6 @@ func (s *CreateSuite) TestExecute() {
 				Profile: entity.Profile{
 					Name:     input.Profile.Name,
 					LastName: input.Profile.LastName,
-					Document: input.Profile.Document,
 					Phone:    input.Profile.Phone,
 				},
 				Email:     "johndoe2@example.com",

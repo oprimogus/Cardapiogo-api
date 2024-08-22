@@ -1034,15 +1034,11 @@ const docTemplate = `{
         "user.CreateProfileParams": {
             "type": "object",
             "required": [
-                "document",
                 "lastName",
                 "name",
                 "phone"
             ],
             "properties": {
-                "document": {
-                    "type": "string"
-                },
                 "lastName": {
                     "type": "string"
                 },
