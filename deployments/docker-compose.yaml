@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: cardapiogo
       POSTGRES_PASSWORD: cardapiogo
     ports:
-      - "5435:5432"
+      - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
@@ -45,7 +45,7 @@ services:
       KC_DB_USERNAME: cardapiogo
       KC_DB_PASSWORD: cardapiogo
     ports:
-      - 8081:8080
+      - 8080:8080
     command: ["start-dev"]
     depends_on: 
       - create-keycloak-schema

@@ -40,7 +40,10 @@ docs:
 	swag init -g cmd/main.go 
 
 test:
-	go test ./... -v -cover
+	go test ./... -v -cover -coverprofile=cover.out
+
+test-cover:
+	go tool cover -html=cover.out
 
 dev:
 	make docs

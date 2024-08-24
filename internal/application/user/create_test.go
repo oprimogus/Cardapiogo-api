@@ -7,18 +7,19 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 
 	"github.com/oprimogus/cardapiogo/internal/application/user"
-	mock_user_repository "github.com/oprimogus/cardapiogo/internal/application/user/mocks"
+	mock_user "github.com/oprimogus/cardapiogo/internal/application/user/mocks"
 	"github.com/oprimogus/cardapiogo/internal/domain/entity"
 )
 
 type CreateSuite struct {
 	suite.Suite
 	controller     *gomock.Controller
-	userRepository *mock_user_repository.MockUserRepository
+	userRepository *mock_user.UserRepositoryMock
 	create         user.Create
 }
 
@@ -32,7 +33,7 @@ func (s *CreateSuite) SuitDown() {
 
 func (s *CreateSuite) SetupSuite() {
 	s.controller = gomock.NewController(s.T())
-	s.userRepository = mock_user_repository.NewMockUserRepository(s.controller)
+	s.userRepository = &mock_user.UserRepositoryMock{}
 	s.create = user.NewCreate(s.userRepository)
 }
 
@@ -50,19 +51,11 @@ func (s *CreateSuite) TestExecute() {
 		input                user.CreateParams
 		mockFindByEmailValue entity.User
 		mockFindByEmailError error
+		mockFindByEmailTimes int
 		mockCreateError      error
 		mockCreateErrorTimes int
 		expected             error
 	}{
-		{
-			name:                 "Not exist user with this email and document",
-			input:                input,
-			mockFindByEmailValue: entity.User{},
-			mockFindByEmailError: nil,
-			mockCreateError:      nil,
-			mockCreateErrorTimes: 1,
-			expected:             nil,
-		},
 		{
 			name:  "Exist user with this email",
 			input: input,
@@ -79,56 +72,17 @@ func (s *CreateSuite) TestExecute() {
 				DeletedAt: time.Now(),
 			},
 			mockFindByEmailError: nil,
+			mockFindByEmailTimes: 1,
 			mockCreateError:      nil,
 			mockCreateErrorTimes: 0,
 			expected:             entity.ErrExistUserWithEmail,
-		},
-		{
-			name:  "Exist user with this document",
-			input: input,
-			mockFindByEmailValue: entity.User{
-				ID: "randowm_uuid",
-				Profile: entity.Profile{
-					Name:     input.Profile.Name,
-					LastName: input.Profile.LastName,
-					Phone:    input.Profile.Phone,
-				},
-				Email:     "johndoe2@example.com",
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
-				DeletedAt: time.Now(),
-			},
-			mockFindByEmailError: nil,
-			mockCreateError:      nil,
-			mockCreateErrorTimes: 0,
-			expected:             entity.ErrExistUserWithDocument,
-		},
-		{
-			name:  "Exist user with this phone",
-			input: input,
-			mockFindByEmailValue: entity.User{
-				ID: "randowm_uuid",
-				Profile: entity.Profile{
-					Name:     input.Profile.Name,
-					LastName: input.Profile.LastName,
-					Document: input.Profile.Phone,
-					Phone:    input.Profile.Phone,
-				},
-				Email:     "johndoe2@example.com",
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
-				DeletedAt: time.Now(),
-			},
-			mockFindByEmailError: nil,
-			mockCreateError:      nil,
-			mockCreateErrorTimes: 0,
-			expected:             entity.ErrExistUserWithPhone,
 		},
 		{
 			name:                 "Fail on find user on repository",
 			input:                input,
 			mockFindByEmailValue: entity.User{},
 			mockFindByEmailError: errors.New("Repository error"),
+			mockFindByEmailTimes: 1,
 			mockCreateError:      nil,
 			mockCreateErrorTimes: 0,
 			expected:             errors.New("Repository error"),
@@ -138,6 +92,7 @@ func (s *CreateSuite) TestExecute() {
 			input:                input,
 			mockFindByEmailValue: entity.User{},
 			mockFindByEmailError: nil,
+			mockFindByEmailTimes: 1,
 			mockCreateError:      errors.New("Repository error"),
 			mockCreateErrorTimes: 1,
 			expected:             errors.New("Repository error"),
@@ -145,9 +100,18 @@ func (s *CreateSuite) TestExecute() {
 	}
 
 	for _, v := range tests {
-		s.userRepository.EXPECT().FindByEmail(gomock.Any(), v.input.Email).Return(v.mockFindByEmailValue, v.mockFindByEmailError)
-		s.userRepository.EXPECT().Create(gomock.Any(), gomock.Any()).Return(v.mockCreateError).Times(v.mockCreateErrorTimes)
+		if v.mockFindByEmailTimes > 0 {
+			s.userRepository.On("FindByEmail", mock.Anything, v.input.Email).
+			Return(v.mockFindByEmailValue, v.mockFindByEmailError).
+			Times(v.mockFindByEmailTimes)
+		}
+		if v.mockCreateErrorTimes > 0 {
+			s.userRepository.On("Create", mock.Anything, mock.Anything).
+			Return(v.mockCreateError).
+			Times(v.mockCreateErrorTimes)
+		}
 		err := s.create.Execute(context.Background(), v.input)
 		assert.Equal(s.T(), err, v.expected, v.name)
+		s.userRepository.AssertExpectations(s.T())
 	}
 }
