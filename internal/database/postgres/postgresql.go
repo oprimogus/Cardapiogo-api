@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -13,6 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 
+	"github.com/oprimogus/cardapiogo/internal/config"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
@@ -63,18 +63,14 @@ func createInstance() *PostgresDatabase {
 }
 
 func (d PostgresDatabase) createStringConn() string {
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbUsername := os.Getenv("DB_USERNAME")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
+	config := config.GetInstance()
 	return fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable search_path=public",
-		dbHost,
-		dbPort,
-		dbUsername,
-		dbPassword,
-		dbName,
+		config.Database.Host(),
+		config.Database.Port(),
+		config.Database.User(),
+		config.Database.Password(),
+		config.Database.Name(),
 	)
 }
 
@@ -96,13 +92,13 @@ func (d PostgresDatabase) getSQLDBConnection(connStr string) (*sql.DB, error) {
 
 func (d PostgresDatabase) migrate() error {
 	sourceURL := "file://internal/database/migrations"
-	dbName := os.Getenv("DB_NAME")
+	config := config.GetInstance()
 	log.Info("starting migration execution")
 	driver, err := postgres.WithInstance(d.sqlDB, &postgres.Config{})
 	if err != nil {
 		return fmt.Errorf("database: could not create migration driver: %w", err)
 	}
-	migrator, err := migrate.NewWithDatabaseInstance(sourceURL, dbName, driver)
+	migrator, err := migrate.NewWithDatabaseInstance(sourceURL, config.Database.Name(), driver)
 	if err != nil && err != migrate.ErrNoChange {
 		return fmt.Errorf("database: Could not create migrator: %w", err)
 	}

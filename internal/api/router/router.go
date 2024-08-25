@@ -2,14 +2,14 @@ package router
 
 import (
 	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/core"
 	"github.com/oprimogus/cardapiogo/internal/api/middleware"
 	"github.com/oprimogus/cardapiogo/internal/api/router/routes"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
+	"github.com/oprimogus/cardapiogo/internal/config"
+	"github.com/oprimogus/cardapiogo/internal/core"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
@@ -34,9 +34,10 @@ func Initialize(factory core.RepositoryFactory) {
 	routes.AuthRoutes(router, validator, factory)
 	routes.UserRoutes(router, validator, factory)
 	routes.StoreRoutes(router, validator, factory)
-	port := os.Getenv("API_PORT")
+	config := config.GetInstance().Api
+	port := config.Port()
 	if port == "" {
-		port = "8080"
+		port = "3000"
 	}
 
 	logger.Infof("Docs available in http://localhost:%s/api/v1/reference/index.html", port)

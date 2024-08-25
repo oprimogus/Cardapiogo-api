@@ -5,11 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/core"
-	"github.com/oprimogus/cardapiogo/internal/core/user"
 	"github.com/oprimogus/cardapiogo/internal/api/controller"
 	"github.com/oprimogus/cardapiogo/internal/api/middleware"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
+	"github.com/oprimogus/cardapiogo/internal/config"
+	"github.com/oprimogus/cardapiogo/internal/core"
+	"github.com/oprimogus/cardapiogo/internal/core/user"
 )
 
 func StoreRoutes(router *gin.Engine,
@@ -19,9 +20,9 @@ func StoreRoutes(router *gin.Engine,
 	storeRepository := factory.NewStoreRepository()
 	storeController := controller.NewStoreController(validator, storeRepository)
 
-	basepath := os.Getenv("API_BASE_PATH")
+	basePath := config.GetInstance().Api.BasePath()
 
-	v1 := router.Group(basepath + "/v1")
+	v1 := router.Group(basePath + "/v1")
 	{
 		v1.POST("/store",
 			middleware.AuthenticationMiddleware(authRepository),

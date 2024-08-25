@@ -3,15 +3,15 @@ package xerrors
 import (
 	"errors"
 	"net/http"
-	"os"
 	"strings"
 	"unicode"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/oprimogus/cardapiogo/internal/config"
 )
 
-var environment = os.Getenv("GIN_MODE")
+var environment = config.GetInstance().Api.GinMode()
 
 const (
 	NOT_FOUND_RECORD      = "Record not found."

@@ -10,11 +10,12 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	_ "github.com/oprimogus/cardapiogo/docs"
+	"github.com/oprimogus/cardapiogo/internal/config"
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
 
 func SwaggerRoutes(router *gin.Engine) {
-	basePath := os.Getenv("API_BASE_PATH")
+	basePath := config.GetInstance().Api.BasePath()
 	v1 := router.Group(basePath)
 
 	v1.GET("/v1/reference/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

@@ -7,7 +7,7 @@ type UserModule struct {
 	Delete      useCaseDelete
 	FindByID    useCaseFindByID
 	FindByEmail useCaseFindByEmail
-	AddRoles useCaseAddRoles
+	AddRoles    useCaseAddRoles
 }
 
 func NewUserModule(userRepository Repository) UserModule {
@@ -18,6 +18,6 @@ func NewUserModule(userRepository Repository) UserModule {
 		Delete:      newUseCaseDelete(userRepository),
 		FindByID:    newUseCaseFindByID(userRepository),
 		FindByEmail: newUseCaseFindByEmail(userRepository),
-		AddRoles: newUseCaseAddRoles(userRepository),
+		AddRoles:    newUseCaseAddRoles(userRepository),
 	}
 }

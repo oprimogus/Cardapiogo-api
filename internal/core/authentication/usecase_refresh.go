@@ -8,7 +8,7 @@ type useCaseRefresh struct {
 	repository Repository
 }
 
-func newUseCaseRefresh(repository Repository) useCaseRefresh{
+func newUseCaseRefresh(repository Repository) useCaseRefresh {
 	return useCaseRefresh{
 		repository: repository,
 	}

@@ -11,15 +11,15 @@ type CreateParams struct {
 	CpfCnpj string          `json:"cpfCnpj" validate:"required,cpfCnpj"`
 	Name    string          `json:"name" validate:"required,lte=25"`
 	Phone   string          `json:"phone" validate:"required,phone"`
-	Address address.Address  `json:"address" validate:"required"`
-	Type    ShopType `json:"type" validate:"required,shopType"`
+	Address address.Address `json:"address" validate:"required"`
+	Type    ShopType        `json:"type" validate:"required,shopType"`
 }
 
 type UpdateParams struct {
-	ID                 string                 `json:"id" validate:"required"`
-	Name               string                 `json:"name" validate:"required,lte=25"`
-	Phone              string                 `json:"phone" validate:"required,phone"`
-	Address            address.Address         `json:"address" validate:"required"`
+	ID                 string          `json:"id" validate:"required"`
+	Name               string          `json:"name" validate:"required,lte=25"`
+	Phone              string          `json:"phone" validate:"required,phone"`
+	Address            address.Address `json:"address" validate:"required"`
 	Type               ShopType        `json:"type" validate:"required,shopType"`
 	PaymentMethodEnums []PaymentMethod `json:"paymentMethod" validate:"dive"`
 }
@@ -65,21 +65,21 @@ func (b *BusinessHoursParams) Entity(timeZone string) (BusinessHours, error) {
 }
 
 type GetStoreByIdOutput struct {
-	ID                 string                 `json:"id"`
-	Name               string                 `json:"name"`
-	Phone              string                 `json:"phone"`
-	Score              int                    `json:"score"`
-	Address            AddressOutput          `json:"address"`
-	Type               ShopType        `json:"type"`
-	BusinessHours      []BusinessHoursParams  `json:"businessHours"`
-	PaymentMethodEnums []PaymentMethod `json:"paymentMethod"`
+	ID                 string                `json:"id"`
+	Name               string                `json:"name"`
+	Phone              string                `json:"phone"`
+	Score              int                   `json:"score"`
+	Address            AddressOutput         `json:"address"`
+	Type               ShopType              `json:"type"`
+	BusinessHours      []BusinessHoursParams `json:"businessHours"`
+	PaymentMethodEnums []PaymentMethod       `json:"paymentMethod"`
 }
 
 type GetStoreByFilterOutput struct {
 	ID            string                `json:"id"`
 	Name          string                `json:"name"`
 	Score         int                   `json:"score"`
-	Type          ShopType       `json:"type"`
+	Type          ShopType              `json:"type"`
 	Neighborhood  string                `json:"neighborhood"`
 	BusinessHours []BusinessHoursParams `json:"businessHours"`
 }

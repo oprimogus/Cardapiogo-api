@@ -5,19 +5,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/core/user"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
+	"github.com/oprimogus/cardapiogo/internal/core/user"
 	xerrors "github.com/oprimogus/cardapiogo/internal/errors"
 )
 
 type UserController struct {
-	validator *validatorutils.Validator
+	validator  *validatorutils.Validator
 	userModule user.UserModule
 }
 
 func NewUserController(validator *validatorutils.Validator, userRepository user.Repository) *UserController {
 	return &UserController{
-		validator: validator,
+		validator:  validator,
 		userModule: user.NewUserModule(userRepository),
 	}
 }

@@ -1,20 +1,19 @@
 package routes
 
 import (
-	"os"
-
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/core"
 	"github.com/oprimogus/cardapiogo/internal/api/controller"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
+	"github.com/oprimogus/cardapiogo/internal/config"
+	"github.com/oprimogus/cardapiogo/internal/core"
 )
 
 func AuthRoutes(router *gin.Engine, validator *validatorutils.Validator, factory core.RepositoryFactory) {
 	authRepository := factory.NewAuthenticationRepository()
 	authController := controller.NewAuthController(validator, authRepository)
 
-	basePath := os.Getenv("API_BASE_PATH")
+	basePath := config.GetInstance().Api.BasePath()
 
 	v1 := router.Group(basePath + "/v1")
 	{

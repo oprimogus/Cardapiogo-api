@@ -14,7 +14,7 @@ func MakePostgres(ctx context.Context) (*Container, error) {
 	dbName := "users"
 	dbUser := "user"
 	dbPassword := "password"
-	
+
 	postgresContainer, err := postgres.Run(ctx,
 		"docker.io/postgres:16-alpine",
 		postgres.WithInitScripts(filepath.Join("testdata", "init-user-db.sh")),
@@ -25,7 +25,7 @@ func MakePostgres(ctx context.Context) (*Container, error) {
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
 				WithOccurrence(2).
-				WithStartupTimeout(5 * time.Second)),
+				WithStartupTimeout(5*time.Second)),
 	)
 	if err != nil {
 		log.Errorf("failed to start container: %s", err)

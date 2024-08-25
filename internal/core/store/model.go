@@ -117,7 +117,7 @@ type Store struct {
 	Active             bool            `json:"active" validate:"required,boolean"`
 	Phone              string          `json:"phone" validate:"required,phone"`
 	Score              int             `json:"score" validate:"required,number"`
-	Address            address.Address  `json:"address" validate:"required"`
+	Address            address.Address `json:"address" validate:"required"`
 	Type               ShopType        `json:"type" validate:"required,shopType"`
 	BusinessHours      []BusinessHours `json:"businessHours" validate:"dive"`
 	PaymentMethodEnums []PaymentMethod `json:"paymentMethod" validate:"dive"`

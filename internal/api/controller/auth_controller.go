@@ -5,20 +5,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/core/authentication"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
+	"github.com/oprimogus/cardapiogo/internal/core/authentication"
 	xerrors "github.com/oprimogus/cardapiogo/internal/errors"
 )
 
 // UserController struct
 type AuthController struct {
-	validator *validatorutils.Validator
+	validator            *validatorutils.Validator
 	authenticationModule authentication.AuthenticationModule
 }
 
 func NewAuthController(validator *validatorutils.Validator, authRepository authentication.Repository) *AuthController {
 	return &AuthController{
-		validator: validator,
+		validator:            validator,
 		authenticationModule: authentication.NewAuthenticationModule(authRepository),
 	}
 }

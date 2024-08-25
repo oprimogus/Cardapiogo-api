@@ -1,15 +1,14 @@
 package routes
 
 import (
-	"os"
-
 	"github.com/gin-gonic/gin"
+	"github.com/oprimogus/cardapiogo/internal/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func DefaultRoutes(router *gin.Engine, reg *prometheus.Registry) {
-	basePath := os.Getenv("API_BASE_PATH")
+	basePath := config.GetInstance().Api.BasePath()
 
 	v1 := router.Group(basePath + "/v1")
 

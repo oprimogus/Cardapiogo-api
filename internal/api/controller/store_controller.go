@@ -6,19 +6,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/core/store"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
+	"github.com/oprimogus/cardapiogo/internal/core/store"
 	xerrors "github.com/oprimogus/cardapiogo/internal/errors"
 )
 
 type StoreController struct {
-	validator           *validatorutils.Validator
+	validator   *validatorutils.Validator
 	storeModule store.StoreModule
 }
 
 func NewStoreController(validator *validatorutils.Validator, repository store.Repository) *StoreController {
 	return &StoreController{
-		validator:           validator,
+		validator:   validator,
 		storeModule: store.NewStoreModule(repository),
 	}
 }

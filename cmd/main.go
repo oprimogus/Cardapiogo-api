@@ -4,7 +4,6 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/api/router"
 	"github.com/oprimogus/cardapiogo/internal/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/persistence"
-	"github.com/subosito/gotenv"
 )
 
 //	@title			Cardapiogo API
@@ -22,8 +21,6 @@ import (
 // @in							header
 // @name						Authorization
 func main() {
-	// env
-	_ = gotenv.Load()
 
 	// database
 	db := postgres.GetInstance()
