@@ -61,7 +61,7 @@ func (c *StoreController) GetStoreByID(ctx *gin.Context) {
 //	@Param			latitude	query		string	false	"latitude of address selected"
 //	@Param			longitude	query		string	false	"longitude of address selected"
 //	@Param			type		query		string	false	"Specify store type"
-//	@Success		200			{object}	store.GetStoreByIdOutput
+//	@Success		200			{object}	[]store.GetStoreByIdOutput
 //	@Failure		404			{object}	xerrors.ErrorResponse
 //	@Failure		500			{object}	xerrors.ErrorResponse
 //	@Failure		502			{object}	xerrors.ErrorResponse

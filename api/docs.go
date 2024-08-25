@@ -236,7 +236,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/store.GetStoreByIdOutput"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/store.GetStoreByIdOutput"
+                            }
                         }
                     },
                     "404": {

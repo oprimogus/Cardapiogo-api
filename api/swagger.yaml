@@ -431,7 +431,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/store.GetStoreByIdOutput'
+            items:
+              $ref: '#/definitions/store.GetStoreByIdOutput'
+            type: array
         "404":
           description: Not Found
           schema:
