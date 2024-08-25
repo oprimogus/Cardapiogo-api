@@ -119,7 +119,7 @@ func (c *StoreController) GetStoreByFilter(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			Params	body	store.CreateParams	true	"Params to create a store"
-//	@Success		201
+//	@Success		201 {object}    store.CreatedStore
 //	@Failure		400	{object}	xerrors.ErrorResponse
 //	@Failure		401	{object}	xerrors.ErrorResponse
 //	@Failure		403	{object}	xerrors.ErrorResponse
@@ -147,8 +147,8 @@ func (c *StoreController) Create(ctx *gin.Context) {
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-
-	ctx.JSON(http.StatusCreated, gin.H{"id": storeID})
+	response := store.CreatedStore{ID: storeID}
+	ctx.JSON(http.StatusCreated, response)
 }
 
 // Update godoc

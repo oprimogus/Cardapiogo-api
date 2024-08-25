@@ -15,6 +15,10 @@ type CreateParams struct {
 	Type    ShopType        `json:"type" validate:"required,shopType"`
 }
 
+type CreatedStore struct {
+	ID string `json:"id"`
+}
+
 type UpdateParams struct {
 	ID                 string          `json:"id" validate:"required"`
 	Name               string          `json:"name" validate:"required,lte=25"`

@@ -352,7 +352,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/store.CreatedStore"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -857,6 +860,14 @@ const docTemplate = `{
                 },
                 "type": {
                     "$ref": "#/definitions/store.ShopType"
+                }
+            }
+        },
+        "store.CreatedStore": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
                 }
             }
         },
