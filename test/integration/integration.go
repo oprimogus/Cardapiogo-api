@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	logger "github.com/oprimogus/cardapiogo/pkg/log"
 	"github.com/testcontainers/testcontainers-go"
 )
+
+var log = logger.NewLogger("Integration")
 
 type Container struct {
 	name     string

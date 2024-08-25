@@ -1,11 +1,10 @@
 package main
 
 import (
+	"github.com/oprimogus/cardapiogo/internal/api/router"
+	"github.com/oprimogus/cardapiogo/internal/database/postgres"
+	"github.com/oprimogus/cardapiogo/internal/persistence"
 	"github.com/subosito/gotenv"
-
-	"github.com/oprimogus/cardapiogo/internal/infrastructure/api/router"
-	"github.com/oprimogus/cardapiogo/internal/infrastructure/database/postgres"
-	"github.com/oprimogus/cardapiogo/internal/infrastructure/persistence"
 )
 
 //	@title			Cardapiogo API

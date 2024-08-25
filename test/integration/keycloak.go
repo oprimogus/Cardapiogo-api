@@ -11,7 +11,7 @@ import (
 func MakeKeycloak(ctx context.Context) (*Container, error) {
 	reqKeycloak := testcontainers.ContainerRequest{
 		Image:        "quay.io/keycloak/keycloak:24.0.4",
-		ExposedPorts: []string{"8081/tcp"},
+		ExposedPorts: []string{"8080/tcp"},
 		WaitingFor:   wait.ForLog("Listening on: http://0.0.0.0:8080"),
 	}
 	keycloakTest, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
@@ -19,7 +19,7 @@ func MakeKeycloak(ctx context.Context) (*Container, error) {
 		Started:          true,
 	})
 	if err != nil {
-		return  nil, fmt.Errorf("could not start Keycloak: %w", err)
+		return nil, fmt.Errorf("could not start Keycloak: %w", err)
 	}
 
 	return &Container{name: "Keycloak", instance: keycloakTest}, nil
