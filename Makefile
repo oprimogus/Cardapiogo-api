@@ -6,6 +6,7 @@ export
 
 lint:
 	@gofmt -s -w .
+	swag fmt
 
 install:
 	go mod tidy
@@ -27,12 +28,9 @@ sqlc:
 
 sqlc-vet:
 	sqlc vet -f configs/sqlc.yaml
-	
-lint-docs:
-	swag fmt
 
 docs:
-	make lint-docs
+	make lint
 	swag init -g cmd/main.go -o api 
 
 test:
