@@ -2,52 +2,71 @@
 
 Repositório da API do Cardápio em Golang
 
-## Sobre o projeto
+## Sobre o Projeto
 
-![img](/docs/assets/banner.svg)
+A API do Cardapiogo é uma solução desenvolvida em Golang que serve como o backend para o aplicativo Cardapiogo. Este aplicativo tem como objetivo facilitar a descoberta de restaurantes e lojas na região dos usuários. Ele fornece informações básicas sobre estabelecimentos, como disponibilidade, e permite que os usuários façam pedidos de delivery ou optem por ir ao local. Além disso, o aplicativo oferece uma funcionalidade de avaliação para que os consumidores possam compartilhar suas experiências.
 
-- Consiste numa API para delivery de pedidos
+Os principais atores do sistema são:
+
+- **Consumidor:** O usuário final que utiliza o aplicativo para conhecer restaurantes e lojas, fazer pedidos (delivery ou ir ao local) e obter informações como disponibilidade dos estabelecimentos.
+  
+- **Dono da Loja:** O proprietário do estabelecimento que utiliza a plataforma para receber pedidos, fazer marketing e gerenciar informações do seu negócio.
+
+- **Futuro Motoboy:** A API está projetada para, futuramente, incluir funcionalidades para motoboys, que poderão receber informações sobre entregas a serem realizadas.
+
+Esta API é a espinha dorsal da aplicação Cardapiogo, garantindo uma integração eficiente e escalável entre os diferentes componentes do sistema e seus usuários.
+
+## Funcionalidades
+
+- **Consulta de Estabelecimentos:** Permite aos consumidores buscar e visualizar informações sobre restaurantes e lojas na sua região.
+- **Pedidos e Entregas:** Facilita a realização de pedidos de delivery e fornece informações sobre a disponibilidade dos estabelecimentos.
+- **Avaliações:** Permite que os consumidores avaliem e comentem sobre suas experiências em diferentes locais.
+- **Gerenciamento de Pedidos:** Oferece uma plataforma para donos de lojas gerenciarem pedidos e realizar atividades de marketing.
+
 
 ## Depêndencias
 
 ### 1. Migrate CLI
 
-Configure o Migrate através deste
- [link](https://github.com/golang-migrate/migrate/tree/v4.16.2/cmd/migrate)
+```bash
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
+
+Repositório com mais informações [aqui](https://github.com/golang-migrate/migrate/tree/v4.16.2/cmd/migrate)
 
 ### 2. SQLC
 
-Configure o SQLC através deste [link](https://docs.sqlc.dev/en/stable/overview/install.html)
+```bash
+go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+```
+
+Repositório com mais informações [aqui](https://docs.sqlc.dev/en/stable/overview/install.html)
 
 ### 3. swaggo
 
-Configure o swaggo através deste [link](https://github.com/swaggo/swag)
+```bash
+go install github.com/swaggo/swag/cmd/swag@latest
+```
 
-### 4. gin-swagger
+Repositório com mais informações [aqui](https://github.com/swaggo/swag)
 
-Documentação disponível [aqui](https://github.com/swaggo/gin-swagger)
+### 4. Air hot reload
+
+```bash
+go install github.com/air-verse/air@latest
+```
+
+Repositório com mais informações [aqui](https://github.com/cosmtrek/air)
 
 ### 5. validator
 
 Documentação disponível [aqui](https://github.com/go-playground/validator)
 
-### 6. go-mock
 
-Documentação disponível [aqui](https://github.com/uber-go/mock)
-
-- Exemplo de geração de mock
-
-```bash
-mockgen -source=internal/domain/profile/repository.go -destination=internal/infra/mocks/mock_profile.go
-```
-
-### 7. Air hot reload
-
-Documentação disponível [aqui](https://github.com/cosmtrek/air)
 
 ## Primeira vez ao rodar o app localmente
 
-1. Criar .env
+1. Criar .env e preencher variáveis de ambiente
 
     ```bash
     cp .env.example .env
@@ -62,7 +81,7 @@ Documentação disponível [aqui](https://github.com/cosmtrek/air)
 3. Subir banco de dados e demais containers
 
     ```bash
-    make dev-docker-up
+    make up
     ```
 
 4. Executar migrations
@@ -80,7 +99,7 @@ Documentação disponível [aqui](https://github.com/cosmtrek/air)
 6. Rodar a API
 
     ```bash
-    make run
+    make dev
     ```
 
-7. Acessar rotas [aqui](http://localhost:8080/api/v1/swagger/index.html#/)
+7. Acessar swagger [aqui](http://localhost:8080/api/v1/swagger/index.html#/)
