@@ -19,8 +19,8 @@ jobs:
       
       - name: Create .env file
         run: |
-          echo APP_REPO=${{ vars.APP_REPO }} >> .env
-          echo APP_NAME=${{ vars.APP_NAME }} >> .env
+          APP_REPO=${{ vars.APP_REPO }} >> .env
+          APP_NAME=${{ vars.APP_NAME }} >> .env
 
       - name: Run Tests
         run: make lint

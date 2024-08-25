@@ -6,7 +6,6 @@ export
 
 lint:
 	@gofmt -s -w .
-	swag fmt
 
 install:
 	go mod tidy
