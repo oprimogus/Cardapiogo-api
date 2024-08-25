@@ -2,7 +2,6 @@ package routes
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/MarceloPetrucio/go-scalar-api-reference"
 	"github.com/gin-gonic/gin"

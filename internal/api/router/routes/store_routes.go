@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"os"
-
 	"github.com/gin-gonic/gin"
 
 	"github.com/oprimogus/cardapiogo/internal/api/controller"
