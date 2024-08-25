@@ -67,11 +67,11 @@ func (d PostgresDatabase) createStringConn() string {
 	config := config.GetInstance()
 	return fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable search_path=public",
-		config.Database.Host(),
-		config.Database.Port(),
-		config.Database.User(),
-		config.Database.Password(),
-		config.Database.Name(),
+		config.Database.Host,
+		config.Database.Port,
+		config.Database.User,
+		config.Database.Password,
+		config.Database.Name,
 	)
 }
 
@@ -103,7 +103,7 @@ func (d PostgresDatabase) migrate() error {
 	if err != nil {
 		return fmt.Errorf("database: could not create migration driver: %w", err)
 	}
-	migrator, err := migrate.NewWithDatabaseInstance(sourceURL, config.Database.Name(), driver)
+	migrator, err := migrate.NewWithDatabaseInstance(sourceURL, config.Database.Name, driver)
 	if err != nil && err != migrate.ErrNoChange {
 		return fmt.Errorf("database: Could not create migrator: %w", err)
 	}

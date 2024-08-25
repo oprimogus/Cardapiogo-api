@@ -15,35 +15,11 @@ var (
 )
 
 type dbConfig struct {
-	host     string
-	port     string
-	name     string
-	user     string
-	password string
-}
-
-func (d *dbConfig) Host() string {
-	return d.host
-}
-
-func (d *dbConfig) Port() string {
-	return d.port
-}
-
-func (d *dbConfig) SetPort(port string) {
-	d.port = port
-}
-
-func (d *dbConfig) Name() string {
-	return d.name
-}
-
-func (d *dbConfig) User() string {
-	return d.user
-}
-
-func (d *dbConfig) Password() string {
-	return d.password
+	Host     string
+	Port     string
+	Name     string
+	User     string
+	Password string
 }
 
 type apiConfig struct {
@@ -119,11 +95,11 @@ func newConfig() *config {
 	}
 	return &config{
 		Database: &dbConfig{
-			host:     os.Getenv("DB_HOST"),
-			port:     os.Getenv("DB_PORT"),
-			name:     os.Getenv("DB_NAME"),
-			user:     os.Getenv("DB_USERNAME"),
-			password: os.Getenv("DB_PASSWORD"),
+			Host:     os.Getenv("DB_HOST"),
+			Port:     os.Getenv("DB_PORT"),
+			Name:     os.Getenv("DB_NAME"),
+			User:     os.Getenv("DB_USERNAME"),
+			Password: os.Getenv("DB_PASSWORD"),
 		},
 		Api: apiConfig{
 			basePath:  os.Getenv("API_BASE_PATH"),

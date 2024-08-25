@@ -21,6 +21,7 @@ jobs:
         run: |
           APP_REPO=${{ vars.APP_REPO }} >> .env
           APP_NAME=${{ vars.APP_NAME }} >> .env
+          echo .env
 
       - name: Run Tests
         run: make lint

@@ -15,11 +15,15 @@ import (
 
 func MakePostgres(ctx context.Context) (*Container, error) {
 	config := config.GetInstance().Database
+	config.Host = "localhost"
+	config.User = "cardapiogo"
+	config.Name = "postgres"
+	config.Password = "cardapiogo"
 	postgresContainer, err := postgres.Run(ctx,
 		"docker.io/postgres:16-alpine",
-		postgres.WithDatabase(config.Name()),
-		postgres.WithUsername(config.User()),
-		postgres.WithPassword(config.Password()),
+		postgres.WithDatabase(config.Name),
+		postgres.WithUsername(config.User),
+		postgres.WithPassword(config.Password),
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
 				WithOccurrence(2).
@@ -35,7 +39,7 @@ func MakePostgres(ctx context.Context) (*Container, error) {
 		log.Errorf("failed to get mapped port: %s", err)
 		return nil, err
 	}
-	config.SetPort(strings.Replace(string(hostPort), "/tcp", "", -1))
+	config.Port = strings.Replace(string(hostPort), "/tcp", "", -1)
 
 	return &Container{name: "postgres", instance: postgresContainer}, nil
 }
