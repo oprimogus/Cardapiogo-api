@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	log             = logger.NewLogger("RepositoryFactory")
+	log = logger.NewLogger("RepositoryFactory")
 )
 
 type DatabaseRepositoryFactory struct {
@@ -27,11 +27,11 @@ func NewDataBaseRepositoryFactory(db *postgres.PostgresDatabase) core.Repository
 }
 
 func (d *DatabaseRepositoryFactory) NewUserRepository() user.Repository {
-	return keycloak.NewKeycloakService(context.Background())
+	return keycloak.GetInstance(context.Background())
 }
 
 func (d *DatabaseRepositoryFactory) NewAuthenticationRepository() authentication.Repository {
-	return keycloak.NewKeycloakService(context.Background())
+	return keycloak.GetInstance(context.Background())
 }
 
 func (d *DatabaseRepositoryFactory) NewStoreRepository() store.Repository {

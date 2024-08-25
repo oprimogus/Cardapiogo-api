@@ -39,17 +39,17 @@ func (s *StoreRepositorySuite) TestCreate() {
 		s.T().Error("fail on generate fake uuid for test")
 	}
 	input := store.CreateParams{
-		Name: "Store test 1",
+		Name:    "Store test 1",
 		CpfCnpj: "66063122000135",
-		Phone: "13997590576",
+		Phone:   "13997590576",
 		Address: address.Address{
 			AddressLine1: "RUA 1",
 			AddressLine2: "657",
 			Neighborhood: "Bairro test",
-			City: "Test city",
-			State: "SP",
-			PostalCode: "1213818",
-			Country: "Brasil",
+			City:         "Test city",
+			State:        "SP",
+			PostalCode:   "1213818",
+			Country:      "Brasil",
 		},
 		Type: store.StoreShopMarket,
 	}
@@ -64,6 +64,5 @@ func (s *StoreRepositorySuite) TestCreate() {
 	jsonStruct, _ := json.Marshal(storeTest)
 	fmt.Printf("%s", jsonStruct)
 	assert.Equal(s.T(), 500, storeTest.Score)
-
 
 }

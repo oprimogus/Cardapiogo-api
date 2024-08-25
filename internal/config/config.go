@@ -5,6 +5,7 @@ import (
 
 	"github.com/subosito/gotenv"
 
+	"github.com/oprimogus/cardapiogo/internal/utils"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
@@ -107,7 +108,11 @@ type config struct {
 }
 
 func newConfig() *config {
-	err := gotenv.Load("../../.env")
+	err := utils.SetWorkingDirToProjectRoot()
+	if err != nil {
+		panic("fail on set project root as workdir")
+	}
+	err = gotenv.Load(".env")
 	if err != nil {
 		log.Errorf("fail on load env vars: %s", err)
 		panic("fail on load env vars")

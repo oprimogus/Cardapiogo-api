@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	log = logger.NewLogger("Keycloak")
+	log              = logger.NewLogger("Keycloak")
+	keycloakInstance *KeycloakService
 )
 
 type KeycloakService struct {
@@ -24,7 +25,14 @@ type KeycloakService struct {
 	mu           sync.Mutex
 }
 
-func NewKeycloakService(ctx context.Context) *KeycloakService {
+func GetInstance(ctx context.Context) *KeycloakService {
+	if keycloakInstance == nil {
+		keycloakInstance = newKeycloakService(ctx)
+	}
+	return keycloakInstance
+}
+
+func newKeycloakService(ctx context.Context) *KeycloakService {
 
 	config := config.GetInstance().Keycloak
 
@@ -32,6 +40,7 @@ func NewKeycloakService(ctx context.Context) *KeycloakService {
 	token, err := client.LoginClient(ctx, config.ClientID(), config.ClientSecret(), config.Realm())
 	if err != nil {
 		log.Errorf("fail on get keycloak client: %s", err)
+		panic(err)
 	}
 	service := &KeycloakService{
 		client:       client,

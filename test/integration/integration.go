@@ -2,7 +2,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 	"github.com/testcontainers/testcontainers-go"
@@ -17,6 +16,6 @@ type Container struct {
 
 func (c *Container) Kill(ctx context.Context) {
 	if err := c.instance.Terminate(ctx); err != nil {
-		fmt.Printf("could not stop %s: %s", c.name, err)
+		log.Errorf("could not stop %s: %s", c.name, err)
 	}
 }

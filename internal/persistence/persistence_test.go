@@ -15,7 +15,7 @@ func TestMain(m *testing.M) {
 		panic("fail on initialize postgres with testContainers")
 	}
 	defer postgres.Kill(ctx)
-	
+
 	code := m.Run()
 	os.Exit(code)
 }
