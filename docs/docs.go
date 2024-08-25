@@ -52,7 +52,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/object.JWT"
+                            "$ref": "#/definitions/authentication.JWT"
                         }
                     },
                     "400": {
@@ -103,7 +103,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/object.JWT"
+                            "$ref": "#/definitions/authentication.JWT"
                         }
                     },
                     "400": {
@@ -680,84 +680,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "authentication.RefreshParams": {
-            "type": "object",
-            "required": [
-                "refreshToken"
-            ],
-            "properties": {
-                "refreshToken": {
-                    "type": "string"
-                }
-            }
-        },
-        "authentication.SignInParams": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.PaymentMethod": {
-            "type": "string",
-            "enum": [
-                "credit",
-                "debit",
-                "pix",
-                "cash"
-            ],
-            "x-enum-varnames": [
-                "Credit",
-                "Debit",
-                "Pix",
-                "Cash"
-            ]
-        },
-        "entity.ShopType": {
-            "type": "string",
-            "enum": [
-                "restaurant",
-                "pharmacy",
-                "tobbaco",
-                "market",
-                "convenience",
-                "pub"
-            ],
-            "x-enum-varnames": [
-                "StoreShopRestaurant",
-                "StoreShopPharmacy",
-                "StoreShopTobbaco",
-                "StoreShopMarket",
-                "StoreShopConvenience",
-                "StoreShopPub"
-            ]
-        },
-        "entity.UserRole": {
-            "type": "string",
-            "enum": [
-                "consumer",
-                "owner",
-                "employee",
-                "delivery_man",
-                "admin"
-            ],
-            "x-enum-varnames": [
-                "UserRoleConsumer",
-                "UserRoleOwner",
-                "UserRoleEmployee",
-                "UserRoleDeliveryMan",
-                "UserRoleAdmin"
-            ]
-        },
-        "object.Address": {
+        "address.Address": {
             "type": "object",
             "required": [
                 "addressLine1",
@@ -805,7 +728,7 @@ const docTemplate = `{
                 }
             }
         },
-        "object.JWT": {
+        "authentication.JWT": {
             "type": "object",
             "properties": {
                 "accessToken": {
@@ -833,6 +756,32 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tokenType": {
+                    "type": "string"
+                }
+            }
+        },
+        "authentication.RefreshParams": {
+            "type": "object",
+            "required": [
+                "refreshToken"
+            ],
+            "properties": {
+                "refreshToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "authentication.SignInParams": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 }
             }
@@ -891,7 +840,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "address": {
-                    "$ref": "#/definitions/object.Address"
+                    "$ref": "#/definitions/address.Address"
                 },
                 "cpfCnpj": {
                     "type": "string"
@@ -904,7 +853,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/entity.ShopType"
+                    "$ref": "#/definitions/store.ShopType"
                 }
             }
         },
@@ -929,7 +878,7 @@ const docTemplate = `{
                 "paymentMethod": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entity.PaymentMethod"
+                        "$ref": "#/definitions/store.PaymentMethod"
                     }
                 },
                 "phone": {
@@ -939,9 +888,43 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "type": {
-                    "$ref": "#/definitions/entity.ShopType"
+                    "$ref": "#/definitions/store.ShopType"
                 }
             }
+        },
+        "store.PaymentMethod": {
+            "type": "string",
+            "enum": [
+                "credit",
+                "debit",
+                "pix",
+                "cash"
+            ],
+            "x-enum-varnames": [
+                "Credit",
+                "Debit",
+                "Pix",
+                "Cash"
+            ]
+        },
+        "store.ShopType": {
+            "type": "string",
+            "enum": [
+                "restaurant",
+                "pharmacy",
+                "tobbaco",
+                "market",
+                "convenience",
+                "pub"
+            ],
+            "x-enum-varnames": [
+                "StoreShopRestaurant",
+                "StoreShopPharmacy",
+                "StoreShopTobbaco",
+                "StoreShopMarket",
+                "StoreShopConvenience",
+                "StoreShopPub"
+            ]
         },
         "store.StoreBusinessHoursParams": {
             "type": "object",
@@ -975,7 +958,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "address": {
-                    "$ref": "#/definitions/object.Address"
+                    "$ref": "#/definitions/address.Address"
                 },
                 "id": {
                     "type": "string"
@@ -987,14 +970,14 @@ const docTemplate = `{
                 "paymentMethod": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entity.PaymentMethod"
+                        "$ref": "#/definitions/store.PaymentMethod"
                     }
                 },
                 "phone": {
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/entity.ShopType"
+                    "$ref": "#/definitions/store.ShopType"
                 }
             }
         },
@@ -1007,7 +990,7 @@ const docTemplate = `{
                 "role": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entity.UserRole"
+                        "$ref": "#/definitions/user.Role"
                     }
                 }
             }
@@ -1049,6 +1032,23 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "user.Role": {
+            "type": "string",
+            "enum": [
+                "consumer",
+                "owner",
+                "employee",
+                "delivery_man",
+                "admin"
+            ],
+            "x-enum-varnames": [
+                "RoleConsumer",
+                "RoleOwner",
+                "RoleEmployee",
+                "RoleDeliveryMan",
+                "RoleAdmin"
+            ]
         },
         "user.UpdateProfileParams": {
             "type": "object",

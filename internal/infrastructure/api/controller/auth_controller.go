@@ -31,7 +31,7 @@ func NewAuthController(validator *validatorutils.Validator, authRepository authe
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		authentication.SignInParams	false	"SignInParams"
-//	@Success		200		{object}	object.JWT
+//	@Success		200		{object}	authentication.JWT
 //	@Failure		400		{object}	xerrors.ErrorResponse
 //	@Failure		500		{object}	xerrors.ErrorResponse
 //	@Failure		502		{object}	xerrors.ErrorResponse
@@ -68,7 +68,7 @@ func (c *AuthController) SignIn(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		authentication.RefreshParams	true	"RefreshParams"
-//	@Success		200		{object}	object.JWT
+//	@Success		200		{object}	authentication.JWT
 //	@Failure		400		{object}	xerrors.ErrorResponse
 //	@Failure		500		{object}	xerrors.ErrorResponse
 //	@Failure		502		{object}	xerrors.ErrorResponse

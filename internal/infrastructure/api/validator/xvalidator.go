@@ -75,8 +75,6 @@ func NewValidator(locale string) (*Validator, error) {
 func (v *Validator) Validate(i interface{}) *xerrors.ErrorResponse {
 	out := make(map[string]string)
 
-	// err1 := v.Validator.StructCtx(nil, i)
-
 	err := v.Validator.Struct(i)
 	if err != nil {
 		errs, ok := err.(validator.ValidationErrors)

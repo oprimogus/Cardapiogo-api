@@ -2,66 +2,7 @@ basePath: /api
 consumes:
 - application/json
 definitions:
-  authentication.RefreshParams:
-    properties:
-      refreshToken:
-        type: string
-    required:
-    - refreshToken
-    type: object
-  authentication.SignInParams:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    required:
-    - email
-    - password
-    type: object
-  entity.PaymentMethod:
-    enum:
-    - credit
-    - debit
-    - pix
-    - cash
-    type: string
-    x-enum-varnames:
-    - Credit
-    - Debit
-    - Pix
-    - Cash
-  entity.ShopType:
-    enum:
-    - restaurant
-    - pharmacy
-    - tobbaco
-    - market
-    - convenience
-    - pub
-    type: string
-    x-enum-varnames:
-    - StoreShopRestaurant
-    - StoreShopPharmacy
-    - StoreShopTobbaco
-    - StoreShopMarket
-    - StoreShopConvenience
-    - StoreShopPub
-  entity.UserRole:
-    enum:
-    - consumer
-    - owner
-    - employee
-    - delivery_man
-    - admin
-    type: string
-    x-enum-varnames:
-    - UserRoleConsumer
-    - UserRoleOwner
-    - UserRoleEmployee
-    - UserRoleDeliveryMan
-    - UserRoleAdmin
-  object.Address:
+  address.Address:
     properties:
       addressLine1:
         maxLength: 40
@@ -97,7 +38,7 @@ definitions:
     - postalCode
     - state
     type: object
-  object.JWT:
+  authentication.JWT:
     properties:
       accessToken:
         type: string
@@ -117,6 +58,23 @@ definitions:
         type: string
       tokenType:
         type: string
+    type: object
+  authentication.RefreshParams:
+    properties:
+      refreshToken:
+        type: string
+    required:
+    - refreshToken
+    type: object
+  authentication.SignInParams:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
     type: object
   store.AddressOutput:
     properties:
@@ -150,7 +108,7 @@ definitions:
   store.CreateParams:
     properties:
       address:
-        $ref: '#/definitions/object.Address'
+        $ref: '#/definitions/address.Address'
       cpfCnpj:
         type: string
       name:
@@ -159,7 +117,7 @@ definitions:
       phone:
         type: string
       type:
-        $ref: '#/definitions/entity.ShopType'
+        $ref: '#/definitions/store.ShopType'
     required:
     - address
     - cpfCnpj
@@ -181,15 +139,43 @@ definitions:
         type: string
       paymentMethod:
         items:
-          $ref: '#/definitions/entity.PaymentMethod'
+          $ref: '#/definitions/store.PaymentMethod'
         type: array
       phone:
         type: string
       score:
         type: integer
       type:
-        $ref: '#/definitions/entity.ShopType'
+        $ref: '#/definitions/store.ShopType'
     type: object
+  store.PaymentMethod:
+    enum:
+    - credit
+    - debit
+    - pix
+    - cash
+    type: string
+    x-enum-varnames:
+    - Credit
+    - Debit
+    - Pix
+    - Cash
+  store.ShopType:
+    enum:
+    - restaurant
+    - pharmacy
+    - tobbaco
+    - market
+    - convenience
+    - pub
+    type: string
+    x-enum-varnames:
+    - StoreShopRestaurant
+    - StoreShopPharmacy
+    - StoreShopTobbaco
+    - StoreShopMarket
+    - StoreShopConvenience
+    - StoreShopPub
   store.StoreBusinessHoursParams:
     properties:
       businessHours:
@@ -207,7 +193,7 @@ definitions:
   store.UpdateParams:
     properties:
       address:
-        $ref: '#/definitions/object.Address'
+        $ref: '#/definitions/address.Address'
       id:
         type: string
       name:
@@ -215,12 +201,12 @@ definitions:
         type: string
       paymentMethod:
         items:
-          $ref: '#/definitions/entity.PaymentMethod'
+          $ref: '#/definitions/store.PaymentMethod'
         type: array
       phone:
         type: string
       type:
-        $ref: '#/definitions/entity.ShopType'
+        $ref: '#/definitions/store.ShopType'
     required:
     - address
     - id
@@ -232,7 +218,7 @@ definitions:
     properties:
       role:
         items:
-          $ref: '#/definitions/entity.UserRole'
+          $ref: '#/definitions/user.Role'
         type: array
     required:
     - role
@@ -263,6 +249,20 @@ definitions:
     - name
     - phone
     type: object
+  user.Role:
+    enum:
+    - consumer
+    - owner
+    - employee
+    - delivery_man
+    - admin
+    type: string
+    x-enum-varnames:
+    - RoleConsumer
+    - RoleOwner
+    - RoleEmployee
+    - RoleDeliveryMan
+    - RoleAdmin
   user.UpdateProfileParams:
     properties:
       lastName:
@@ -310,7 +310,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/object.JWT'
+            $ref: '#/definitions/authentication.JWT'
         "400":
           description: Bad Request
           schema:
@@ -344,7 +344,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/object.JWT'
+            $ref: '#/definitions/authentication.JWT'
         "400":
           description: Bad Request
           schema:

@@ -43,7 +43,7 @@ type UpdateProfileParams struct {
 }
 
 type AddRolesParams struct {
-	Roles []Role `json:"role" validate:"required,role"`
+	Roles []Role `json:"roles" validate:"required,role"`
 }
 
 func (d UpdateProfileParams) ToEntity() User {

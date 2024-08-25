@@ -39,8 +39,8 @@ func Initialize(factory core.RepositoryFactory) {
 		port = "8080"
 	}
 
-	logger.Info("Docs available in http://localhost:8080/api/v1/reference/index.html")
-	logger.Info("Docs available in http://localhost:8080/api/v2/reference")
+	logger.Infof("Docs available in http://localhost:%s/api/v1/reference/index.html", port)
+	logger.Infof("Docs available in http://localhost:%s/api/v2/reference", port)
 	log.Printf("Listening and serving in HTTP :%v\n", port)
 	err = router.Run(":" + port)
 	if err != nil {
