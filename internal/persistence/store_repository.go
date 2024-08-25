@@ -23,24 +23,24 @@ func NewStoreRepository(db *postgres.PostgresDatabase, querier *sqlc.Queries) *S
 	return &StoreRepository{db: db, querier: querier}
 }
 
-func (s *StoreRepository) Create(ctx context.Context, params store.Store) error {
+func (s *StoreRepository) Create(ctx context.Context, params store.Store) (id string, err error) {
 
 	ownerIDUUID, err := converters.ConvertStringToUUID(params.OwnerID)
 	if err != nil {
-		return fmt.Errorf("fail in uuid convert: %w", err)
+		return "", fmt.Errorf("fail in uuid convert: %w", err)
 	}
 
-	id, err := uuid.NewV7()
+	storeID, err := uuid.NewV7()
 	if err != nil {
-		return fmt.Errorf("fail in generate uuidv7: %w", err)
+		return "", fmt.Errorf("fail in generate uuidv7: %w", err)
 	}
-	convertedUUIDV7, err := converters.ConvertStringToUUID(id.String())
+	convertedStoreUUIDV7, err := converters.ConvertStringToUUID(storeID.String())
 	if err != nil {
-		return fmt.Errorf("fail in convert uuidv7: %w", err)
+		return "", fmt.Errorf("fail in convert uuidv7: %w", err)
 	}
 
 	args := sqlc.CreateStoreParams{
-		ID:           convertedUUIDV7,
+		ID:           convertedStoreUUIDV7,
 		CpfCnpj:      params.CpfCnpj,
 		OwnerID:      ownerIDUUID,
 		Name:         params.Name,
@@ -60,9 +60,9 @@ func (s *StoreRepository) Create(ctx context.Context, params store.Store) error 
 	}
 	err = s.querier.CreateStore(ctx, args)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return storeID.String(), nil
 }
 
 func (s *StoreRepository) Update(ctx context.Context, userID string, params store.Store) error {

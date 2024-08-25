@@ -24,14 +24,14 @@ type KeycloakService struct {
 	mu           sync.Mutex
 }
 
-func NewKeycloakService(ctx context.Context) (*KeycloakService, error) {
+func NewKeycloakService(ctx context.Context) *KeycloakService {
 
 	config := config.GetInstance().Keycloak
 
 	client := gocloak.NewClient(config.BaseURL())
 	token, err := client.LoginClient(ctx, config.ClientID(), config.ClientSecret(), config.Realm())
 	if err != nil {
-		return nil, err
+		log.Errorf("fail on get keycloak client: %s", err)
 	}
 	service := &KeycloakService{
 		client:       client,
@@ -43,7 +43,7 @@ func NewKeycloakService(ctx context.Context) (*KeycloakService, error) {
 
 	go service.startTokenRenewer(ctx)
 
-	return service, nil
+	return service
 }
 
 func shouldRefreshToken(expirationTime time.Time) bool {

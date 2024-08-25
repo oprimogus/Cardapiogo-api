@@ -15,14 +15,14 @@ func newUseCaseCreate(repository Repository) useCaseCreate {
 	}
 }
 
-func (c useCaseCreate) Execute(ctx context.Context, params CreateParams) error {
+func (c useCaseCreate) Execute(ctx context.Context, params CreateParams) (id string, err error) {
 	userID := ctx.Value("userID").(string)
 	if userID == "" {
-		return fmt.Errorf("invalid userID: '%s'", userID)
+		return "", fmt.Errorf("invalid userID: '%s'", userID)
 	}
-	err := c.repository.Create(ctx, params.Entity(userID))
+	id, err = c.repository.Create(ctx, params.Entity(userID))
 	if err != nil {
-		return fmt.Errorf("could not Create a store for this user: %w", err)
+		return "", fmt.Errorf("could not Create a store for this user: %w", err)
 	}
-	return nil
+	return id, nil
 }

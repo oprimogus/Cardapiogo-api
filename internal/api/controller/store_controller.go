@@ -141,14 +141,14 @@ func (c *StoreController) Create(ctx *gin.Context) {
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	err = c.storeModule.Create.Execute(ctx, params)
+	storeID, err := c.storeModule.Create.Execute(ctx, params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, gin.H{"id": storeID})
 }
 
 // Update godoc

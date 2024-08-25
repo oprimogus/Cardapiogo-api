@@ -3,8 +3,9 @@ package config
 import (
 	"os"
 
-	logger "github.com/oprimogus/cardapiogo/pkg/log"
 	"github.com/subosito/gotenv"
+
+	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
 var (
@@ -20,23 +21,27 @@ type dbConfig struct {
 	password string
 }
 
-func (d dbConfig) Host() string {
+func (d *dbConfig) Host() string {
 	return d.host
 }
 
-func (d dbConfig) Port() string {
+func (d *dbConfig) Port() string {
 	return d.port
 }
 
-func (d dbConfig) Name() string {
+func (d *dbConfig) SetPort(port string) {
+	d.port = port
+}
+
+func (d *dbConfig) Name() string {
 	return d.name
 }
 
-func (d dbConfig) User() string {
+func (d *dbConfig) User() string {
 	return d.user
 }
 
-func (d dbConfig) Password() string {
+func (d *dbConfig) Password() string {
 	return d.password
 }
 
@@ -95,20 +100,20 @@ func (r resendConfig) APIKey() string {
 }
 
 type config struct {
-	Database dbConfig
+	Database *dbConfig
 	Api      apiConfig
 	Keycloak keycloakConfig
 	Resend   resendConfig
 }
 
 func newConfig() *config {
-	err := gotenv.Load()
+	err := gotenv.Load("../../.env")
 	if err != nil {
 		log.Errorf("fail on load env vars: %s", err)
 		panic("fail on load env vars")
 	}
 	return &config{
-		Database: dbConfig{
+		Database: &dbConfig{
 			host:     os.Getenv("DB_HOST"),
 			port:     os.Getenv("DB_PORT"),
 			name:     os.Getenv("DB_NAME"),

@@ -1,5 +1,3 @@
--- Migration 000002
-
 CREATE TYPE "ShopType" AS ENUM (
   'restaurant',
   'pharmacy',
