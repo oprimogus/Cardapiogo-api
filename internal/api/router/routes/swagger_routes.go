@@ -8,7 +8,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	_ "github.com/oprimogus/cardapiogo/docs"
+	_ "github.com/oprimogus/cardapiogo/api"
 	"github.com/oprimogus/cardapiogo/internal/config"
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
@@ -21,7 +21,7 @@ func SwaggerRoutes(router *gin.Engine) {
 
 	v1.GET("/v2/reference", func(c *gin.Context) {
 		htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
-			SpecURL: "./docs/swagger.json",
+			SpecURL: "./api/swagger.json",
 			CustomOptions: scalar.CustomOptions{
 				PageTitle: "Cardapiogo",
 			},

@@ -33,7 +33,7 @@ lint-docs:
 
 docs:
 	make lint-docs
-	swag init -g cmd/main.go 
+	swag init -g cmd/main.go -o api 
 
 test:
 	go test ./... -v -cover -coverprofile=cover.out
