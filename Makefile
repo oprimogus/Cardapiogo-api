@@ -22,10 +22,6 @@ stop:
 mock-db:
 	go run scripts/populate_local_db.go
 
-mock:
-	@read -p "Enter entity domain: " name; \
-		mockgen -source=internal/domain/repository/$${name}_repository.go -destination=internal/application/$${name}/mocks/mock_$${name}_repository.go -package mock_$${name}_repository
-
 sqlc:
 	sqlc generate -f configs/sqlc.yaml
 
