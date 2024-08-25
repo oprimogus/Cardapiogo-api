@@ -7,11 +7,11 @@ import (
 
 	"github.com/Nerzal/gocloak/v13"
 
-	"github.com/oprimogus/cardapiogo/internal/domain/entity"
-	"github.com/oprimogus/cardapiogo/internal/domain/object"
+	"github.com/oprimogus/cardapiogo/internal/core/authentication"
+	"github.com/oprimogus/cardapiogo/internal/core/user"
 )
 
-func entityUserToKeycloakUser(user entity.User, userEnabled, userEmailVerified bool) *gocloak.User {
+func entityUserToKeycloakUser(user user.User, userEnabled, userEmailVerified bool) *gocloak.User {
 	realmRoles := make([]string, len(user.Roles))
 	for i, v := range user.Roles {
 		realmRoles[i] = string(v)
@@ -34,30 +34,30 @@ func entityUserToKeycloakUser(user entity.User, userEnabled, userEmailVerified b
 	}
 }
 
-func keycloakUserToEntityUser(user *gocloak.User) entity.User {
+func keycloakUserToEntityUser(userGocloak *gocloak.User) user.User {
 	var document, phone string
-	if user.Attributes != nil {
-		if docValues, ok := (*user.Attributes)["document"]; ok && len(docValues) > 0 {
+	if userGocloak.Attributes != nil {
+		if docValues, ok := (*userGocloak.Attributes)["document"]; ok && len(docValues) > 0 {
 			document = docValues[0]
 		}
-		if phoneValues, ok := (*user.Attributes)["phone"]; ok && len(phoneValues) > 0 {
+		if phoneValues, ok := (*userGocloak.Attributes)["phone"]; ok && len(phoneValues) > 0 {
 			phone = phoneValues[0]
 		}
 	}
 
-	userRoles := make([]entity.UserRole, len(*user.RealmRoles))
-	for i, v := range *user.RealmRoles {
-		if entity.IsValidUserRole(v) {
-			userRoles[i] = entity.UserRole(v)
+	userRoles := make([]user.Role, len(*userGocloak.RealmRoles))
+	for i, v := range *userGocloak.RealmRoles {
+		if user.IsValidRole(v) {
+			userRoles[i] = user.Role(v)
 		}
 	}
 
-	return entity.User{
-		ID:    *user.ID,
-		Email: *user.Email,
-		Profile: entity.Profile{
-			Name:     *user.FirstName,
-			LastName: *user.LastName,
+	return user.User{
+		ID:    *userGocloak.ID,
+		Email: *userGocloak.Email,
+		Profile: user.Profile{
+			Name:     *userGocloak.FirstName,
+			LastName: *userGocloak.LastName,
 			Document: document,
 			Phone:    phone,
 		},
@@ -65,7 +65,7 @@ func keycloakUserToEntityUser(user *gocloak.User) entity.User {
 	}
 }
 
-func (k *KeycloakService) Create(ctx context.Context, user entity.User) error {
+func (k *KeycloakService) Create(ctx context.Context, user user.User) error {
 	enabled := true
 	emailVerified := false
 	keycloakUser := entityUserToKeycloakUser(user, enabled, emailVerified)
@@ -81,32 +81,32 @@ func (k *KeycloakService) Create(ctx context.Context, user entity.User) error {
 	return nil
 }
 
-func (k *KeycloakService) FindByID(ctx context.Context, id string) (entity.User, error) {
-	user, err := k.client.GetUserByID(ctx, k.token.AccessToken, k.realm, id)
+func (k *KeycloakService) FindByID(ctx context.Context, id string) (user.User, error) {
+	userGocloak, err := k.client.GetUserByID(ctx, k.token.AccessToken, k.realm, id)
 	if err != nil {
-		return entity.User{}, err
+		return user.User{}, err
 	}
-	return keycloakUserToEntityUser(user), nil
+	return keycloakUserToEntityUser(userGocloak), nil
 }
 
-func (k *KeycloakService) FindByEmail(ctx context.Context, email string) (entity.User, error) {
+func (k *KeycloakService) FindByEmail(ctx context.Context, email string) (user.User, error) {
 	maxUsers := 1
-	user, err := k.client.GetUsers(
+	userGocloak, err := k.client.GetUsers(
 		ctx,
 		k.token.AccessToken,
 		k.realm,
 		gocloak.GetUsersParams{Email: &email, Max: &maxUsers},
 	)
 	if err != nil {
-		return entity.User{}, err
+		return user.User{}, err
 	}
-	if len(user) == 0 {
-		return entity.User{}, nil
+	if len(userGocloak) == 0 {
+		return user.User{}, nil
 	}
-	return keycloakUserToEntityUser(user[0]), nil
+	return keycloakUserToEntityUser(userGocloak[0]), nil
 }
 
-func (k *KeycloakService) Update(ctx context.Context, user entity.User) error {
+func (k *KeycloakService) Update(ctx context.Context, user user.User) error {
 	actualUser, err := k.client.GetUserByID(ctx, k.token.AccessToken, k.realm, user.ID)
 	if err != nil {
 		return fmt.Errorf("fail in found user: %w", err)
@@ -144,39 +144,39 @@ func (k *KeycloakService) ResetPasswordByEmail(ctx context.Context, id string) e
 	)
 }
 
-func (k *KeycloakService) SignIn(ctx context.Context, email, password string) (object.JWT, error) {
-	jwt, err := k.client.Login(ctx, k.clientID, k.clientSecret, k.realm, email, password)
+func (k *KeycloakService) SignIn(ctx context.Context, email, password string) (authentication.JWT, error) {
+	jwtInstance, err := k.client.Login(ctx, k.clientID, k.clientSecret, k.realm, email, password)
 	if err != nil {
-		return object.JWT{}, err
+		return authentication.JWT{}, err
 	}
-	return object.JWT{
-		AccessToken:      jwt.AccessToken,
-		IDToken:          jwt.IDToken,
-		ExpiresIn:        jwt.ExpiresIn,
-		RefreshExpiresIn: jwt.RefreshExpiresIn,
-		RefreshToken:     jwt.RefreshToken,
-		TokenType:        jwt.TokenType,
-		NotBeforePolicy:  jwt.NotBeforePolicy,
-		SessionState:     jwt.SessionState,
-		Scope:            jwt.Scope,
+	return authentication.JWT{
+		AccessToken:      jwtInstance.AccessToken,
+		IDToken:          jwtInstance.IDToken,
+		ExpiresIn:        jwtInstance.ExpiresIn,
+		RefreshExpiresIn: jwtInstance.RefreshExpiresIn,
+		RefreshToken:     jwtInstance.RefreshToken,
+		TokenType:        jwtInstance.TokenType,
+		NotBeforePolicy:  jwtInstance.NotBeforePolicy,
+		SessionState:     jwtInstance.SessionState,
+		Scope:            jwtInstance.Scope,
 	}, nil
 }
 
-func (k *KeycloakService) RefreshToken(ctx context.Context, refreshToken string) (object.JWT, error) {
-	jwt, err := k.client.RefreshToken(ctx, refreshToken, k.clientID, k.clientSecret, k.realm)
+func (k *KeycloakService) RefreshToken(ctx context.Context, refreshToken string) (authentication.JWT, error) {
+	jwtInstance, err := k.client.RefreshToken(ctx, refreshToken, k.clientID, k.clientSecret, k.realm)
 	if err != nil {
-		return object.JWT{}, err
+		return authentication.JWT{}, err
 	}
-	return object.JWT{
-		AccessToken:      jwt.AccessToken,
-		IDToken:          jwt.IDToken,
-		ExpiresIn:        jwt.ExpiresIn,
-		RefreshExpiresIn: jwt.RefreshExpiresIn,
-		RefreshToken:     jwt.RefreshToken,
-		TokenType:        jwt.TokenType,
-		NotBeforePolicy:  jwt.NotBeforePolicy,
-		SessionState:     jwt.SessionState,
-		Scope:            jwt.Scope,
+	return authentication.JWT{
+		AccessToken:      jwtInstance.AccessToken,
+		IDToken:          jwtInstance.IDToken,
+		ExpiresIn:        jwtInstance.ExpiresIn,
+		RefreshExpiresIn: jwtInstance.RefreshExpiresIn,
+		RefreshToken:     jwtInstance.RefreshToken,
+		TokenType:        jwtInstance.TokenType,
+		NotBeforePolicy:  jwtInstance.NotBeforePolicy,
+		SessionState:     jwtInstance.SessionState,
+		Scope:            jwtInstance.Scope,
 	}, nil
 }
 
@@ -206,7 +206,7 @@ func (k *KeycloakService) DecodeAccessToken(ctx context.Context, accessToken str
 	return *mapClaims, nil
 }
 
-func (k *KeycloakService) AddRoles(ctx context.Context, userID string, roles []entity.UserRole) error {
+func (k *KeycloakService) AddRoles(ctx context.Context, userID string, roles []user.Role) error {
 	userKeycloakRoles, err := k.client.GetRealmRolesByUserID(ctx, k.token.AccessToken, k.realm, userID)
 	if err != nil {
 		return fmt.Errorf("fail in set new roles: %w", err)

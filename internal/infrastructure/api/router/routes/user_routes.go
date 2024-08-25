@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/domain/entity"
-	"github.com/oprimogus/cardapiogo/internal/domain/repository"
+	"github.com/oprimogus/cardapiogo/internal/core"
+	"github.com/oprimogus/cardapiogo/internal/core/user"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/api/controller"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/api/middleware"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/infrastructure/api/validator"
@@ -14,8 +14,9 @@ import (
 
 func UserRoutes(router *gin.Engine,
 	validator *validatorutils.Validator,
-	userRepository repository.UserRepository,
-	authRepository repository.AuthenticationRepository) {
+	factory core.RepositoryFactory) {
+	userRepository := factory.NewUserRepository()
+	authRepository := factory.NewAuthenticationRepository()
 	userController := controller.NewUserController(validator, userRepository)
 
 	basepath := os.Getenv("API_BASE_PATH")
@@ -25,11 +26,11 @@ func UserRoutes(router *gin.Engine,
 		v1.POST("/auth/sign-up", userController.CreateUser)
 		v1.PUT("/user",
 			middleware.AuthenticationMiddleware(authRepository),
-			middleware.AuthorizationMiddleware([]entity.UserRole{}),
+			middleware.AuthorizationMiddleware([]user.Role{}),
 			userController.UpdateUser)
 		v1.POST("/user/roles",
 			middleware.AuthenticationMiddleware(authRepository),
-			middleware.AuthorizationMiddleware([]entity.UserRole{}),
+			middleware.AuthorizationMiddleware([]user.Role{}),
 			userController.AddRolesToUser)
 	}
 }

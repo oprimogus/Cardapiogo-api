@@ -5,27 +5,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/application/user"
-	"github.com/oprimogus/cardapiogo/internal/domain/repository"
+	"github.com/oprimogus/cardapiogo/internal/core/user"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/infrastructure/api/validator"
 	xerrors "github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
 )
 
 type UserController struct {
 	validator *validatorutils.Validator
-	create    user.Create
-	update    user.Update
-	delete    user.Delete
-	addRoles  user.AddRoles
+	userModule user.UserModule
 }
 
-func NewUserController(validator *validatorutils.Validator, userRepository repository.UserRepository) *UserController {
+func NewUserController(validator *validatorutils.Validator, userRepository user.Repository) *UserController {
 	return &UserController{
 		validator: validator,
-		create:    user.NewCreate(userRepository),
-		update:    user.NewUpdate(userRepository),
-		delete:    user.NewDelete(userRepository),
-		addRoles:  user.NewAddRoles(userRepository),
+		userModule: user.NewUserModule(userRepository),
 	}
 }
 
@@ -58,7 +51,7 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	er := c.create.Execute(ctx, params)
+	er := c.userModule.Create.Execute(ctx, params)
 	if er != nil {
 		xerror := xerrors.Map(er)
 		ctx.JSON(xerror.Status, xerror)
@@ -97,7 +90,7 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	er := c.update.Execute(ctx, params)
+	er := c.userModule.Update.Execute(ctx, params)
 	if er != nil {
 		xerror := xerrors.Map(er)
 		ctx.JSON(xerror.Status, xerror)
@@ -136,7 +129,7 @@ func (c *UserController) AddRolesToUser(ctx *gin.Context) {
 		return
 	}
 
-	er := c.addRoles.Execute(ctx, params.Roles)
+	er := c.userModule.AddRoles.Execute(ctx, params.Roles)
 	if er != nil {
 		xerror := xerrors.Map(er)
 		ctx.JSON(xerror.Status, xerror)

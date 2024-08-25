@@ -77,7 +77,7 @@ func (k *KeycloakService) startTokenRenewer(ctx context.Context) {
 	}
 }
 
-func (k *KeycloakService) startTicker(name string, renewBefore time.Duration, tokenExpiresIn int) (ticker *time.Ticker, willExpireIn time.Time)   {
+func (k *KeycloakService) startTicker(name string, renewBefore time.Duration, tokenExpiresIn int) (ticker *time.Ticker, willExpireIn time.Time) {
 	actualTime := time.Now()
 	tokenExpireIn := time.Second * time.Duration(tokenExpiresIn)
 	willExpireIn = actualTime.Add(time.Duration(tokenExpireIn) - renewBefore)

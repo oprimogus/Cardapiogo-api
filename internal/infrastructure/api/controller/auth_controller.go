@@ -5,8 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/application/authentication"
-	"github.com/oprimogus/cardapiogo/internal/domain/repository"
+	"github.com/oprimogus/cardapiogo/internal/core/authentication"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/infrastructure/api/validator"
 	xerrors "github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
 )
@@ -14,15 +13,13 @@ import (
 // UserController struct
 type AuthController struct {
 	validator *validatorutils.Validator
-	signIn    authentication.SignIn
-	refresh   authentication.Refresh
+	authenticationModule authentication.AuthenticationModule
 }
 
-func NewAuthController(validator *validatorutils.Validator, authRepository repository.AuthenticationRepository) *AuthController {
+func NewAuthController(validator *validatorutils.Validator, authRepository authentication.Repository) *AuthController {
 	return &AuthController{
 		validator: validator,
-		signIn:    authentication.NewSignIn(authRepository),
-		refresh:   authentication.NewRefresh(authRepository),
+		authenticationModule: authentication.NewAuthenticationModule(authRepository),
 	}
 }
 
@@ -53,7 +50,7 @@ func (c *AuthController) SignIn(ctx *gin.Context) {
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	jwt, err := c.signIn.Execute(ctx, params.Email, params.Password)
+	jwt, err := c.authenticationModule.SignIn.Execute(ctx, params.Email, params.Password)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
@@ -90,7 +87,7 @@ func (c *AuthController) RefreshUserToken(ctx *gin.Context) {
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	jwt, err := c.refresh.Execute(ctx, params.RefreshToken)
+	jwt, err := c.authenticationModule.Refresh.Execute(ctx, params.RefreshToken)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
