@@ -984,10 +984,10 @@ const docTemplate = `{
         "user.AddRolesParams": {
             "type": "object",
             "required": [
-                "role"
+                "roles"
             ],
             "properties": {
-                "role": {
+                "roles": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/user.Role"

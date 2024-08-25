@@ -216,12 +216,12 @@ definitions:
     type: object
   user.AddRolesParams:
     properties:
-      role:
+      roles:
         items:
           $ref: '#/definitions/user.Role'
         type: array
     required:
-    - role
+    - roles
     type: object
   user.CreateParams:
     properties:

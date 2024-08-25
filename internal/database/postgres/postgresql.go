@@ -95,7 +95,7 @@ func (d PostgresDatabase) getSQLDBConnection(connStr string) (*sql.DB, error) {
 }
 
 func (d PostgresDatabase) migrate() error {
-	sourceURL := "file://internal/infrastructure/database/migrations"
+	sourceURL := "file://internal/database/migrations"
 	dbName := os.Getenv("DB_NAME")
 	log.Info("starting migration execution")
 	driver, err := postgres.WithInstance(d.sqlDB, &postgres.Config{})
