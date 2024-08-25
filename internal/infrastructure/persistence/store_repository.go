@@ -7,8 +7,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 
-	"github.com/oprimogus/cardapiogo/internal/domain/entity"
-	"github.com/oprimogus/cardapiogo/internal/domain/object"
+	"github.com/oprimogus/cardapiogo/internal/core/address"
+	"github.com/oprimogus/cardapiogo/internal/core/store"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/database/sqlc"
 	"github.com/oprimogus/cardapiogo/pkg/converters"
@@ -23,7 +23,7 @@ func NewStoreRepository(db *postgres.PostgresDatabase, querier *sqlc.Queries) *S
 	return &StoreRepository{db: db, querier: querier}
 }
 
-func (s *StoreRepository) Create(ctx context.Context, params entity.Store) error {
+func (s *StoreRepository) Create(ctx context.Context, params store.Store) error {
 
 	ownerIDUUID, err := converters.ConvertStringToUUID(params.OwnerID)
 	if err != nil {
@@ -65,7 +65,7 @@ func (s *StoreRepository) Create(ctx context.Context, params entity.Store) error
 	return nil
 }
 
-func (s *StoreRepository) Update(ctx context.Context, userID string, params entity.Store) error {
+func (s *StoreRepository) Update(ctx context.Context, userID string, params store.Store) error {
 	convertedUserID, errUserID := converters.ConvertStringToUUID(userID)
 	if errUserID != nil {
 		return fmt.Errorf("fail in convert uuidv7: %w", errUserID)
@@ -96,7 +96,7 @@ func (s *StoreRepository) Update(ctx context.Context, userID string, params enti
 	return nil
 }
 
-func (s *StoreRepository) AddBusinessHour(ctx context.Context, storeID string, params []entity.BusinessHours) error {
+func (s *StoreRepository) AddBusinessHour(ctx context.Context, storeID string, params []store.BusinessHours) error {
 	convertedStoreID, errStoreId := converters.ConvertStringToUUID(storeID)
 	if errStoreId != nil {
 		return fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
@@ -122,7 +122,7 @@ func (s *StoreRepository) AddBusinessHour(ctx context.Context, storeID string, p
 	return nil
 }
 
-func (s *StoreRepository) DeleteBusinessHour(ctx context.Context, storeID string, params []entity.BusinessHours) error {
+func (s *StoreRepository) DeleteBusinessHour(ctx context.Context, storeID string, params []store.BusinessHours) error {
 	convertedStoreID, errStoreId := converters.ConvertStringToUUID(storeID)
 	if errStoreId != nil {
 		return fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
@@ -142,34 +142,34 @@ func (s *StoreRepository) DeleteBusinessHour(ctx context.Context, storeID string
 	return nil
 }
 
-func (s *StoreRepository) FindByID(ctx context.Context, id string) (entity.Store, error) {
+func (s *StoreRepository) FindByID(ctx context.Context, id string) (store.Store, error) {
 	convertedStoreID, errStoreId := converters.ConvertStringToUUID(id)
 	if errStoreId != nil {
-		return entity.Store{}, fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
+		return store.Store{}, fmt.Errorf("fail in convert uuidv7: %w", errStoreId)
 	}
-	store, err := s.querier.GetStoreByID(ctx, convertedStoreID)
+	storeInstance, err := s.querier.GetStoreByID(ctx, convertedStoreID)
 	if err != nil {
-		return entity.Store{}, err
+		return store.Store{}, err
 	}
 
 	sqlcStoreBusinessHours, errSqlc := s.querier.GetStoreBusinessHoursByID(ctx, convertedStoreID)
 	if errSqlc != nil {
-		return entity.Store{}, errSqlc
+		return store.Store{}, errSqlc
 	}
 
-	businessHours := make([]entity.BusinessHours, len(sqlcStoreBusinessHours))
+	businessHours := make([]store.BusinessHours, len(sqlcStoreBusinessHours))
 	if len(sqlcStoreBusinessHours) > 0 {
 		for i, v := range sqlcStoreBusinessHours {
 			openingTime, errOpeningTime := converters.Time(v.OpeningTime)
 			if errOpeningTime != nil {
-				return entity.Store{}, errOpeningTime
+				return store.Store{}, errOpeningTime
 			}
 			closingTime, errClosingTime := converters.Time(v.ClosingTime)
 			if errClosingTime != nil {
-				return entity.Store{}, errClosingTime
+				return store.Store{}, errClosingTime
 			}
 
-			businessHours[i] = entity.BusinessHours{
+			businessHours[i] = store.BusinessHours{
 				WeekDay:     int(v.WeekDay),
 				OpeningTime: openingTime,
 				ClosingTime: closingTime,
@@ -177,25 +177,25 @@ func (s *StoreRepository) FindByID(ctx context.Context, id string) (entity.Store
 		}
 	}
 
-	return entity.Store{
+	return store.Store{
 		ID:    id,
-		Name:  store.Name,
-		Phone: store.Phone,
-		Score: int(store.Score),
-		Type:  entity.ShopType(store.Type),
-		Address: object.Address{
-			AddressLine1: store.AddressLine1,
-			AddressLine2: store.AddressLine2,
-			Neighborhood: store.Neighborhood,
-			City:         store.City,
-			State:        store.State,
-			Country:      store.Country,
+		Name:  storeInstance.Name,
+		Phone: storeInstance.Phone,
+		Score: int(storeInstance.Score),
+		Type:  store.ShopType(storeInstance.Type),
+		Address: address.Address{
+			AddressLine1: storeInstance.AddressLine1,
+			AddressLine2: storeInstance.AddressLine2,
+			Neighborhood: storeInstance.Neighborhood,
+			City:         storeInstance.City,
+			State:        storeInstance.State,
+			Country:      storeInstance.Country,
 		},
 		BusinessHours: businessHours,
 	}, nil
 }
 
-func (s *StoreRepository) FindByFilter(ctx context.Context, params entity.StoreFilter) (*[]entity.Store, error) {
+func (s *StoreRepository) FindByFilter(ctx context.Context, params store.StoreFilter) (*[]store.Store, error) {
 
 	args := sqlc.GetStoreByFilterParams{
 		Column1: converters.ConvertStringToText(params.Name),
@@ -223,14 +223,14 @@ func (s *StoreRepository) FindByFilter(ctx context.Context, params entity.StoreF
 		mapBusinessHours[v.StoreID] = append(mapBusinessHours[v.StoreID], v)
 	}
 
-	stores := make([]entity.Store, len(filteredStores))
+	stores := make([]store.Store, len(filteredStores))
 	for i, v := range filteredStores {
 		convertedID, errConvertUUID := converters.ConvertUUIDToString(v.ID)
 		if errConvertUUID != nil {
 			return nil, fmt.Errorf("fail on convert database UUID: %w", errConvertUUID)
 		}
 		businessHours := mapBusinessHours[v.ID]
-		entityBusinessHour := make([]entity.BusinessHours, len(businessHours))
+		entityBusinessHour := make([]store.BusinessHours, len(businessHours))
 		for i, v := range businessHours {
 			openingTime, errOpeningTime := converters.Time(v.OpeningTime)
 			if errOpeningTime != nil {
@@ -240,19 +240,19 @@ func (s *StoreRepository) FindByFilter(ctx context.Context, params entity.StoreF
 			if errClosingTime != nil {
 				return nil, fmt.Errorf("fail on convert closingTime: %w", errClosingTime)
 			}
-			entityBusinessHour[i] = entity.BusinessHours{
+			entityBusinessHour[i] = store.BusinessHours{
 				WeekDay:     int(v.WeekDay),
 				OpeningTime: openingTime,
 				ClosingTime: closingTime,
 			}
 
 		}
-		stores[i] = entity.Store{
+		stores[i] = store.Store{
 			ID:    *convertedID,
 			Name:  v.Name,
 			Score: int(v.Score),
-			Type:  entity.ShopType(v.Type),
-			Address: object.Address{
+			Type:  store.ShopType(v.Type),
+			Address: address.Address{
 				Neighborhood: v.Neighborhood,
 				Latitude:     v.Latitude.String,
 				Longitude:    v.Longitude.String,

@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/go-playground/validator/v10"
-
-	"github.com/oprimogus/cardapiogo/internal/domain/entity"
+	"github.com/oprimogus/cardapiogo/internal/core/store"
+	"github.com/oprimogus/cardapiogo/internal/core/user"
 )
 
 func isValidUserRole(fl validator.FieldLevel) bool {
@@ -18,7 +18,7 @@ func isValidUserRole(fl validator.FieldLevel) bool {
 	}
 	for i := 0; i < role.Len(); i++ {
 		role := role.Index(i).String()
-		if !entity.IsValidUserRole(role) {
+		if !user.IsValidRole(role) {
 			return false
 		}
 	}
@@ -40,17 +40,17 @@ func IsValidPhone(fl validator.FieldLevel) bool {
 
 func IsValidShopType(fl validator.FieldLevel) bool {
 	value := fl.Field().String()
-	return entity.IsValidShopType(value)
+	return store.IsValidShopType(value)
 }
 
 func IsValidPaymentMethod(fl validator.FieldLevel) bool {
 	value := fl.Field().String()
-	return entity.IsValidPaymentMethod(value)
+	return store.IsValidPaymentMethod(value)
 }
 
 func IsValidBusinessHour(fl validator.FieldLevel) bool {
 	value := fl.Field().String()
-	return entity.IsBusinessHourString(value)
+	return store.IsBusinessHourString(value)
 }
 
 func IsValidCpf(fl validator.FieldLevel) bool {

@@ -4,7 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/oprimogus/cardapiogo/internal/domain/repository"
+	"github.com/oprimogus/cardapiogo/internal/core"
+	"github.com/oprimogus/cardapiogo/internal/core/authentication"
+	"github.com/oprimogus/cardapiogo/internal/core/store"
+	"github.com/oprimogus/cardapiogo/internal/core/user"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/database/sqlc"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/services/authentication/keycloak"
@@ -35,18 +38,18 @@ type DatabaseRepositoryFactory struct {
 	querier *sqlc.Queries
 }
 
-func NewDataBaseRepositoryFactory(db *postgres.PostgresDatabase) repository.Factory {
+func NewDataBaseRepositoryFactory(db *postgres.PostgresDatabase) core.RepositoryFactory {
 	return &DatabaseRepositoryFactory{db: db, querier: sqlc.New(db.GetDB())}
 }
 
-func (d *DatabaseRepositoryFactory) NewUserRepository() repository.UserRepository {
+func (d *DatabaseRepositoryFactory) NewUserRepository() user.Repository {
 	return keycloakService
 }
 
-func (d *DatabaseRepositoryFactory) NewAuthenticationRepository() repository.AuthenticationRepository {
+func (d *DatabaseRepositoryFactory) NewAuthenticationRepository() authentication.Repository {
 	return keycloakService
 }
 
-func (d *DatabaseRepositoryFactory) NewStoreRepository() repository.StoreRepository {
+func (d *DatabaseRepositoryFactory) NewStoreRepository() store.Repository {
 	return NewStoreRepository(d.db, d.querier)
 }

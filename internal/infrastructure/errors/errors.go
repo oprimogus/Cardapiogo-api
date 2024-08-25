@@ -7,7 +7,8 @@ import (
 
 	"github.com/Nerzal/gocloak/v13"
 
-	"github.com/oprimogus/cardapiogo/internal/domain/entity"
+	"github.com/oprimogus/cardapiogo/internal/core/store"
+	"github.com/oprimogus/cardapiogo/internal/core/user"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
@@ -54,15 +55,15 @@ func Map(err error) *ErrorResponse {
 	}
 
 	switch err {
-	case entity.ErrExistUserWithDocument,
-		entity.ErrExistUserWithEmail,
-		entity.ErrExistUserWithPhone:
+	case user.ErrExistUserWithDocument,
+		user.ErrExistUserWithEmail,
+		user.ErrExistUserWithPhone:
 		return &ErrorResponse{
 			Status:       http.StatusConflict,
 			ErrorMessage: err.Error(),
 		}
-	case entity.ErrClosingTimeBeforeOpeningTime,
-		entity.ErrOpeningTimeAfterClosingTime:
+	case store.ErrClosingTimeBeforeOpeningTime,
+		store.ErrOpeningTimeAfterClosingTime:
 		return &ErrorResponse{
 			Status:       http.StatusBadRequest,
 			ErrorMessage: err.Error(),
