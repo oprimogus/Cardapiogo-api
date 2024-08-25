@@ -6,32 +6,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/application/store"
-	"github.com/oprimogus/cardapiogo/internal/domain/entity"
-	"github.com/oprimogus/cardapiogo/internal/domain/repository"
+	"github.com/oprimogus/cardapiogo/internal/core/store"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/infrastructure/api/validator"
 	xerrors "github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
 )
 
 type StoreController struct {
 	validator           *validatorutils.Validator
-	create              store.Create
-	update              store.Update
-	addBusinessHours    store.AddBusinessHour
-	deleteBusinessHours store.DeleteBusinessHour
-	getByID             store.GetByID
-	getByFilter         store.GetByFilter
+	storeModule store.StoreModule
 }
 
-func NewStoreController(validator *validatorutils.Validator, repository repository.StoreRepository) *StoreController {
+func NewStoreController(validator *validatorutils.Validator, repository store.Repository) *StoreController {
 	return &StoreController{
 		validator:           validator,
-		create:              store.NewCreate(repository),
-		update:              store.NewUpdate(repository),
-		addBusinessHours:    store.NewUpdateBusinessHour(repository),
-		deleteBusinessHours: store.NewDeleteBusinessHour(repository),
-		getByID:             store.NewGetByID(repository),
-		getByFilter:         store.NewGetByFilter(repository),
+		storeModule: store.NewStoreModule(repository),
 	}
 }
 
@@ -50,7 +38,7 @@ func NewStoreController(validator *validatorutils.Validator, repository reposito
 //	@Router			/v1/store/{id} [get]
 func (c *StoreController) GetStoreByID(ctx *gin.Context) {
 	id := ctx.Param("id")
-	storeInstance, err := c.getByID.Execute(ctx, id)
+	storeInstance, err := c.storeModule.GetByID.Execute(ctx, id)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
@@ -79,12 +67,12 @@ func (c *StoreController) GetStoreByID(ctx *gin.Context) {
 //	@Failure		502			{object}	xerrors.ErrorResponse
 //	@Router			/v1/store [get]
 func (c *StoreController) GetStoreByFilter(ctx *gin.Context) {
-	var params entity.StoreFilter
+	var params store.StoreFilter
 	params.Name = ctx.Query("name")
 	params.City = ctx.Query("city")
 	params.Latitude = ctx.Query("latitude")
 	params.Longitude = ctx.Query("longitude")
-	params.Type = entity.ShopType(ctx.Query("type"))
+	params.Type = store.ShopType(ctx.Query("type"))
 
 	queryRange := ctx.Query("range")
 	if queryRange != "" {
@@ -114,7 +102,7 @@ func (c *StoreController) GetStoreByFilter(ctx *gin.Context) {
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	storeList, err := c.getByFilter.Execute(ctx, params)
+	storeList, err := c.storeModule.GetByFilter.Execute(ctx, params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
@@ -153,7 +141,7 @@ func (c *StoreController) Create(ctx *gin.Context) {
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	err = c.create.Execute(ctx, params)
+	err = c.storeModule.Create.Execute(ctx, params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
@@ -193,7 +181,7 @@ func (c *StoreController) Update(ctx *gin.Context) {
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	err = c.update.Execute(ctx, params)
+	err = c.storeModule.Update.Execute(ctx, params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
@@ -233,7 +221,7 @@ func (c *StoreController) AddBusinessHours(ctx *gin.Context) {
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	err = c.addBusinessHours.Execute(ctx, params)
+	err = c.storeModule.AddBusinessHour.Execute(ctx, params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)
@@ -273,7 +261,7 @@ func (c *StoreController) DeleteBusinessHours(ctx *gin.Context) {
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	err = c.deleteBusinessHours.Execute(ctx, params)
+	err = c.storeModule.DeleteBusinessHour.Execute(ctx, params)
 	if err != nil {
 		xerror := xerrors.Map(err)
 		ctx.JSON(xerror.Status, xerror)

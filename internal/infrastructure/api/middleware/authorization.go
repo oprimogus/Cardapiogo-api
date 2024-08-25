@@ -5,11 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/domain/entity"
+	"github.com/oprimogus/cardapiogo/internal/core/user"
 	xerrors "github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
 )
 
-func AuthorizationMiddleware(allowedRoles []entity.UserRole) gin.HandlerFunc {
+func AuthorizationMiddleware(allowedRoles []user.Role) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userRolesContext, exists := c.Get("userRoles")
 		if !exists {
@@ -17,7 +17,7 @@ func AuthorizationMiddleware(allowedRoles []entity.UserRole) gin.HandlerFunc {
 			return
 		}
 
-		userRoles, ok := userRolesContext.([]entity.UserRole)
+		userRoles, ok := userRolesContext.([]user.Role)
 		if !ok {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, xerrors.Forbidden(""))
 			return

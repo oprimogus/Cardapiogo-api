@@ -6,12 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oprimogus/cardapiogo/internal/domain/entity"
-	"github.com/oprimogus/cardapiogo/internal/domain/repository"
+	"github.com/oprimogus/cardapiogo/internal/core/authentication"
+	"github.com/oprimogus/cardapiogo/internal/core/user"
 	"github.com/oprimogus/cardapiogo/internal/infrastructure/errors"
 )
 
-func AuthenticationMiddleware(repository repository.AuthenticationRepository) gin.HandlerFunc {
+func AuthenticationMiddleware(repository authentication.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
@@ -48,11 +48,11 @@ func AuthenticationMiddleware(repository repository.AuthenticationRepository) gi
 			return
 		}
 
-		userRoles := []entity.UserRole{}
+		userRoles := []user.Role{}
 		for _, role := range roles {
 			if roleStr, ok := role.(string); ok {
-				if entity.IsValidUserRole(roleStr) {
-					userRoles = append(userRoles, entity.UserRole(roleStr))
+				if user.IsValidRole(roleStr) {
+					userRoles = append(userRoles, user.Role(roleStr))
 				}
 
 			}
