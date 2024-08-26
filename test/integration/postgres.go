@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"path/filepath"
 	"strings"
 
 	"time"
@@ -11,9 +12,11 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 
 	"github.com/oprimogus/cardapiogo/internal/config"
+	"github.com/oprimogus/cardapiogo/internal/utils"
 )
 
 func MakePostgres(ctx context.Context) (*Container, error) {
+	_ = utils.SetWorkingDirToProjectRoot()
 	config := config.GetInstance().Database
 	config.Host = "localhost"
 	config.User = "cardapiogo"
@@ -21,6 +24,7 @@ func MakePostgres(ctx context.Context) (*Container, error) {
 	config.Password = "cardapiogo"
 	postgresContainer, err := postgres.Run(ctx,
 		"docker.io/postgres:16-alpine",
+		postgres.WithInitScripts(filepath.Join("test", "integration", "testdata", "postgres-init.sh")),
 		postgres.WithDatabase(config.Name),
 		postgres.WithUsername(config.User),
 		postgres.WithPassword(config.Password),

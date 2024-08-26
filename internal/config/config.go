@@ -46,26 +46,10 @@ func (a apiConfig) SQLCDebug() string {
 }
 
 type keycloakConfig struct {
-	baseURL      string
-	realm        string
-	clientID     string
-	clientSecret string
-}
-
-func (k keycloakConfig) BaseURL() string {
-	return k.baseURL
-}
-
-func (k keycloakConfig) Realm() string {
-	return k.realm
-}
-
-func (k keycloakConfig) ClientID() string {
-	return k.clientID
-}
-
-func (k keycloakConfig) ClientSecret() string {
-	return k.clientSecret
+	BaseURL      string
+	Realm        string
+	ClientID     string
+	ClientSecret string
 }
 
 type resendConfig struct {
@@ -79,7 +63,7 @@ func (r resendConfig) APIKey() string {
 type config struct {
 	Database *dbConfig
 	Api      apiConfig
-	Keycloak keycloakConfig
+	Keycloak *keycloakConfig
 	Resend   resendConfig
 }
 
@@ -107,11 +91,11 @@ func newConfig() *config {
 			ginMode:   os.Getenv("GIN_MODE"),
 			sqlcDebug: os.Getenv("SQLCDEBUG"),
 		},
-		Keycloak: keycloakConfig{
-			baseURL:      os.Getenv("KEYCLOAK_BASE_URL"),
-			realm:        os.Getenv("KEYCLOAK_REALM"),
-			clientID:     os.Getenv("KEYCLOAK_CLIENT_ID"),
-			clientSecret: os.Getenv("KEYCLOAK_CLIENT_SECRET"),
+		Keycloak: &keycloakConfig{
+			BaseURL:      os.Getenv("KEYCLOAK_BASE_URL"),
+			Realm:        os.Getenv("KEYCLOAK_REALM"),
+			ClientID:     os.Getenv("KEYCLOAK_CLIENT_ID"),
+			ClientSecret: os.Getenv("KEYCLOAK_CLIENT_SECRET"),
 		},
 		Resend: resendConfig{
 			apiKey: os.Getenv("RESEND_API_KEY"),

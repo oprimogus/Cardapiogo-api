@@ -36,8 +36,8 @@ func newKeycloakService(ctx context.Context) *KeycloakService {
 
 	config := config.GetInstance().Keycloak
 
-	client := gocloak.NewClient(config.BaseURL())
-	token, err := client.LoginClient(ctx, config.ClientID(), config.ClientSecret(), config.Realm())
+	client := gocloak.NewClient(config.BaseURL)
+	token, err := client.LoginClient(ctx, config.ClientID, config.ClientSecret, config.Realm)
 	if err != nil {
 		log.Errorf("fail on get keycloak client: %s", err)
 		panic(err)
@@ -45,9 +45,9 @@ func newKeycloakService(ctx context.Context) *KeycloakService {
 	service := &KeycloakService{
 		client:       client,
 		token:        token,
-		realm:        config.Realm(),
-		clientID:     config.ClientID(),
-		clientSecret: config.ClientSecret(),
+		realm:        config.Realm,
+		clientID:     config.ClientID,
+		clientSecret: config.ClientSecret,
 	}
 
 	go service.startTokenRenewer(ctx)

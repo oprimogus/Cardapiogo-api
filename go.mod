@@ -12,6 +12,7 @@ require (
 	github.com/jackc/pgx/v5 v5.5.4
 	github.com/lib/pq v1.10.9
 	github.com/prometheus/client_golang v1.18.0
+	github.com/stillya/testcontainers-keycloak v0.3.0
 	github.com/stretchr/testify v1.9.0
 	github.com/subosito/gotenv v1.6.0
 	github.com/swaggo/files v1.0.1
