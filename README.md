@@ -103,3 +103,9 @@ Documentação disponível [aqui](https://github.com/go-playground/validator)
     ```
 
 7. Acessar swagger [aqui](http://localhost:8080/api/v1/swagger/index.html#/)
+
+
+# Sobre testes:
+
+- Funções que executem testes de integração devem possuir a palavra `Integration` no nome.
+- Funções que executem testes de integração devem possuir a palavra `Unit` no nome.

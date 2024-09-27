@@ -15,6 +15,7 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/database/sqlc"
 	"github.com/oprimogus/cardapiogo/internal/persistence"
+	"github.com/oprimogus/cardapiogo/test/integration"
 )
 
 type StoreRepositorySuite struct {
@@ -28,7 +29,13 @@ func (s *StoreRepositorySuite) SetupSuite() {
 	s.repository = persistence.NewStoreRepository(db, querier)
 }
 
-func TestStoreRepositorySuite(t *testing.T) {
+func TestIntegrationStoreRepositorySuite(t *testing.T) {
+	ctx := context.Background()
+	mockPostgres, err := integration.MakePostgres(ctx)
+	if err != nil {
+		panic("fail on initialize postgres with testContainers")
+	}
+	defer mockPostgres.Kill(ctx)
 	suite.Run(t, new(StoreRepositorySuite))
 }
 

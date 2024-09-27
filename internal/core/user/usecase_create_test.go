@@ -28,7 +28,7 @@ func (s *CreateSuite) TearDownTest() {
 	s.userRepository.AssertExpectations(s.T())
 }
 
-func TestCreateSuite(t *testing.T) {
+func TestUnitCreateSuite(t *testing.T) {
 	suite.Run(t, new(CreateSuite))
 }
 
