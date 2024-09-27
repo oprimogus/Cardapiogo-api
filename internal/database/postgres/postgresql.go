@@ -5,15 +5,12 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 
 	"github.com/oprimogus/cardapiogo/internal/config"
-	"github.com/oprimogus/cardapiogo/internal/utils"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
@@ -22,13 +19,11 @@ var (
 	log      = logger.NewLogger("Postgres")
 )
 
-// PostgresDatabase struct
 type PostgresDatabase struct {
 	pool  *pgxpool.Pool
 	sqlDB *sql.DB
 }
 
-// GetInstance of PostgresDatabase
 func GetInstance() *PostgresDatabase {
 	if instance == nil {
 		instance = createInstance()
@@ -40,7 +35,6 @@ func createInstance() *PostgresDatabase {
 	database := &PostgresDatabase{}
 	strConnection := database.createStringConn()
 
-	// Open connection with pgx
 	var err error
 	database.pool, err = database.getPgxConnection(strConnection)
 	if err != nil {
@@ -48,14 +42,7 @@ func createInstance() *PostgresDatabase {
 		panic(err)
 	}
 
-	// Open connection with database/sql for migration
 	database.sqlDB, err = database.getSQLDBConnection(strConnection)
-	if err != nil {
-		log.Error(err)
-		panic(err)
-	}
-
-	err = database.migrate()
 	if err != nil {
 		log.Error(err)
 		panic(err)
@@ -91,40 +78,10 @@ func (d PostgresDatabase) getSQLDBConnection(connStr string) (*sql.DB, error) {
 	return sqlDB, nil
 }
 
-func (d PostgresDatabase) migrate() error {
-	err := utils.SetWorkingDirToProjectRoot()
-	if err != nil {
-		return err
-	}
-	sourceURL := "file://internal/database/migrations"
-	config := config.GetInstance()
-	log.Info("starting migration execution")
-	driver, err := postgres.WithInstance(d.sqlDB, &postgres.Config{})
-	if err != nil {
-		return fmt.Errorf("database: could not create migration driver: %w", err)
-	}
-	migrator, err := migrate.NewWithDatabaseInstance(sourceURL, config.Database.Name, driver)
-	if err != nil && err != migrate.ErrNoChange {
-		return fmt.Errorf("database: Could not create migrator: %w", err)
-	}
-	err = migrator.Up()
-	if err != nil && err != migrate.ErrNoChange {
-		return fmt.Errorf("database: Could not apply migrations: %w", err)
-	}
-	if err == migrate.ErrNoChange {
-		log.Info("No migrations to run.")
-	} else {
-		log.Info("Migrations applied successfully.")
-	}
-	return nil
-}
-
-// GetDB return a pgxpool.Pool pointer
 func (d PostgresDatabase) GetDB() *pgxpool.Pool {
 	return d.pool
 }
 
-// Close connection with database
 func (d PostgresDatabase) Close() {
 	d.pool.Close()
 	if d.sqlDB != nil {
