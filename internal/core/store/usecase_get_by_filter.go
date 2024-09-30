@@ -35,6 +35,7 @@ func (g useCaseGetByFilter) Execute(ctx context.Context, params StoreFilter) (*[
 			Name:          v.Name,
 			Score:         v.Score,
 			Type:          v.Type,
+			ProfileImage: v.ProfileImage,
 			Neighborhood:  v.Address.Neighborhood,
 			BusinessHours: businesHours,
 		}

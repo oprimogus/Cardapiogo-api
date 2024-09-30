@@ -270,3 +270,43 @@ func (c *StoreController) DeleteBusinessHours(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
+
+// SetProfileImage godoc
+//
+//	@Summary		Owner can update profile image of store.
+//	@Description	Owner can update profile image of store.
+//	@Tags			Store
+//	@Accept			json
+//	@Produce		json
+//	@Param			Params	body	store.StoreBusinessHoursParams	true	"Params to update business hours of store"
+//	@Success		200
+//	@Failure		400	{object}	xerrors.ErrorResponse
+//	@Failure		401	{object}	xerrors.ErrorResponse
+//	@Failure		403	{object}	xerrors.ErrorResponse
+//	@Failure		409	{object}	xerrors.ErrorResponse
+//	@Failure		500	{object}	xerrors.ErrorResponse
+//	@Failure		502	{object}	xerrors.ErrorResponse
+//	@Router			/v1/store/business-hours [put]
+func (c *StoreController) SetProfileImage(ctx *gin.Context) {
+	var params store.StoreBusinessHoursParams
+	err := ctx.BindJSON(&params)
+	if err != nil {
+		xerror := xerrors.Map(err)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+	errValidate := c.validator.Validate(params)
+	if errValidate != nil {
+		xerror := xerrors.Map(errValidate)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+	err = c.storeModule.AddBusinessHour.Execute(ctx, params)
+	if err != nil {
+		xerror := xerrors.Map(err)
+		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}

@@ -17,7 +17,7 @@ import (
 //	@accept		json
 //	@produce	json
 
-// @securityDefinitions.apikey	Bearer Token
+// @securityDefinitions.apikey	BearerToken
 // @in							header
 // @name						Authorization
 func main() {
