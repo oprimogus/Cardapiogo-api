@@ -23,7 +23,8 @@ WHERE id = $1 AND owner_id = $2;
 SELECT EXISTS(SELECT 1 FROM store WHERE id = $1 AND owner_id = $2);
 
 -- name: GetStoreByID :one
-SELECT s.id, s.name, s.phone, s.score, s.type, s.address_line_1, s.address_line_2, s.neighborhood, s.city, s.state, s.country
+SELECT s.id, s.name, s.phone, s.score, s.type, s.address_line_1, 
+s.address_line_2, s.neighborhood, s.city, s.state, s.country, s.profile_image, s.header_image
 FROM store s
 WHERE id = $1;
 
@@ -34,7 +35,7 @@ WHERE store_id = $1
 ORDER BY week_day;
 
 -- name: GetStoreByFilter :many
-SELECT s.id, s.name, s.score, s.type, s.neighborhood, s.latitude, s.longitude
+SELECT s.id, s.name, s.score, s.type, s.neighborhood, s.latitude, s.longitude, s.profile_image
 FROM store s
 WHERE 1 = 1
   AND (COALESCE(NULLIF($1, ''), s.name) IS NULL OR s.name LIKE '%' || COALESCE(NULLIF($1, ''), s.name) || '%')

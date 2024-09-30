@@ -35,6 +35,8 @@ CREATE TABLE "store" (
   "latitude" varchar,
   "longitude" varchar,
   "country" varchar(15) NOT NULL,
+  "profile_image" varchar UNIQUE,
+  "header_image" varchar UNIQUE,
   "created_at" timestamp NOT NULL,
   "updated_at" timestamp,
   "deleted_at" timestamp

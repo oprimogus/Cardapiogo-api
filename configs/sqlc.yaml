@@ -1,12 +1,12 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "../internal/infrastructure/database/sql/query.sql"
-    schema: "../internal/infrastructure/database/sql/schema.sql"
+    queries: "../internal/database/sql/query.sql"
+    schema: "../internal/database/sql/schema.sql"
     gen:
       go:
         package: "sqlc"
-        out: "../internal/infrastructure/database/sqlc"
+        out: "../internal/database/sqlc"
         sql_package: "pgx/v5"
         emit_db_tags: true
         emit_prepared_queries: true

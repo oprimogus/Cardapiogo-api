@@ -183,6 +183,8 @@ func (s *StoreRepository) FindByID(ctx context.Context, id string) (store.Store,
 		Phone: storeInstance.Phone,
 		Score: int(storeInstance.Score),
 		Type:  store.ShopType(storeInstance.Type),
+		ProfileImage: storeInstance.ProfileImage.String,
+		HeaderImage: storeInstance.HeaderImage.String,
 		Address: address.Address{
 			AddressLine1: storeInstance.AddressLine1,
 			AddressLine2: storeInstance.AddressLine2,
@@ -252,6 +254,7 @@ func (s *StoreRepository) FindByFilter(ctx context.Context, params store.StoreFi
 			Name:  v.Name,
 			Score: int(v.Score),
 			Type:  store.ShopType(v.Type),
+			ProfileImage: v.ProfileImage.String,
 			Address: address.Address{
 				Neighborhood: v.Neighborhood,
 				Latitude:     v.Latitude.String,
