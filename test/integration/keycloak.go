@@ -29,7 +29,7 @@ func MakeKeycloak(ctx context.Context) (*Container, error) {
 		log.Errorf("failed to get mapped port: %s", err)
 		return nil, err
 	}
- 	config := config.GetInstance().Keycloak
+	config := config.GetInstance().Keycloak
 	portFormatted := strings.Replace(string(hostPort), "/tcp", "", -1)
 	config.BaseURL = fmt.Sprintf("http://localhost:%s", portFormatted)
 	config.Realm = "cardapiogo"

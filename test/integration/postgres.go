@@ -12,6 +12,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 
 	"github.com/oprimogus/cardapiogo/internal/config"
+	postgresDB "github.com/oprimogus/cardapiogo/internal/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/utils"
 )
 
@@ -44,6 +45,12 @@ func MakePostgres(ctx context.Context) (*Container, error) {
 		return nil, err
 	}
 	config.Port = strings.Replace(string(hostPort), "/tcp", "", -1)
+
+	errOnMigration := postgresDB.GetInstance().Migrate()
+	if errOnMigration != nil {
+		log.Errorf("failed on do migrations: %s", errOnMigration)
+		return nil, errOnMigration
+	}
 
 	return &Container{name: "postgres", instance: postgresContainer}, nil
 }

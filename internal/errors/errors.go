@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/Nerzal/gocloak/v13"
 
@@ -30,7 +31,7 @@ func New(status int, message string, details ...interface{}) *ErrorResponse {
 }
 
 func Map(err error) *ErrorResponse {
-	log.Error(err.Error())
+	log.Debug(err.Error())
 	if errResp, ok := err.(*ErrorResponse); ok {
 		return errResp
 	}
@@ -42,6 +43,15 @@ func Map(err error) *ErrorResponse {
 		}
 	}
 	if errResp, ok := err.(*gocloak.APIError); ok {
+		switch {
+		case strings.Contains(errResp.Message, "invalid_grant"):
+			messages := strings.Split(errResp.Message, ":")
+			return &ErrorResponse{
+				Status:       errResp.Code,
+				ErrorMessage: strings.TrimSpace(messages[len(messages) - 1]),
+				Details:      strings.TrimSpace(messages[len(messages) - 2]),
+			}
+		}
 		return &ErrorResponse{
 			Status:       errResp.Code,
 			ErrorMessage: errResp.Message,

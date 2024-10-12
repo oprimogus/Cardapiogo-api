@@ -45,11 +45,15 @@ func keycloakUserToEntityUser(userGocloak *gocloak.User) user.User {
 		}
 	}
 
-	userRoles := make([]user.Role, len(*userGocloak.RealmRoles))
-	for i, v := range *userGocloak.RealmRoles {
-		if user.IsValidRole(v) {
-			userRoles[i] = user.Role(v)
+	var userRoles []user.Role
+	if userGocloak.RealmRoles != nil {
+		userRoles = make([]user.Role, len(*userGocloak.RealmRoles))
+		for i, v := range *userGocloak.RealmRoles {
+			if user.IsValidRole(v) {
+				userRoles[i] = user.Role(v)
+			}
 		}
+
 	}
 
 	return user.User{
