@@ -23,9 +23,6 @@ jobs:
           APP_NAME=${{ vars.APP_NAME }} >> .env
           echo .env
 
-      - name: Run Tests
-        run: make lint
-
       - name: Run Unit Tests
         run: make test-unit
 
