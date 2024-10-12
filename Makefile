@@ -33,6 +33,9 @@ docs:
 	swag init -g cmd/main.go -o api 
 
 test:
+	go test ./... -v -cover -coverprofile=cover.out
+
+test-unit:
 	go test ./... -run Unit -v -cover -coverprofile=cover.out
 
 test-integration:
