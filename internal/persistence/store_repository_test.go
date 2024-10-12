@@ -2,8 +2,6 @@ package persistence_test
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/google/uuid"
@@ -68,8 +66,6 @@ func (s *StoreRepositorySuite) TestCreate() {
 	if err != nil {
 		s.T().Fatalf("fail on verify data in database")
 	}
-	jsonStruct, _ := json.Marshal(storeTest)
-	fmt.Printf("%s", jsonStruct)
 	assert.Equal(s.T(), 500, storeTest.Score)
 
 }

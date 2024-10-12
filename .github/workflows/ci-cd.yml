@@ -15,7 +15,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: '1.22.0'
+          go-version: '1.22.5'
       
       - name: Create .env file
         run: |
@@ -23,11 +23,11 @@ jobs:
           APP_NAME=${{ vars.APP_NAME }} >> .env
           echo .env
 
-      - name: Run Tests
-        run: make lint
+      - name: Run Unit Tests
+        run: make test-unit
 
-      - name: Run Tests
-        run: make test
+      - name: Run Integration Tests
+        run: make test-integration
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1

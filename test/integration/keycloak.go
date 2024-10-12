@@ -16,6 +16,7 @@ func MakeKeycloak(ctx context.Context) (*Container, error) {
 	_ = utils.SetWorkingDirToProjectRoot()
 	keycloakContainer, err := keycloak.Run(ctx, "quay.io/keycloak/keycloak:24.0.4",
 		testcontainers.WithWaitStrategy(wait.ForListeningPort("8080/tcp")),
+		testcontainers.WithWaitStrategy(wait.ForLog("Running the server in development mode.")),
 		keycloak.WithContextPath("/"),
 		keycloak.WithRealmImportFile("test/integration/testdata/keycloak.json"),
 		keycloak.WithAdminUsername("admin"),

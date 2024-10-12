@@ -22,8 +22,5 @@ func (c useCaseCreate) Execute(ctx context.Context, input CreateParams) error {
 	if existUser.Email == input.Email {
 		return ErrExistUserWithEmail
 	}
-	if existUser.Profile.Phone == input.Profile.Phone {
-		return ErrExistUserWithPhone
-	}
 	return c.repository.Create(ctx, input.ToEntity())
 }
