@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"fmt"
+	"mime/multipart"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -11,6 +12,7 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/core/store"
 	"github.com/oprimogus/cardapiogo/internal/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/database/sqlc"
+	"github.com/oprimogus/cardapiogo/internal/services/aws"
 	"github.com/oprimogus/cardapiogo/pkg/converters"
 )
 
@@ -178,13 +180,13 @@ func (s *StoreRepository) FindByID(ctx context.Context, id string) (store.Store,
 	}
 
 	return store.Store{
-		ID:    id,
-		Name:  storeInstance.Name,
-		Phone: storeInstance.Phone,
-		Score: int(storeInstance.Score),
-		Type:  store.ShopType(storeInstance.Type),
+		ID:           id,
+		Name:         storeInstance.Name,
+		Phone:        storeInstance.Phone,
+		Score:        int(storeInstance.Score),
+		Type:         store.ShopType(storeInstance.Type),
 		ProfileImage: storeInstance.ProfileImage.String,
-		HeaderImage: storeInstance.HeaderImage.String,
+		HeaderImage:  storeInstance.HeaderImage.String,
 		Address: address.Address{
 			AddressLine1: storeInstance.AddressLine1,
 			AddressLine2: storeInstance.AddressLine2,
@@ -250,10 +252,10 @@ func (s *StoreRepository) FindByFilter(ctx context.Context, params store.StoreFi
 
 		}
 		stores[i] = store.Store{
-			ID:    *convertedID,
-			Name:  v.Name,
-			Score: int(v.Score),
-			Type:  store.ShopType(v.Type),
+			ID:           *convertedID,
+			Name:         v.Name,
+			Score:        int(v.Score),
+			Type:         store.ShopType(v.Type),
 			ProfileImage: v.ProfileImage.String,
 			Address: address.Address{
 				Neighborhood: v.Neighborhood,
@@ -290,4 +292,68 @@ func (s *StoreRepository) IsOwner(ctx context.Context, id, userID string) (bool,
 		return false, err
 	}
 	return isOwner, nil
+}
+
+func (s *StoreRepository) SetProfileImage(ctx context.Context, storeID string, image *multipart.FileHeader) (imageURL string, err error) {
+	awsInstance, err := aws.GetInstance(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	objectName := fmt.Sprintf("%s-profile-image", storeID)
+
+	file, err := converters.FileHeaderToBytes(image)
+	if err != nil {
+		return "", err
+	}
+
+	objectURL, errOnUpload := awsInstance.S3.UploadFile(ctx, aws.BucketProfileImage, objectName, file)
+	if errOnUpload != nil {
+		log.Errorf("could not upload this file in S3 Bucket: %s", errOnUpload)
+		return "", errOnUpload
+	}
+
+	convertedStoreUUIDV7, err := converters.ConvertStringToUUID(storeID)
+	if err != nil {
+		return "", fmt.Errorf("fail in convert uuidv7: %w", err)
+	}
+
+	err = s.querier.SetProfileImage(ctx, sqlc.SetProfileImageParams{
+		ID:           convertedStoreUUIDV7,
+		ProfileImage: pgtype.Text{String: objectURL, Valid: true},
+	})
+
+	return objectURL, err
+}
+
+func (s *StoreRepository) SetHeaderImage(ctx context.Context, storeID string, image *multipart.FileHeader) (imageURL string, err error) {
+	awsInstance, err := aws.GetInstance(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	objectName := fmt.Sprintf("%s-header-image", storeID)
+
+	file, err := converters.FileHeaderToBytes(image)
+	if err != nil {
+		return "", err
+	}
+
+	objectURL, errOnUpload := awsInstance.S3.UploadFile(ctx, aws.BucketHeaderImage, objectName, file)
+	if errOnUpload != nil {
+		log.Errorf("could not upload this file in S3 Bucket: %s", errOnUpload)
+		return "", errOnUpload
+	}
+
+	convertedStoreUUIDV7, err := converters.ConvertStringToUUID(storeID)
+	if err != nil {
+		return "", fmt.Errorf("fail in convert uuidv7: %w", err)
+	}
+
+	err = s.querier.SetHeaderImage(ctx, sqlc.SetHeaderImageParams{
+		ID:          convertedStoreUUIDV7,
+		HeaderImage: pgtype.Text{String: objectURL, Valid: true},
+	})
+
+	return objectURL, err
 }

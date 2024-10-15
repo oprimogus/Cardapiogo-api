@@ -8,6 +8,8 @@ type StoreModule struct {
 	DeleteBusinessHour useCaseDeleteBusinessHour
 	GetByID            useCaseGetByID
 	GetByFilter        useCaseGetByFilter
+	SetProfileImage    useCaseSetProfileImage
+	SetHeaderImage     useCaseSetHeaderImage
 }
 
 func NewStoreModule(storeRepository Repository) StoreModule {
@@ -19,5 +21,7 @@ func NewStoreModule(storeRepository Repository) StoreModule {
 		DeleteBusinessHour: newUseCaseDeleteBusinessHour(storeRepository),
 		GetByID:            newUseCaseGetByID(storeRepository),
 		GetByFilter:        newUseCaseGetByFilter(storeRepository),
+		SetProfileImage:    newUseCaseSetProfileImage(storeRepository),
+		SetHeaderImage:     newUseCaseSetHeaderImage(storeRepository),
 	}
 }

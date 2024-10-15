@@ -71,8 +71,8 @@ func (b *BusinessHoursParams) Entity(timeZone string) (BusinessHours, error) {
 type GetStoreByIdOutput struct {
 	ID                 string                `json:"id"`
 	Name               string                `json:"name"`
-	ProfileImage       string          `json:"profileImage"`
-	HeaderImage        string          `json:"headerImage"`
+	ProfileImage       string                `json:"profileImage"`
+	HeaderImage        string                `json:"headerImage"`
 	Phone              string                `json:"phone"`
 	Score              int                   `json:"score"`
 	Address            AddressOutput         `json:"address"`
@@ -84,7 +84,7 @@ type GetStoreByIdOutput struct {
 type GetStoreByFilterOutput struct {
 	ID            string                `json:"id"`
 	Name          string                `json:"name"`
-	ProfileImage       string          `json:"profileImage"`
+	ProfileImage  string                `json:"profileImage"`
 	Score         int                   `json:"score"`
 	Type          ShopType              `json:"type"`
 	Neighborhood  string                `json:"neighborhood"`
