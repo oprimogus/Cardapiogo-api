@@ -9,7 +9,7 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/core/user"
 	"github.com/oprimogus/cardapiogo/internal/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/database/sqlc"
-	"github.com/oprimogus/cardapiogo/internal/services/authentication/keycloak"
+	"github.com/oprimogus/cardapiogo/internal/services/keycloak"
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 

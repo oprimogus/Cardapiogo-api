@@ -46,7 +46,7 @@ type Querier interface {
 	GetStoreBusinessHoursByID(ctx context.Context, storeID pgtype.UUID) ([]GetStoreBusinessHoursByIDRow, error)
 	//GetStoreByFilter
 	//
-	//  SELECT s.id, s.name, s.score, s.type, s.neighborhood, s.latitude, s.longitude
+	//  SELECT s.id, s.name, s.score, s.type, s.neighborhood, s.latitude, s.longitude, s.profile_image
 	//  FROM store s
 	//  WHERE 1 = 1
 	//    AND (COALESCE(NULLIF($1, ''), s.name) IS NULL OR s.name LIKE '%' || COALESCE(NULLIF($1, ''), s.name) || '%')
@@ -57,7 +57,8 @@ type Querier interface {
 	GetStoreByFilter(ctx context.Context, arg GetStoreByFilterParams) ([]GetStoreByFilterRow, error)
 	//GetStoreByID
 	//
-	//  SELECT s.id, s.name, s.phone, s.score, s.type, s.address_line_1, s.address_line_2, s.neighborhood, s.city, s.state, s.country
+	//  SELECT s.id, s.name, s.phone, s.score, s.type, s.address_line_1,
+	//  s.address_line_2, s.neighborhood, s.city, s.state, s.country, s.profile_image, s.header_image
 	//  FROM store s
 	//  WHERE id = $1
 	GetStoreByID(ctx context.Context, id pgtype.UUID) (GetStoreByIDRow, error)
@@ -65,6 +66,20 @@ type Querier interface {
 	//
 	//  SELECT EXISTS(SELECT 1 FROM store WHERE id = $1 AND owner_id = $2)
 	IsOwner(ctx context.Context, arg IsOwnerParams) (bool, error)
+	//SetHeaderImage
+	//
+	//  UPDATE store
+	//    SET
+	//      header_image = $2
+	//  WHERE id = $1
+	SetHeaderImage(ctx context.Context, arg SetHeaderImageParams) error
+	//SetProfileImage
+	//
+	//  UPDATE store
+	//    SET
+	//      profile_image = $2
+	//  WHERE id = $1
+	SetProfileImage(ctx context.Context, arg SetProfileImageParams) error
 	//UpdateStore
 	//
 	//  UPDATE store

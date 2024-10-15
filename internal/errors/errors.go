@@ -48,8 +48,8 @@ func Map(err error) *ErrorResponse {
 			messages := strings.Split(errResp.Message, ":")
 			return &ErrorResponse{
 				Status:       errResp.Code,
-				ErrorMessage: strings.TrimSpace(messages[len(messages) - 1]),
-				Details:      strings.TrimSpace(messages[len(messages) - 2]),
+				ErrorMessage: strings.TrimSpace(messages[len(messages)-1]),
+				Details:      strings.TrimSpace(messages[len(messages)-2]),
 			}
 		}
 		return &ErrorResponse{

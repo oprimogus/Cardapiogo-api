@@ -43,5 +43,7 @@ func (g useCaseGetByID) Execute(ctx context.Context, id string) (GetStoreByIdOut
 		Type:               storeInstance.Type,
 		BusinessHours:      businessHours,
 		PaymentMethodEnums: storeInstance.PaymentMethodEnums,
+		ProfileImage:       storeInstance.ProfileImage,
+		HeaderImage:        storeInstance.HeaderImage,
 	}, nil
 }
