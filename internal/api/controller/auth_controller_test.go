@@ -160,8 +160,8 @@ func (s *AuthControllerSuite) TestSignIn() {
 			},
 			expectedStatusCode: 401,
 			expectedResponse: map[string]interface{}{
-					"error":   "Invalid user credentials",
-					"details": "invalid_grant",
+				"error":   "Invalid user credentials",
+				"details": "invalid_grant",
 			},
 		},
 	}

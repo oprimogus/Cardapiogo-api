@@ -40,11 +40,11 @@ func StoreRoutes(router *gin.Engine,
 			storeController.DeleteBusinessHours)
 		v1.GET("/store/:id", storeController.GetStoreByID)
 		v1.GET("/store", storeController.GetStoreByFilter)
-		v1.PUT("/store/profile-image",
+		v1.POST("/store/:id/profile-image",
 			middleware.AuthenticationMiddleware(authRepository),
 			middleware.AuthorizationMiddleware([]user.Role{user.RoleOwner}),
 			storeController.SetProfileImage)
-		v1.PUT("/store/header-image",
+		v1.POST("/store/:id/header-image",
 			middleware.AuthenticationMiddleware(authRepository),
 			middleware.AuthorizationMiddleware([]user.Role{user.RoleOwner}),
 			storeController.SetHeaderImage)
