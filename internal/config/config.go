@@ -23,10 +23,12 @@ type dbConfig struct {
 }
 
 type apiConfig struct {
-	basePath  string
-	port      string
-	ginMode   string
-	sqlcDebug string
+	basePath    string
+	port        string
+	ginMode     string
+	environment string
+	sqlcDebug   string
+	Consts      map[string]string
 }
 
 func (a apiConfig) BasePath() string {
@@ -39,6 +41,10 @@ func (a apiConfig) Port() string {
 
 func (a apiConfig) GinMode() string {
 	return a.ginMode
+}
+
+func (a apiConfig) Environment() string {
+	return a.environment
 }
 
 func (a apiConfig) SQLCDebug() string {
@@ -60,11 +66,35 @@ func (r resendConfig) APIKey() string {
 	return r.apiKey
 }
 
+type aws struct {
+	region          string
+	accessKeyID     string
+	secretAccessKey string
+	sessionKey      string
+}
+
+func (a aws) Region() string {
+	return a.region
+}
+
+func (a aws) AccessKeyID() string {
+	return a.accessKeyID
+}
+
+func (a aws) SecretAccessKey() string {
+	return a.secretAccessKey
+}
+
+func (a aws) SessionKey() string {
+	return a.sessionKey
+}
+
 type config struct {
 	Database *dbConfig
 	Api      apiConfig
 	Keycloak *keycloakConfig
 	Resend   resendConfig
+	Aws      aws
 }
 
 func newConfig() *config {
@@ -86,10 +116,11 @@ func newConfig() *config {
 			Password: os.Getenv("DB_PASSWORD"),
 		},
 		Api: apiConfig{
-			basePath:  os.Getenv("API_BASE_PATH"),
-			port:      os.Getenv("API_PORT"),
-			ginMode:   os.Getenv("GIN_MODE"),
-			sqlcDebug: os.Getenv("SQLCDEBUG"),
+			basePath:    os.Getenv("API_BASE_PATH"),
+			port:        os.Getenv("API_PORT"),
+			ginMode:     os.Getenv("GIN_MODE"),
+			environment: os.Getenv("ENVIRONMENT"),
+			sqlcDebug:   os.Getenv("SQLCDEBUG"),
 		},
 		Keycloak: &keycloakConfig{
 			BaseURL:      os.Getenv("KEYCLOAK_BASE_URL"),
@@ -99,6 +130,11 @@ func newConfig() *config {
 		},
 		Resend: resendConfig{
 			apiKey: os.Getenv("RESEND_API_KEY"),
+		},
+		Aws: aws{
+			region:          os.Getenv("AWS_REGION"),
+			accessKeyID:     os.Getenv("AWS_ACCESS_KEY_ID"),
+			secretAccessKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
 		},
 	}
 }
