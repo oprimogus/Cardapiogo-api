@@ -19,6 +19,18 @@ UPDATE store
     updated_at = NOW() AT TIME ZONE 'UTC'
 WHERE id = $1 AND owner_id = $2;
 
+-- name: SetProfileImage :exec
+UPDATE store
+  SET 
+    profile_image = $2
+WHERE id = $1;
+
+-- name: SetHeaderImage :exec
+UPDATE store
+  SET 
+    header_image = $2
+WHERE id = $1;
+
 -- name: IsOwner :one
 SELECT EXISTS(SELECT 1 FROM store WHERE id = $1 AND owner_id = $2);
 
