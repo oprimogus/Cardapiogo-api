@@ -18,7 +18,7 @@ type Bucket string
 
 const (
 	BucketProfileImage Bucket = "cardapiogo-profile-images"
-	BucketHeaderImage Bucket = "cardapiogo-header-images"
+	BucketHeaderImage  Bucket = "cardapiogo-header-images"
 )
 
 type Region string
