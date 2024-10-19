@@ -114,6 +114,8 @@ type Store struct {
 	CpfCnpj            string          `json:"cpfCnpj" validate:"required,cpfCnpj"`
 	OwnerID            string          `json:"owner_id" validate:"required,uuid"`
 	Name               string          `json:"name" validate:"required,lte=25"`
+	ProfileImage       string          `json:"profileImage"`
+	HeaderImage        string          `json:"headerImage"`
 	Active             bool            `json:"active" validate:"required,boolean"`
 	Phone              string          `json:"phone" validate:"required,phone"`
 	Score              int             `json:"score" validate:"required,number"`

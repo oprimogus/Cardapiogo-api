@@ -1,6 +1,9 @@
 package store
 
-import "context"
+import (
+	"context"
+	"mime/multipart"
+)
 
 type Repository interface {
 	Create(ctx context.Context, params Store) (id string, err error)
@@ -12,4 +15,6 @@ type Repository interface {
 	IsOwner(ctx context.Context, id, userID string) (bool, error)
 	AddBusinessHour(ctx context.Context, storeID string, params []BusinessHours) error
 	DeleteBusinessHour(ctx context.Context, storeID string, params []BusinessHours) error
+	SetProfileImage(ctx context.Context, storeID string, image *multipart.FileHeader) (objectURL string, err error)
+	SetHeaderImage(ctx context.Context, storeID string, image *multipart.FileHeader) (objectURL string, err error)
 }

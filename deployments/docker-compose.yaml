@@ -55,6 +55,8 @@ services:
   prometheus:
     image: bitnami/prometheus
     container_name: cardapiogo-prometheus
+    ports:
+      - 9090:9090
     volumes:
       - ../configs/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
@@ -68,6 +70,8 @@ services:
   promtail:
     image: grafana/promtail
     container_name: cardapiogo-promtail
+    ports:
+      - "9080:9080"
     volumes:
       - /var/log/journal:/var/log/journal
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
@@ -80,6 +84,8 @@ services:
   loki:
     image: grafana/loki
     container_name: cardapiogo-loki
+    ports:
+      - "3100:3100"
     command:
       - -config.file=/etc/loki/local-config.yaml
       - -print-config-stderr=true
@@ -89,21 +95,38 @@ services:
   grafana:
     image: grafana/grafana
     container_name: cardapiogo-grafana
-    volumes:
-      - grafana_data:/var/lib/grafana
+    ports:
+      - 3001:3000
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
     depends_on:
       - prometheus
       - loki
+    volumes:
+      - grafana_data:/var/lib/grafana
     networks:
       - observability
+
+  localstack:
+    container_name: "cardapiogo-localstack"
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_API_KEY}
+    volumes:
+      - localstack_data:/var/lib/localstack"
+      - localstack_data:/var/run/docker.sock"
 
 volumes:
   postgres-data:
   prometheus_data:
   grafana_data:
+  localstack_data:
 
 networks:
   observability:

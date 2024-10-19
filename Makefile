@@ -11,7 +11,7 @@ install:
 	go mod tidy
 
 up:
-	docker compose -f deployments/docker-compose.yaml up -d
+	docker compose -f deployments/docker-compose.yaml --env-file .env up -d
 
 down:
 	docker compose -f deployments/docker-compose.yaml down
