@@ -597,7 +597,7 @@ paths:
         name: id
         required: true
         type: string
-      - description: Store header image
+      - description: jpeg/png image
         in: formData
         name: file
         required: true
@@ -647,7 +647,7 @@ paths:
         name: id
         required: true
         type: string
-      - description: Store profile image
+      - description: jpeg/png image
         in: formData
         name: file
         required: true

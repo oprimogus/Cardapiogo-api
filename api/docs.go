@@ -601,7 +601,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "file",
-                        "description": "Store header image",
+                        "description": "jpeg/png image",
                         "name": "file",
                         "in": "formData",
                         "required": true
@@ -676,7 +676,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "file",
-                        "description": "Store profile image",
+                        "description": "jpeg/png image",
                         "name": "file",
                         "in": "formData",
                         "required": true

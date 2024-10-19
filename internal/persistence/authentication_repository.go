@@ -9,7 +9,7 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/services/keycloak"
 )
 
-type AuthenticationRepository struct {}
+type AuthenticationRepository struct{}
 
 func NewAuthenticationRepository() *AuthenticationRepository {
 	return &AuthenticationRepository{}

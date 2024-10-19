@@ -4,10 +4,11 @@ import (
 	"errors"
 	"time"
 )
+
 var (
-	ErrExistUserWithEmail = errors.New("exist user with this email")
+	ErrExistUserWithEmail    = errors.New("exist user with this email")
 	ErrExistUserWithDocument = errors.New("exist user with this document")
-	ErrExistUserWithPhone = errors.New("exist user with this phone")
+	ErrExistUserWithPhone    = errors.New("exist user with this phone")
 )
 
 type Role string

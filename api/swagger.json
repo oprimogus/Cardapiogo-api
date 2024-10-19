@@ -595,7 +595,7 @@
                     },
                     {
                         "type": "file",
-                        "description": "Store header image",
+                        "description": "jpeg/png image",
                         "name": "file",
                         "in": "formData",
                         "required": true
@@ -670,7 +670,7 @@
                     },
                     {
                         "type": "file",
-                        "description": "Store profile image",
+                        "description": "jpeg/png image",
                         "name": "file",
                         "in": "formData",
                         "required": true

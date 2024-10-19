@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -286,7 +287,7 @@ func (c *StoreController) DeleteBusinessHours(ctx *gin.Context) {
 //	@Accept			multipart/form-data
 //	@Produce		json
 //	@Param			id	path	string true	"Store ID"
-//	@Param			file	formData	file true	"Store profile image"
+//	@Param			file	formData	file true	"jpeg/png image"
 //	@Success		200 {object} setFileOutput
 //	@Failure		400	{object}	xerrors.ErrorResponse
 //	@Failure		401	{object}	xerrors.ErrorResponse
@@ -311,6 +312,31 @@ func (c *StoreController) SetProfileImage(ctx *gin.Context) {
 		return
 	}
 
+	openedFile, err := image.Open()
+	if err != nil {
+		message := fmt.Sprintf("file sent is invalid: %s", err)
+		xerr := xerrors.BadRequest(message, transactionID)
+		ctx.JSON(xerr.Status, xerr)
+		return
+	}
+	defer openedFile.Close()
+
+	buffer := make([]byte, 512)
+	if _, err := openedFile.Read(buffer); err != nil {
+		message := fmt.Sprintf("file sent is invalid: %s", err)
+		xerr := xerrors.BadRequest(message, transactionID)
+		ctx.JSON(xerr.Status, xerr)
+		return
+	}
+
+	fileType := http.DetectContentType(buffer)
+
+	if fileType != "image/jpeg" && fileType != "image/png" {
+		xerr := xerrors.BadRequest("Unsupported file type", transactionID)
+		ctx.JSON(xerr.Status, xerr)
+		return
+	}
+
 	url, err := c.storeModule.SetProfileImage.Execute(ctx, storeID, image)
 
 	if err != nil {
@@ -330,7 +356,7 @@ func (c *StoreController) SetProfileImage(ctx *gin.Context) {
 //	@Accept			multipart/form-data
 //	@Produce		json
 //	@Param			id	path	string true	"Store ID"
-//	@Param			file	formData	file true	"Store header image"
+//	@Param			file	formData	file true	"jpeg/png image"
 //	@Success		200 {object} setFileOutput
 //	@Failure		400	{object}	xerrors.ErrorResponse
 //	@Failure		401	{object}	xerrors.ErrorResponse
@@ -352,6 +378,31 @@ func (c *StoreController) SetHeaderImage(ctx *gin.Context) {
 	if err != nil {
 		xerror := xerrors.HandleError(err, transactionID)
 		ctx.JSON(xerror.Status, xerror)
+		return
+	}
+
+	openedFile, err := image.Open()
+	if err != nil {
+		message := fmt.Sprintf("file sent is invalid: %s", err)
+		xerr := xerrors.BadRequest(message, transactionID)
+		ctx.JSON(xerr.Status, xerr)
+		return
+	}
+	defer openedFile.Close()
+
+	buffer := make([]byte, 512)
+	if _, err := openedFile.Read(buffer); err != nil {
+		message := fmt.Sprintf("file sent is invalid: %s", err)
+		xerr := xerrors.BadRequest(message, transactionID)
+		ctx.JSON(xerr.Status, xerr)
+		return
+	}
+
+	fileType := http.DetectContentType(buffer)
+
+	if fileType != "image/jpeg" && fileType != "image/png" {
+		xerr := xerrors.BadRequest("Unsupported file type", transactionID)
+		ctx.JSON(xerr.Status, xerr)
 		return
 	}
 

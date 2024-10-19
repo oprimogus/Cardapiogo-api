@@ -29,6 +29,8 @@ func Initialize(factory core.RepositoryFactory) {
 	metrics := middleware.NewPrometheusMetrics()
 	router.Use(middleware.PrometheusMiddleware(metrics))
 
+	router.MaxMultipartMemory = 8 << 20
+
 	routes.DefaultRoutes(router, metrics.Registry)
 	routes.SwaggerRoutes(router)
 	routes.AuthRoutes(router, validator, factory)
