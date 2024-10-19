@@ -296,6 +296,8 @@ definitions:
       details: {}
       error:
         type: string
+      transactionID:
+        type: string
     type: object
 host: localhost:3000
 info:

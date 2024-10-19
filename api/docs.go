@@ -1254,6 +1254,9 @@ const docTemplate = `{
                 "details": {},
                 "error": {
                     "type": "string"
+                },
+                "transactionID": {
+                    "type": "string"
                 }
             }
         }

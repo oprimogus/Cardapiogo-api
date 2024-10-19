@@ -9,7 +9,7 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/services/keycloak"
 )
 
-type UserRepository struct {}
+type UserRepository struct{}
 
 func NewUserRepository() *UserRepository {
 	return &UserRepository{}
@@ -129,7 +129,7 @@ func (u *UserRepository) FindByEmail(ctx context.Context, email string) (user.Us
 	return keycloakUserToEntityUser(userGocloak[0]), nil
 }
 
-func (u *UserRepository) Update(ctx context.Context, user user.User) error  {
+func (u *UserRepository) Update(ctx context.Context, user user.User) error {
 	k, err := keycloak.GetInstance(ctx)
 	if err != nil {
 		return err
@@ -151,19 +151,19 @@ func (u *UserRepository) Update(ctx context.Context, user user.User) error  {
 		return fmt.Errorf("fail in update user data: %w", errUpdateUser)
 	}
 	return nil
-	
+
 }
 
-func (u *UserRepository) Delete(ctx context.Context, id string) error  {
+func (u *UserRepository) Delete(ctx context.Context, id string) error {
 	k, err := keycloak.GetInstance(ctx)
 	if err != nil {
 		return err
 	}
 	return k.Client.DeleteUser(ctx, k.Token.AccessToken, k.Realm, id)
-	
+
 }
 
-func (u *UserRepository) ResetPasswordByEmail(ctx context.Context, id string) error  {
+func (u *UserRepository) ResetPasswordByEmail(ctx context.Context, id string) error {
 	k, err := keycloak.GetInstance(ctx)
 	if err != nil {
 		return err
@@ -183,7 +183,7 @@ func (u *UserRepository) ResetPasswordByEmail(ctx context.Context, id string) er
 	)
 }
 
-func (u *UserRepository) AddRoles(ctx context.Context, userID string, roles []user.Role) error  {
+func (u *UserRepository) AddRoles(ctx context.Context, userID string, roles []user.Role) error {
 	k, err := keycloak.GetInstance(ctx)
 	if err != nil {
 		return err

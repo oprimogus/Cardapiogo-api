@@ -26,7 +26,7 @@ type apiConfig struct {
 	basePath    string
 	port        string
 	ginMode     string
-	environment string
+	Environment string
 	sqlcDebug   string
 	Consts      map[string]string
 }
@@ -43,9 +43,9 @@ func (a apiConfig) GinMode() string {
 	return a.ginMode
 }
 
-func (a apiConfig) Environment() string {
-	return a.environment
-}
+// func (a apiConfig) Environment() string {
+// 	return a.environment
+// }
 
 func (a apiConfig) SQLCDebug() string {
 	return a.sqlcDebug
@@ -119,7 +119,7 @@ func newConfig() *config {
 			basePath:    os.Getenv("API_BASE_PATH"),
 			port:        os.Getenv("API_PORT"),
 			ginMode:     os.Getenv("GIN_MODE"),
-			environment: os.Getenv("ENVIRONMENT"),
+			Environment: os.Getenv("ENVIRONMENT"),
 			sqlcDebug:   os.Getenv("SQLCDEBUG"),
 		},
 		Keycloak: &keycloakConfig{

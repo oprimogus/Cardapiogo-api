@@ -39,7 +39,7 @@ func newAwsInstance(ctx context.Context) (awsInstance *AwsInstance, err error) {
 	}
 
 	var s3Client *s3.Client
-	if configInstance.Api.Environment() == string(config.Production) {
+	if configInstance.Api.Environment == string(config.Production) {
 		s3Client = s3.NewFromConfig(cfg)
 	} else {
 		s3Client = s3.NewFromConfig(cfg, func(o *s3.Options) {

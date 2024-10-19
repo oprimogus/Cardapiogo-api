@@ -74,7 +74,7 @@ func (c *ClientS3) BucketExists(ctx context.Context, bucketName Bucket) (bool, e
 
 func (c *ClientS3) getPublicObjectUrl(bucketName Bucket, region Region, objectKey string) string {
 	configInstance := config.GetInstance()
-	if configInstance.Api.Environment() == string(config.Production) {
+	if configInstance.Api.Environment == string(config.Production) {
 		return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, objectKey)
 	}
 	return fmt.Sprintf("https://localhost.localstack.cloud:4566/%s/%s", bucketName, objectKey)
