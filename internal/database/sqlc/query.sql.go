@@ -150,7 +150,7 @@ func (q *Queries) GetStoreBusinessHoursByID(ctx context.Context, storeID pgtype.
 }
 
 const getStoreByFilter = `-- name: GetStoreByFilter :many
-SELECT s.id, s.name, s.score, s.type, s.neighborhood, s.latitude, s.longitude
+SELECT s.id, s.name, s.score, s.type, s.neighborhood, s.latitude, s.longitude, s.profile_image
 FROM store s
 WHERE 1 = 1
   AND (COALESCE(NULLIF($1, ''), s.name) IS NULL OR s.name LIKE '%' || COALESCE(NULLIF($1, ''), s.name) || '%')
@@ -175,11 +175,12 @@ type GetStoreByFilterRow struct {
 	Neighborhood string      `db:"neighborhood" json:"neighborhood"`
 	Latitude     pgtype.Text `db:"latitude" json:"latitude"`
 	Longitude    pgtype.Text `db:"longitude" json:"longitude"`
+	ProfileImage pgtype.Text `db:"profile_image" json:"profile_image"`
 }
 
 // GetStoreByFilter
 //
-//	SELECT s.id, s.name, s.score, s.type, s.neighborhood, s.latitude, s.longitude
+//	SELECT s.id, s.name, s.score, s.type, s.neighborhood, s.latitude, s.longitude, s.profile_image
 //	FROM store s
 //	WHERE 1 = 1
 //	  AND (COALESCE(NULLIF($1, ''), s.name) IS NULL OR s.name LIKE '%' || COALESCE(NULLIF($1, ''), s.name) || '%')
@@ -209,6 +210,7 @@ func (q *Queries) GetStoreByFilter(ctx context.Context, arg GetStoreByFilterPara
 			&i.Neighborhood,
 			&i.Latitude,
 			&i.Longitude,
+			&i.ProfileImage,
 		); err != nil {
 			return nil, err
 		}
@@ -221,7 +223,8 @@ func (q *Queries) GetStoreByFilter(ctx context.Context, arg GetStoreByFilterPara
 }
 
 const getStoreByID = `-- name: GetStoreByID :one
-SELECT s.id, s.name, s.phone, s.score, s.type, s.address_line_1, s.address_line_2, s.neighborhood, s.city, s.state, s.country
+SELECT s.id, s.name, s.phone, s.score, s.type, s.address_line_1, 
+s.address_line_2, s.neighborhood, s.city, s.state, s.country, s.profile_image, s.header_image
 FROM store s
 WHERE id = $1
 `
@@ -238,11 +241,14 @@ type GetStoreByIDRow struct {
 	City         string      `db:"city" json:"city"`
 	State        string      `db:"state" json:"state"`
 	Country      string      `db:"country" json:"country"`
+	ProfileImage pgtype.Text `db:"profile_image" json:"profile_image"`
+	HeaderImage  pgtype.Text `db:"header_image" json:"header_image"`
 }
 
 // GetStoreByID
 //
-//	SELECT s.id, s.name, s.phone, s.score, s.type, s.address_line_1, s.address_line_2, s.neighborhood, s.city, s.state, s.country
+//	SELECT s.id, s.name, s.phone, s.score, s.type, s.address_line_1,
+//	s.address_line_2, s.neighborhood, s.city, s.state, s.country, s.profile_image, s.header_image
 //	FROM store s
 //	WHERE id = $1
 func (q *Queries) GetStoreByID(ctx context.Context, id pgtype.UUID) (GetStoreByIDRow, error) {
@@ -260,6 +266,8 @@ func (q *Queries) GetStoreByID(ctx context.Context, id pgtype.UUID) (GetStoreByI
 		&i.City,
 		&i.State,
 		&i.Country,
+		&i.ProfileImage,
+		&i.HeaderImage,
 	)
 	return i, err
 }
@@ -281,6 +289,52 @@ func (q *Queries) IsOwner(ctx context.Context, arg IsOwnerParams) (bool, error) 
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
+}
+
+const setHeaderImage = `-- name: SetHeaderImage :exec
+UPDATE store
+  SET 
+    header_image = $2
+WHERE id = $1
+`
+
+type SetHeaderImageParams struct {
+	ID          pgtype.UUID `db:"id" json:"id"`
+	HeaderImage pgtype.Text `db:"header_image" json:"header_image"`
+}
+
+// SetHeaderImage
+//
+//	UPDATE store
+//	  SET
+//	    header_image = $2
+//	WHERE id = $1
+func (q *Queries) SetHeaderImage(ctx context.Context, arg SetHeaderImageParams) error {
+	_, err := q.db.Exec(ctx, setHeaderImage, arg.ID, arg.HeaderImage)
+	return err
+}
+
+const setProfileImage = `-- name: SetProfileImage :exec
+UPDATE store
+  SET 
+    profile_image = $2
+WHERE id = $1
+`
+
+type SetProfileImageParams struct {
+	ID           pgtype.UUID `db:"id" json:"id"`
+	ProfileImage pgtype.Text `db:"profile_image" json:"profile_image"`
+}
+
+// SetProfileImage
+//
+//	UPDATE store
+//	  SET
+//	    profile_image = $2
+//	WHERE id = $1
+func (q *Queries) SetProfileImage(ctx context.Context, arg SetProfileImageParams) error {
+	_, err := q.db.Exec(ctx, setProfileImage, arg.ID, arg.ProfileImage)
+	return err
 }
 
 const updateStore = `-- name: UpdateStore :exec

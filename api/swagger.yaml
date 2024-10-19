@@ -76,6 +76,11 @@ definitions:
     - email
     - password
     type: object
+  controller.setFileOutput:
+    properties:
+      objectURL:
+        type: string
+    type: object
   store.AddressOutput:
     properties:
       addressLine1:
@@ -138,6 +143,8 @@ definitions:
         items:
           $ref: '#/definitions/store.BusinessHoursParams'
         type: array
+      headerImage:
+        type: string
       id:
         type: string
       name:
@@ -147,6 +154,8 @@ definitions:
           $ref: '#/definitions/store.PaymentMethod'
         type: array
       phone:
+        type: string
+      profileImage:
         type: string
       score:
         type: integer
@@ -286,6 +295,8 @@ definitions:
       debug: {}
       details: {}
       error:
+        type: string
+      transactionID:
         type: string
     type: object
 host: localhost:3000
@@ -575,6 +586,106 @@ paths:
       summary: Any user can view a store.
       tags:
       - Store
+  /v1/store/{id}/header-image:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Owner can update header image of store.
+      parameters:
+      - description: Store ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Store header image
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.setFileOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+      summary: Owner can update header image of store.
+      tags:
+      - Store
+  /v1/store/{id}/profile-image:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Owner can update profile image of store.
+      parameters:
+      - description: Store ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Store profile image
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.setFileOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/xerrors.ErrorResponse'
+      summary: Owner can update profile image of store.
+      tags:
+      - Store
   /v1/store/business-hours:
     delete:
       consumes:
@@ -731,7 +842,7 @@ paths:
 produces:
 - application/json
 securityDefinitions:
-  Bearer Token:
+  BearerToken:
     in: header
     name: Authorization
     type: apiKey

@@ -149,6 +149,8 @@ type Store struct {
 	Latitude     pgtype.Text      `db:"latitude" json:"latitude"`
 	Longitude    pgtype.Text      `db:"longitude" json:"longitude"`
 	Country      string           `db:"country" json:"country"`
+	ProfileImage pgtype.Text      `db:"profile_image" json:"profile_image"`
+	HeaderImage  pgtype.Text      `db:"header_image" json:"header_image"`
 	CreatedAt    pgtype.Timestamp `db:"created_at" json:"created_at"`
 	UpdatedAt    pgtype.Timestamp `db:"updated_at" json:"updated_at"`
 	DeletedAt    pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`

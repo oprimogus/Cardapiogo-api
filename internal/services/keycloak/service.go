@@ -2,6 +2,7 @@ package keycloak
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -17,22 +18,25 @@ var (
 )
 
 type KeycloakService struct {
-	client       *gocloak.GoCloak
-	token        *gocloak.JWT
-	realm        string
-	clientID     string
-	clientSecret string
+	Client       *gocloak.GoCloak
+	Token        *gocloak.JWT
+	Realm        string
+	ClientID     string
+	ClientSecret string
 	mu           sync.Mutex
 }
 
-func GetInstance(ctx context.Context) *KeycloakService {
+func GetInstance(ctx context.Context) (k *KeycloakService, err error) {
 	if keycloakInstance == nil {
-		keycloakInstance = newKeycloakService(ctx)
+		keycloakInstance, err = newKeycloakService(ctx)
+		if err != nil {
+			return keycloakInstance, err
+		}
 	}
-	return keycloakInstance
+	return keycloakInstance, nil
 }
 
-func newKeycloakService(ctx context.Context) *KeycloakService {
+func newKeycloakService(ctx context.Context) (k *KeycloakService, err error) {
 
 	config := config.GetInstance().Keycloak
 
@@ -40,19 +44,19 @@ func newKeycloakService(ctx context.Context) *KeycloakService {
 	token, err := client.LoginClient(ctx, config.ClientID, config.ClientSecret, config.Realm)
 	if err != nil {
 		log.Errorf("fail on get keycloak client: %s", err)
-		panic(err)
+		return nil, fmt.Errorf("fail on get keycloak client: %w", err)
 	}
 	service := &KeycloakService{
-		client:       client,
-		token:        token,
-		realm:        config.Realm,
-		clientID:     config.ClientID,
-		clientSecret: config.ClientSecret,
+		Client:       client,
+		Token:        token,
+		Realm:        config.Realm,
+		ClientID:     config.ClientID,
+		ClientSecret: config.ClientSecret,
 	}
 
 	go service.startTokenRenewer(ctx)
 
-	return service
+	return service, nil
 }
 
 func shouldRefreshToken(expirationTime time.Time) bool {
@@ -64,10 +68,10 @@ func (k *KeycloakService) startTokenRenewer(ctx context.Context) {
 
 	refreshBefore := time.Second * 60 // 1 min
 
-	accessTokenTicker, accessTokenExpireIn := k.startTicker("accessToken", refreshBefore, k.token.ExpiresIn)
+	accessTokenTicker, accessTokenExpireIn := k.startTicker("accessToken", refreshBefore, k.Token.ExpiresIn)
 	defer accessTokenTicker.Stop()
 
-	refreshTokenTicker, refreshTokenExpireIn := k.startTicker("refreshToken", refreshBefore, k.token.RefreshExpiresIn)
+	refreshTokenTicker, refreshTokenExpireIn := k.startTicker("refreshToken", refreshBefore, k.Token.RefreshExpiresIn)
 	defer refreshTokenTicker.Stop()
 
 	for {
@@ -101,9 +105,9 @@ func (k *KeycloakService) handleTokenRenewal(ctx context.Context, tokenExpireIn 
 		var err error
 
 		if isRefreshToken {
-			token, err = k.client.LoginClient(ctx, k.clientID, k.clientSecret, k.realm)
+			token, err = k.Client.LoginClient(ctx, k.ClientID, k.ClientSecret, k.Realm)
 		} else {
-			token, err = k.client.RefreshToken(ctx, k.token.RefreshToken, k.clientID, k.clientSecret, k.realm)
+			token, err = k.Client.RefreshToken(ctx, k.Token.RefreshToken, k.ClientID, k.ClientSecret, k.Realm)
 		}
 
 		if err != nil {
@@ -111,7 +115,7 @@ func (k *KeycloakService) handleTokenRenewal(ctx context.Context, tokenExpireIn 
 			return
 		}
 
-		k.token = token
+		k.Token = token
 		log.Infof("Token refreshed successfully (isRefreshToken: %v)", isRefreshToken)
 	}
 }
