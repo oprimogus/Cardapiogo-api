@@ -72,7 +72,7 @@ func NewValidator(locale string) (*Validator, error) {
 	}, nil
 }
 
-func (v *Validator) Validate(i interface{}) *xerrors.ErrorResponse {
+func (v *Validator) Validate(i interface{}, transactionID string) *xerrors.ErrorResponse {
 	out := make(map[string]string)
 
 	err := v.Validator.Struct(i)
@@ -80,7 +80,7 @@ func (v *Validator) Validate(i interface{}) *xerrors.ErrorResponse {
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
 			out["error"] = "Unknown validation error"
-			return xerrors.New(http.StatusBadRequest, out["error"])
+			return xerrors.New(http.StatusBadRequest, out["error"], transactionID)
 		}
 
 		for _, e := range errs {
@@ -94,7 +94,7 @@ func (v *Validator) Validate(i interface{}) *xerrors.ErrorResponse {
 	}
 
 	if len(out) > 0 {
-		return xerrors.InvalidInput(out)
+		return xerrors.InvalidInput(out, transactionID)
 	}
 	return nil
 }

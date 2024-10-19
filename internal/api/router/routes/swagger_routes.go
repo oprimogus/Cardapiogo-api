@@ -9,6 +9,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	_ "github.com/oprimogus/cardapiogo/api"
+	"github.com/oprimogus/cardapiogo/internal/api/middleware"
 	"github.com/oprimogus/cardapiogo/internal/config"
 	"github.com/oprimogus/cardapiogo/internal/errors"
 )
@@ -28,7 +29,8 @@ func SwaggerRoutes(router *gin.Engine) {
 			DarkMode: true,
 		})
 		if err != nil {
-			c.JSON(500, xerrors.InternalServerError(err.Error()))
+			transactionID := c.GetString(middleware.TransactionIDLabel)
+			c.JSON(500, xerrors.InternalServerError(err.Error(), transactionID))
 			return
 		}
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(htmlContent))

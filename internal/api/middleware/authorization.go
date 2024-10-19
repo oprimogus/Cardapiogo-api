@@ -11,19 +11,20 @@ import (
 
 func AuthorizationMiddleware(allowedRoles []user.Role) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		transactionID := c.GetString(TransactionIDLabel)
 		userRolesContext, exists := c.Get("userRoles")
 		if !exists {
-			c.AbortWithStatusJSON(http.StatusForbidden, xerrors.Forbidden(""))
+			c.AbortWithStatusJSON(http.StatusForbidden, xerrors.Forbidden("", transactionID))
 			return
 		}
 
 		userRoles, ok := userRolesContext.([]user.Role)
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, xerrors.Forbidden(""))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, xerrors.Forbidden("", transactionID))
 			return
 		}
 		if len(userRoles) == 0 {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Forbidden(""))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Forbidden("", transactionID))
 			return
 		}
 
@@ -36,7 +37,7 @@ func AuthorizationMiddleware(allowedRoles []user.Role) gin.HandlerFunc {
 			}
 		}
 		if !isAllowed && len(allowedRoles) != 0 {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Forbidden(""))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Forbidden("", transactionID))
 			return
 		}
 		c.Next()

@@ -9,12 +9,17 @@ import (
 	logger "github.com/oprimogus/cardapiogo/pkg/log"
 )
 
+const (
+	TransactionIDLabel string = "transactionID"
+	UserIDLabel        string = "userID"
+)
+
 func LoggerMiddleware(logger *logger.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Início do request
 		t := time.Now()
 		transactionId := uuid.New().String()
-		c.Set("transactionId", transactionId)
+		c.Set(TransactionIDLabel, transactionId)
 
 		// Processa a próxima função no encadeamento
 		c.Next()
@@ -35,8 +40,8 @@ func LoggerMiddleware(logger *logger.Logger) gin.HandlerFunc {
 
 		// Loga os detalhes do request como campos estruturados
 		entry.With(
-			"transactionid", transactionId,
-			"userid", userID,
+			TransactionIDLabel, transactionId,
+			UserIDLabel, userID,
 			"client_ip", clientIP,
 			"method", method,
 			"path", path,

@@ -11,8 +11,6 @@ import (
 	"github.com/oprimogus/cardapiogo/internal/config"
 )
 
-var environment = config.GetInstance().Api.GinMode()
-
 const (
 	NOT_FOUND_RECORD      = "Record not found."
 	DUPLICATED_RECORD     = "There is a record with this data."
@@ -31,9 +29,13 @@ type fieldError struct {
 	Debug   interface{} `json:"debug,omitempty"`
 }
 
-func mapDatabaseErrors(err error) *ErrorResponse {
+func handleDatabaseErrors(err error, transactionID string) *ErrorResponse {
 	if err == nil {
 		return nil
+	}
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return New(http.StatusNotFound, NOT_FOUND_RECORD, transactionID)
 	}
 
 	var pgErr *pgconn.PgError
@@ -41,21 +43,16 @@ func mapDatabaseErrors(err error) *ErrorResponse {
 		log.Error(pgErr)
 		switch pgErr.Code {
 		case "23505":
-			return handleUniqueViolation(pgErr)
+			return handleUniqueViolation(pgErr, transactionID)
 		case "23502", "22001", "22P02":
-			return handleColumnViolation(pgErr)
+			return handleColumnViolation(pgErr, transactionID)
 		default:
-			if environment != "release" {
-				return New(http.StatusInternalServerError, UNKNOWN_ERROR, pgErr)
+			if environment != string(config.Production) {
+				return New(http.StatusInternalServerError, UNKNOWN_ERROR, transactionID, pgErr)
 			}
-			return New(http.StatusInternalServerError, UNKNOWN_ERROR, pgErr.Message)
+			return New(http.StatusInternalServerError, UNKNOWN_ERROR, transactionID)
 		}
 	}
-
-	if errors.Is(err, pgx.ErrNoRows) {
-		return New(http.StatusNotFound, NOT_FOUND_RECORD)
-	}
-
 	return nil
 }
 
@@ -69,7 +66,7 @@ func snakeToCamelCase(s string) string {
 
 }
 
-func handleUniqueViolation(pgErr *pgconn.PgError) *ErrorResponse {
+func handleUniqueViolation(pgErr *pgconn.PgError, transactionID string) *ErrorResponse {
 	startField := strings.Index(pgErr.Detail, "(") + 1
 	endField := strings.Index(pgErr.Detail, ")=")
 	field := snakeToCamelCase(pgErr.Detail[startField:endField])
@@ -85,20 +82,20 @@ func handleUniqueViolation(pgErr *pgconn.PgError) *ErrorResponse {
 		Input:   value,
 		Message: description,
 	}
-	if environment != "release" {
+	if environment != string(config.Production) {
 		fieldError.Debug = pgErr
 	}
-	return New(http.StatusConflict, DUPLICATED_RECORD, fieldError)
+	return New(http.StatusConflict, DUPLICATED_RECORD, transactionID, fieldError)
 }
 
-func handleColumnViolation(pgErr *pgconn.PgError) *ErrorResponse {
+func handleColumnViolation(pgErr *pgconn.PgError, transactionID string) *ErrorResponse {
 	fieldError := fieldError{
 		Field:   "",
 		Input:   "",
 		Message: pgErr.Message,
 	}
-	if environment != "release" {
+	if environment != string(config.Production) {
 		fieldError.Debug = pgErr
 	}
-	return New(http.StatusBadRequest, INVALID_VALUES, fieldError)
+	return New(http.StatusBadRequest, INVALID_VALUES, transactionID, fieldError)
 }

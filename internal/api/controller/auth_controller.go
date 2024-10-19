@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/oprimogus/cardapiogo/internal/api/middleware"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
 	"github.com/oprimogus/cardapiogo/internal/core/authentication"
 	xerrors "github.com/oprimogus/cardapiogo/internal/errors"
@@ -38,21 +39,22 @@ func NewAuthController(validator *validatorutils.Validator, authRepository authe
 //	@Router			/v1/auth/sign-in [post]
 func (c *AuthController) SignIn(ctx *gin.Context) {
 	var params authentication.SignInParams
+	transactionID := ctx.GetString(middleware.TransactionIDLabel)
 	err := ctx.BindJSON(&params)
 	if err != nil {
-		xerror := xerrors.Map(err)
+		xerror := xerrors.HandleError(err, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	errValidate := c.validator.Validate(params)
+	errValidate := c.validator.Validate(params, transactionID)
 	if errValidate != nil {
-		xerror := xerrors.Map(errValidate)
+		xerror := xerrors.HandleError(errValidate, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 	jwt, err := c.authenticationModule.SignIn.Execute(ctx, params.Email, params.Password)
 	if err != nil {
-		xerror := xerrors.Map(err)
+		xerror := xerrors.HandleError(err, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
@@ -75,21 +77,22 @@ func (c *AuthController) SignIn(ctx *gin.Context) {
 //	@Router			/v1/auth/refresh [post]
 func (c *AuthController) RefreshUserToken(ctx *gin.Context) {
 	var params authentication.RefreshParams
+	transactionID := ctx.GetString(middleware.TransactionIDLabel)
 	err := ctx.BindJSON(&params)
 	if err != nil {
-		xerror := xerrors.Map(err)
+		xerror := xerrors.HandleError(err, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
-	errValidate := c.validator.Validate(params)
+	errValidate := c.validator.Validate(params, transactionID)
 	if errValidate != nil {
-		xerror := xerrors.Map(errValidate)
+		xerror := xerrors.HandleError(errValidate, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 	jwt, err := c.authenticationModule.Refresh.Execute(ctx, params.RefreshToken)
 	if err != nil {
-		xerror := xerrors.Map(err)
+		xerror := xerrors.HandleError(err, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}

@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/oprimogus/cardapiogo/internal/api/controller"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
+	"github.com/oprimogus/cardapiogo/internal/config"
 	"github.com/oprimogus/cardapiogo/internal/core/authentication"
 	postgresDB "github.com/oprimogus/cardapiogo/internal/database/postgres"
 	"github.com/oprimogus/cardapiogo/internal/persistence"
@@ -55,6 +56,7 @@ func (s *AuthControllerSuite) SetupSuite() {
 		s.T().Fatal("fail on make validator: %w", err)
 	}
 	db := postgresDB.GetInstance()
+	config.GetInstance().Api.Environment = string(config.Staging)
 
 	factory := persistence.NewDataBaseRepositoryFactory(db)
 	s.authController = controller.NewAuthController(validator, factory.NewAuthenticationRepository())
@@ -107,8 +109,9 @@ func (s *AuthControllerSuite) TestSignUp() {
 			},
 			expectedStatusCode: 409,
 			expectedResponse: map[string]interface{}{
-				"error":   "exist user with this email",
-				"details": nil,
+				"error":         "exist user with this email",
+				"details":       nil,
+				"transactionID": "",
 			},
 		},
 	}
@@ -160,8 +163,9 @@ func (s *AuthControllerSuite) TestSignIn() {
 			},
 			expectedStatusCode: 401,
 			expectedResponse: map[string]interface{}{
-					"error":   "Invalid user credentials",
-					"details": "invalid_grant",
+				"error":         "Invalid user credentials",
+				"details":       "invalid_grant",
+				"transactionID": "",
 			},
 		},
 	}

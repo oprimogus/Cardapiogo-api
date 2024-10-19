@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/oprimogus/cardapiogo/internal/api/middleware"
 	validatorutils "github.com/oprimogus/cardapiogo/internal/api/validator"
 	"github.com/oprimogus/cardapiogo/internal/core/user"
 	xerrors "github.com/oprimogus/cardapiogo/internal/errors"
@@ -36,24 +38,26 @@ func NewUserController(validator *validatorutils.Validator, userRepository user.
 //	@Failure		502	{object}	xerrors.ErrorResponse
 //	@Router			/v1/auth/sign-up [post]
 func (c *UserController) CreateUser(ctx *gin.Context) {
+	transactionID := ctx.GetString(middleware.TransactionIDLabel)
+	fmt.Println(transactionID)
 	var params user.CreateParams
 	err := ctx.BindJSON(&params)
 	if err != nil {
-		xerror := xerrors.Map(err)
+		xerror := xerrors.HandleError(err, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
-	errValidate := c.validator.Validate(params)
+	errValidate := c.validator.Validate(params, transactionID)
 	if errValidate != nil {
-		xerror := xerrors.Map(errValidate)
+		xerror := xerrors.HandleError(errValidate, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
 	er := c.userModule.Create.Execute(ctx, params)
 	if er != nil {
-		xerror := xerrors.Map(er)
+		xerror := xerrors.HandleError(er, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
@@ -75,24 +79,25 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 //	@Security		Bearer Token
 //	@Router			/v1/user [put]
 func (c *UserController) UpdateUser(ctx *gin.Context) {
+	transactionID := ctx.GetString(middleware.TransactionIDLabel)
 	var params user.UpdateProfileParams
 	err := ctx.BindJSON(&params)
 	if err != nil {
-		xerror := xerrors.Map(err)
+		xerror := xerrors.HandleError(err, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
-	errValidate := c.validator.Validate(params)
+	errValidate := c.validator.Validate(params, transactionID)
 	if errValidate != nil {
-		xerror := xerrors.Map(errValidate)
+		xerror := xerrors.HandleError(errValidate, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
 	er := c.userModule.Update.Execute(ctx, params)
 	if er != nil {
-		xerror := xerrors.Map(er)
+		xerror := xerrors.HandleError(er, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
@@ -114,24 +119,25 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 //	@Security		Bearer Token
 //	@Router			/v1/user/roles [post]
 func (c *UserController) AddRolesToUser(ctx *gin.Context) {
+	transactionID := ctx.GetString(middleware.TransactionIDLabel)
 	var params user.AddRolesParams
 	err := ctx.BindJSON(&params)
 	if err != nil {
-		xerror := xerrors.Map(err)
+		xerror := xerrors.HandleError(err, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
-	errValidate := c.validator.Validate(params)
+	errValidate := c.validator.Validate(params, transactionID)
 	if errValidate != nil {
-		xerror := xerrors.Map(errValidate)
+		xerror := xerrors.HandleError(errValidate, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
 
 	er := c.userModule.AddRoles.Execute(ctx, params.Roles)
 	if er != nil {
-		xerror := xerrors.Map(er)
+		xerror := xerrors.HandleError(er, transactionID)
 		ctx.JSON(xerror.Status, xerror)
 		return
 	}
